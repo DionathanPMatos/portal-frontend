@@ -1,0 +1,309 @@
+.crm-container { 
+    background-color: #064a6a !important; 
+    padding: 20px; 
+    min-height: 100vh;
+    max-width: 100%; 
+}
+.crm-toolbar {
+    background-color: #ffffff1d;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start; /* Alinha os itens ao topo */
+}
+
+.crm-toolbar-left {
+    display: flex;
+    flex-direction: column; /* Organiza o título e os botões em coluna */
+    align-items: flex-start; /* Alinha à esquerda */
+    gap: 5px; /* Espaço entre o título e a linha de botões */
+    
+}
+
+/* Estilo para os botões dentro do ButtonGroup na toolbar */
+.crm-toolbar-left .btn-group .btn-light {
+    background-color: #ffffff8a;
+    color: #ffffff;
+    border-color: #ffffff4f; /* Borda sutil para separar */
+}
+
+/* Efeito de hover para os botões claros */
+.crm-toolbar-left .btn-group .btn-light:hover {
+    background-color: #ffffffe6;
+    color: #000000; /* Muda a cor do texto para melhor leitura */
+}
+/* Classe para o lado direito (busca) */
+.crm-toolbar-right {
+    display: flex;
+    align-items: center;
+}
+.btn-crm-menu {
+    background-color: #c0bebe8a;
+    color: #ffffff;
+    border-color: #ffffff4f; /* Borda sutil para separar */
+}
+
+.btn-crm-menu:hover {
+    background-color: #c0bebee1;
+}
+.kanban-board { display: flex; gap: 0.5rem; overflow-x: auto; padding: 1rem 0.5rem; align-items: flex-start; }
+.kanban-column { 
+    display: flex; 
+    flex-direction: column; 
+    flex-shrink: 0; 
+    width: 300px; 
+    min-height: 100vh;
+    max-height: 100%;
+    background-color: #ffffff00; 
+    padding: 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    margin-bottom: 5px;
+    border-left: 2px dotted #ccc;
+}
+.kanban-column-header {
+    padding: 10px 15px;
+    border-radius: 8px; /* Bordas arredondadas em todos os cantos */
+    margin-bottom: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    /* Removemos a borda e o fundo branco */
+}.kanban-column-header h5 {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #ffffff; /* Título em branco */
+    margin-bottom: 0;
+}.kanban-column-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #ffffffd9; /* Texto de info em branco semi-transparente */
+    margin-top: 5px;
+    padding-top: 5px;
+    border-top: 1px solid #ffffff4f; /* Linha separadora também em branco semi-transparente */
+}
+/* 0% - Projeto Perdido */
+.etapa-0-projeto-perdido {
+    background-color: #6c757d !important; /* Cinza */
+}
+
+/* 05% - Prospecção */
+.etapa-05-prospec-o {
+    background-color: #0d6efd !important; /* Azul */
+}
+
+/* 25% - Especificação de Projeto */
+.etapa-25-especifica-o-de-projeto {
+    background-color: #dc3545 !important; /* Vermelho (cor do antigo DTC) */
+}
+
+/* 35% - POC */
+.etapa-35-poc {
+    background-color: #6f42c1 !important; /* Roxo */
+}
+
+/* 55% - Envio de Proposta - Projeto */
+.etapa-55-envio-de-proposta-projeto {
+    background-color: #fd7e14 !important; /* Laranja */
+}
+
+/* 75% - Aguardando Aprovação */
+.etapa-75-aguardando-aprova-o {
+    background-color: #ffc107 !important; /* Amarelo */
+}
+
+/* 95% - Pedido Fechado */
+.etapa-95-pedido-fechado {
+    background-color: #198754 !important; /* Verde */
+}
+
+/* 98% - Parcialmente Entregue */
+.etapa-98-parcialmente-entregue {
+    background-color: #0dcaf0 !important; /* Ciano */
+}
+
+/* 100% - Faturado e Entregue */
+.etapa-100-faturado-e-entregue {
+    background-color: #198754 !important; /* Verde (pode ser um tom mais escuro se preferir) */
+}
+
+/* Etapa de fallback/legado */
+.etapa-ganho {
+    background-color: #198754 !important; /* Verde */
+}
+
+.form-control { border-radius: 8px; background-color: #ffffff; }
+.kanban-cards-container {
+    /* Define uma altura máxima. O valor 75vh significa 75% da altura da tela. */
+    /* Você pode ajustar este valor se achar muito alto ou baixo. */
+    max-height: 75vh;
+    
+    /* Quando o conteúdo ultrapassar a altura máxima, uma barra de rolagem aparecerá. */
+    overflow-y: auto; 
+
+    border-radius: 8px;
+    transition: background-color 0.2s ease, border 0.2s ease;
+    padding: 5px;
+}
+
+/* Estilização opcional para a barra de rolagem (funciona em navegadores WebKit como Chrome/Safari) */
+.kanban-cards-container::-webkit-scrollbar {
+    width: 8px;
+}
+.kanban-cards-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+.kanban-cards-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+.kanban-cards-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}.kanban-cards-container.drag-over { background-color: #e6f7ff; border: 2px dashed #0d6efd; }
+.kanban-empty-placeholder { display: flex; align-items: center; justify-content: center; height: 100%; min-height: 380px; border-radius: 6px; color: #adb5bd; font-style: italic; pointer-events: none; /* Impede que o texto interfira */ }
+
+.kanban-card { 
+    background-color: #ffffff; 
+    border: 1px solid #eef2f4; 
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07); 
+    border-radius: 6px; 
+    cursor: grab; 
+    margin-bottom: 1rem; 
+    padding: 15px; 
+    border-left: #88afea 5px solid;
+}
+.kanban-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); transform: translateY(-2px); transition: all 0.2s ease; }
+.kanban-card:active { cursor: grabbing; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+.kanban-card-title { font-weight: 600; margin-bottom: 5px; }
+.kanban-card-title a { text-decoration: none; color: #212529; }
+.kanban-card-title a:hover { color: #0056b3; }
+.kanban-card-client { font-size: 0.85rem; color: #6c757d; margin-bottom: 15px; }
+.kanban-card-value { font-size: 1rem; font-weight: 700; color: #333; background-color: #f8f9fa; padding: 5px 10px; border-radius: 4px; display: inline-block; }
+
+.kanban-quick-add {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 8px;
+    border: 1px  #ced4da;
+    border-radius: 20px;
+    background-color: #999b9fd0;
+    color: #efefef;
+    margin-top: 10px; /* Espaço entre a área dos cards e o botão */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.kanban-quick-add:hover {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+    color: #495057;
+}
+
+.kanban-card-title a,
+.table td a {
+    text-transform: uppercase;
+}
+
+.list-view-container {
+    background-color: #ffffff1d;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    max-width: 100%;
+}
+
+.list-filters .form-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #ffffff;
+}
+
+.project-list-table {
+    border-collapse: separate;
+    margin-top: 20px;
+}
+
+.project-list-table thead th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6 !important;
+    border-top: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    vertical-align: middle;
+}
+
+.project-list-table tbody td {
+    vertical-align: middle;
+    padding: 1rem 0.75rem;
+}
+
+.project-list-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.etapa-badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #6c757d;
+    text-transform: uppercase;
+}
+
+.list-group-container .project-list-table {
+    margin-top: 0; /* Remove a margem superior da tabela dentro de um grupo */
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.list-group-header {
+    padding: 5px 15px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 0.6rem;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.list-group-row th {
+    padding: 10px 15px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    /* Usamos a cor da classe da etapa para o fundo */
+    background-color: var(--etapa-bg-color); 
+    border: none; /* Remove bordas da linha de cabeçalho do grupo */
+
+}
+
+.project-list-table {
+    border-collapse: separate; /* Essencial para border-spacing funcionar */
+    border-spacing: 0 1px;  /* 0 horizontal, 15px vertical (aqui está o gap!) */
+    margin-top: 10px;
+}
+
+.project-list-table thead th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6 !important;
+    border-top: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    vertical-align: middle;
+}
+
+.project-list-table tbody td {
+    vertical-align: middle;
+    padding: 1rem 0.75rem;
+    background-color: #fff; /* Fundo branco para as células de dados */
+}
+
+.project-list-table tbody tr:not(.list-group-row):hover td {
+    background-color: #f8f9fa; /* Efeito hover apenas nas linhas de dados */
+}

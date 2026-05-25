@@ -1,0 +1,252 @@
+/* ==========================================================================
+   SIDEBAR GERAL (Arquitetura Desktop - Altura Total 100vh)
+   ========================================================================== */
+
+#h5 {
+    color: #003049;
+}
+
+.sidebar {
+    /* Cores dinâmicas injetadas direto pelo painel do Administrador */
+    background-color: var(--sidebar-color);
+    color: #adb5bd;
+    
+    /* 🚀 Nova Estrutura: Domina a lateral esquerda do teto ao chão */
+    width: var(--sidebar-width);
+    top: 0; 
+    left: 0;
+    height: 100vh; 
+    position: fixed;
+    z-index: 1010; /* Fica acima do Header para garantir a dominância lateral */
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 1rem;
+    
+    /* Ativa rolagem vertical sutil se o menu ou a cascata crescerem além da tela */
+    overflow-y: auto; 
+    overflow-x: hidden;
+    transition: width 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+/* 🚀 ESTILIZAÇÃO DA LOGO NO TOPO DO MENU */
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 0.5rem 1rem 0.5rem; /* Dá um respiro extra abaixo da logo */
+    margin-bottom: 1rem; /* Separa a logo do restante do menu */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Uma linha sutil separando a logo das opções */
+}
+
+.sidebar-logo img {
+    max-width: 65%; /* Garante que a logo respire nas laterais */
+    height: auto;
+    object-fit: contain;
+}
+
+/* Ocultar barra de rolagem visualmente para manter o design limpo */
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.sidebar-link {
+    color: #b0bec5;
+    border-radius: 6px;
+    margin: 0 10px;
+}
+
+/* Container do Menu Principal */
+.sidebar .main-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem;
+    border-radius: 1rem;
+    background-color: var(--sidebar-color); 
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: auto;
+
+
+}
+.sidebar-footer {
+    
+    padding: 1rem;
+    text-align: center;
+    font-size: 12px;
+    color: #6c757d;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+.sidebar .main-menu li {
+    position: relative;
+    overflow: visible;
+    border-bottom: none;
+    width: 100%;
+    height: auto;
+}
+
+/* Itens Principais do Menu */
+.sidebar .main-menu li a {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Alinha ícone + texto à esquerda no Desktop */
+    padding: 0.8rem 1.2rem;
+    color: var(--sidebar-icon-color, #ffffff) !important;
+    text-decoration: none;
+    transition: background-color 1s ease, color 0.2s ease; /* Transição suave para hover e ativo */
+    white-space: nowrap;
+    font-size: 14px;
+    border-radius: 0.5rem;
+    margin: 0.2rem 0.5rem;
+}
+
+/* Envoltório dos Ícones */
+.sidebar .main-menu li a .icon-wrapper {
+    height: 20px;
+    width: 20px;
+    min-width: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem; /* Dá espaço entre o ícone e o texto ao lado */
+}
+
+/* 🚀 FORÇAR O NOME DAS OPÇÕES A APARECEREM NO DESKTOP */
+.sidebar .main-menu li a .item-name {
+    display: inline-block !important;
+    opacity: 1 !important;
+    width: auto !important;
+    overflow: visible !important;
+    white-space: nowrap;
+}
+
+/* Estado de Hover e Ativo */
+.main-menu li a:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* Efeito translúcido para respeitar o Admin Theme */
+    color: #fff;
+}
+
+.sidebar .main-menu li.active a {
+    background-color: var(--sidebar-active-color, #a72323); /* Injeção dinâmica do Admin */
+    color: #fff;
+}
+
+.sidebar .main-menu li:not(:last-child) {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ==========================================================================
+   🚀 SISTEMA EM CASCATA / ACORDEÃO (Desktop e Mobile Unificados)
+   ========================================================================== */
+
+.sidebar .subitems { /* Container dos subitens da cascata */
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: relative; /* 👈 Muda de absolute para relative para empurrar o layout para baixo */
+    left: 0;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.15); /* Escurece sutilmente o fundo da cascata */
+    box-shadow: none;
+    border-radius: 0;
+    
+    /* Efeito sanfona controlado por max-height */
+    max-height: 0; 
+    overflow: hidden;
+    visibility: visible;
+    opacity: 1;
+    transition: max-height 0.5s ease-in-out; /* Transição suave para a expansão e recolhimento da cascata */
+}
+
+/* 🚀 Gatilho de Abertura: Quando a li tiver a classe .open (via clique React) ou no hover */
+.sidebar .main-menu li:hover .subitems,
+.sidebar .main-menu li.open .subitems,
+.sidebar .subitems-open {
+    max-height: 500px; /* Altura limite para acomodar os subitens expandidos */
+}
+
+/* Estilização das opções internas da Cascata */
+.subitems li a {
+    padding: 0.6rem 1rem 0.6rem 3.2rem !important; /* Recuo extra para a esquerda cria a hierarquia visual */
+    color: var(--sidebar-icon-color, #adb5bd) !important;
+    text-decoration: none;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    border-radius: 0.3rem;
+    margin: 0.1rem 0.5rem;
+    background-color: transparent !important;
+}
+
+.subitems li a:hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    color: #fff !important;
+}
+
+/* ==========================================================================
+   SIDEBAR NO MOBILE (Até 768px - Comportamento Gaveta Mantido)
+   ========================================================================== */
+
+.mobile-toggle {
+    display: none;
+    background: transparent;
+    border: none;
+    color: var(--text-primary-color, #153049);
+    cursor: pointer;
+    font-size: 1.8rem;
+    padding: 0.5rem;
+    z-index: 1015; /* Maior que o Header e Sidebar para sempre responder ao clique */
+}
+
+@media (max-width: 768px) {
+    .mobile-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed; 
+        left: var(--page-padding-x); 
+        top: calc(var(--header-height) / 2);
+        transform: translateY(-50%); 
+        background-color: var(--header-color);
+        border-radius: 8px;
+    }
+
+    .sidebar {
+        width: var(--sidebar-width); 
+        transform: translateX(-100%); /* Esconde para fora da tela */
+        visibility: hidden;
+        top: 0;
+        height: 100vh;
+        z-index: 1012; /* Sobrepõe o conteúdo mobile ao abrir */
+    }
+
+    /* Gatilho disparado pelo estado do React no Mobile */
+    .sidebar.open {
+        transform: translateX(0);
+        visibility: visible;
+    }
+
+    .sidebar .main-menu {
+        margin: 0;
+        border-radius: 0;
+        padding-top: 4rem; /* Abre espaço para não ficar colado no topo do celular */
+    }
+
+    .sidebar .main-menu li a {
+        justify-content: flex-start;
+        padding: 0.8rem 1.5rem;
+    }
+
+    .sidebar .main-menu li a .icon-wrapper {
+        min-width: 2rem;
+        margin-right: 1.5rem;
+    }
+}

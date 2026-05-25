@@ -1,0 +1,182 @@
+
+/* =========================
+   HEADER
+   ========================= */
+.header-area {
+    background-color: var(--header-color);
+    position: fixed;
+    display: flex;
+    top: 0;
+    
+    /* 🚀 Nova Estrutura: Começa após a sidebar e ocupa o resto da tela */
+    left: var(--sidebar-width); 
+    width: calc(100% - var(--sidebar-width)); 
+    z-index: 1001; 
+    
+    height: var(--header-height);
+    padding: 0 var(--page-padding-x); 
+    
+    justify-content: space-between;
+    align-items: center; 
+    border-bottom: 2px solid var(--cor-borda, #eef2f5);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: left 0.3s ease-in-out, width 0.3s ease-in-out; /* Acompanha a sidebar se ela recolher */
+}
+
+
+
+.nav {
+    /* Navegação do header */
+    display: flex;
+
+    align-items: center;
+}
+
+.nav-link a {
+    /* Link da navegação */
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: #313132;
+    font-weight: 900;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #007bff;
+}
+
+/* Header Flag Language */
+.nav .flag {
+    margin-left: 4px;
+    margin-right: 10;
+    padding: 0;
+    display: inline-block;
+}
+
+.card-flag {
+    margin-left: 4px;
+    margin-right: 10px;
+    margin-top: 1px;
+    padding: 0;
+    display: inline-block;
+}
+
+.nav .flag img,
+.nav .flag::before {
+    vertical-align: middle;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 500; /* Aumenta o peso da fonte para 500 px */
+    color: #313132;
+}
+
+.login-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 28px; /* Altura fixa para o botão de login */
+    font-size: 0.8rem;
+    font-weight: 500; /* Aumenta o peso da fonte para 500 px */
+    color: #313132;
+    background-color: transparent;
+    border: 1px solid #313132; /* Remove a borda para um visual mais limpo */
+    cursor: pointer;
+}
+
+/* =========================
+   NOTIFICAÇÕES
+   ========================= */
+.notification-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 4px;
+    transition: transform 0.2s ease;
+}
+
+.notification-container:hover {
+    transform: scale(1.1);
+}
+
+.notification-bell {
+    font-size: 1.2rem;
+    color: var(--text-primary-color, #313132); /* Adapta as cores com o modo escuro */
+}
+
+.notification-badge {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    width: 8px;
+    height: 8px;
+    background-color: #e53935;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px var(--header-color); /* Cria um contorno suave em volta da bolinha */
+}
+
+/* =========================
+   HEADER RESPONSIVO
+   ========================= */
+
+/* Estilos para telas menores, como celulares (max-width: 768px) */
+@media (max-width: 768px) {
+.header-area {
+        left: 0; /* No mobile ele volta a colar na esquerda da tela */
+        width: 100%;
+        position: fixed;
+    }
+    /* 🚀 OCULTA AS BANDEIRAS, TEXTOS E O SWITCH DE TEMA NO MOBILE */
+  .nav-link,            /* Esconde os links "Início" e "Loja Online" */
+  .flag,                /* Esconde as bandeiras de idioma */
+  .card-flag,           /* Esconde o container das bandeiras */
+  .flag-container,      /* Esconde o container das bandeiras no header */
+  .theme-switch-wrapper { /* 👈 ISSO ESCONDE O BOTÃO DE TEMA NO MOBILE! */
+      display: none !important;
+  }
+  .login-button {
+      display: flex; /* Mantém o botão de login visível no mobile */
+      align-items: center; /* Centraliza o conteúdo do botão */
+      gap: 0.5rem; /* Mantém o espaçamento entre o ícone e o texto */
+      font-size: 0.8rem; /* Reduz um pouco o tamanho da fonte para caber melhor no mobile */
+      font-weight: 500; /* Aumenta o peso da fonte para 500 px */
+      margin-top: 1rem; /* Adiciona um pouco de padding para separar do topo */
+  }
+}
+
+    .nav {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 12px; /* Espaçamento ideal entre o switch de tema e o avatar/perfil */
+        margin: 0;
+        margin-left: auto; /* Força todo o conjunto a colar na extremidade direita */
+        z-index: 1003; /* Garante que os botões fiquem clicáveis */
+        
+    }
+
+  /* Ajusta o contêiner de logout */
+.user-profile, .logout {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        
+
+    }
+
+
+/* Estilos para telas um pouco maiores, como tablets (769px a 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* Ajusta a largura e o padding para tablets */
+  .header-area {
+    left: 0;
+    width: 100%;
+    padding: 1rem 20px;
+  }
+
+}

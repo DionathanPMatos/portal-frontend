@@ -1,0 +1,5 @@
+/* Estilo opcional para um hover suave */
+.card:hover {
+    transform: translateY(-5px);
+    transition: transform 0.3s ease-in-out;
+}

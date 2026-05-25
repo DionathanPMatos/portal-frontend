@@ -1,0 +1,415 @@
+/* =========================
+   GERAL (Reset & Base)
+   ========================= */
+
+   /* App.css */
+
+:root {
+  --card-background-color: var(--light-mode-surface, rgba(255, 255, 255, 0.92));
+  --text-primary-color: #080808;
+  --text-secondary-color: #8a949f;
+  --highlight-color: #0063c6; /* Um azul vibrante */
+  --border-color: #eef2f5;
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --body-bg: transparent;
+  --system-background: url('./assets/sistema/24143.jpg');
+  --sidebar-color: #153049;
+  --header-color: #ffffff;
+  --page-padding-x: 1.5rem;  /* Padding lateral no mobile */
+  --header-padding-y: 1rem;  /* Padding vertical do header no mobile */
+
+  --header-height: 70px; /* Header mobile é maior porque os itens empilham (column) */
+  --sidebar-width: 14rem; /* Largura do menu mobile quando aberto */
+}
+
+@media (min-width: 768px) {
+  :root {
+    /* Espaçamento e Estrutura - Tablet/Desktop */
+    --page-padding-x: 1.5rem;
+    --header-padding-y: 1.25rem;
+    
+    --header-height: 80px; /* Altura fixa do header no PC */
+    --sidebar-width: 260px; /* Largura da sidebar recolhida */
+  }
+  /* O container que abraça suas páginas/rotas */
+  .main-content, .container-main {
+    padding-top: calc(var(--header-height) + 1.5rem); /* Abre espaço abaixo do header fixo */
+    min-height: 100vh;
+    transition: margin-left 0.3s ease-in-out;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --page-padding-x: 2rem;
+  }
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+/* --- TEMA ESCURO --- */
+/* Quando o body tiver a classe .dark-mode, estas variáveis serão usadas */
+body.dark-mode {
+  --system-background: var(--dark-mode-background, #121212);
+  --sidebar-color: #1E1E1E; /* Pode ser a mesma cor da superfície ou outra */
+  --header-color: #1E1E1E;
+  --card-background-color: var(--dark-mode-surface, #1E1E1E);
+  --text-primary-color: var(--dark-mode-primary-text, #E1E1E1);
+  --text-secondary-color: var(--dark-mode-secondary-text, #BBBBBB);
+}
+
+
+body {
+  background: var(--system-background) center center / cover no-repeat fixed !important;
+  margin: 0;
+  padding: 0;
+  color: var(--text-primary-color); /* Aplica a cor do texto a todo o site */
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.main-container {
+    display: flex;
+    height: 100vh;
+} 
+
+.container-main, .card {
+    background-color: var(--card-background-color) !important;
+    transition: background-color 0.3s ease;
+}
+
+
+/* Garanta que os títulos e textos também usem as variáveis */
+h1, h2, h3, h6 {
+    color: var(--text-primary-color);
+}
+h4, h5{
+    color: '#ffffff';
+}
+/* Define a cor de texto padrão para o conteúdo principal */
+.container-main p, .container-main li {
+    color: var(--text-primary-color);
+}
+
+/* Define a cor para textos secundários (cinza) apenas onde for necessário */
+.container-main .text-muted, .container-main small, .card-body span {
+    color: var(--text-secondary-color);
+}
+
+/* Define a cor padrão para links dentro do conteúdo principal */
+.container-main a {
+    /* Aqui podemos usar uma cor de destaque ou a cor primária */
+    color: var(--primary-color, #0063c6); /* Usando uma nova variável para links */
+}
+.container-main a:hover {
+    text-decoration: underline;
+}
+a {
+    font-size: 14px;
+    text-decoration: none;
+    font-family: "inter", sans-serif;
+}
+/* Área de conteúdo principal (dashboard) */
+.content-area {
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: hidden; /* 🚀 Prevenção de segurança contra escapes do grid */
+    position: relative;
+    
+    margin-left: var(--sidebar-width);
+    
+    /* 🚀 A MÁGICA DA CENTRALIZAÇÃO E ROLAGEM: Ocupa só o que sobra da tela */
+    width: calc(100vw - var(--sidebar-width)); 
+    
+    padding-top: calc(var(--header-height) + 2rem);
+    padding-left: var(--page-padding-x);
+    padding-right: var(--page-padding-x);
+    padding-bottom: 2rem;
+    
+    transition: margin-left 0.3s ease, width 0.3s ease;
+}
+/* =========================
+   LAYOUT PRINCIPAL 
+   ========================= */
+/* Scrollbar personalizada para o conteúdo principal */
+/* SCROLLBAR GERAL */
+::-webkit-scrollbar {
+  width: 10px;               /* largura da barra vertical */
+  height: 10px;              /* altura da barra horizontal */
+}
+
+/* FUNDO DA SCROLLBAR */
+::-webkit-scrollbar-track {
+  background: #e3e6ea;       /* cor de fundo */
+  border-radius: 10px;
+}
+
+/* O "polegar" (a parte que se move) */
+::-webkit-scrollbar-thumb {
+  background-color: #69696a; /* cor da barra */
+  border-radius: 10px;
+  border: 2px solid #e3e6ea; /* cria um "espacinho" visual */
+}
+
+/* HOVER */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #0056b3;
+}
+
+  .btn-flat {
+    border: none;
+  box-shadow: none;
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 6px 14px;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-flat:active {
+  transform: scale(0.97);
+}
+
+/* Variantes */
+.btn-flat-primary {
+  background-color: #D62828;
+  color: #fff;
+}
+.btn-flat-primary:hover {
+  background-color: #B71C1C;
+}
+
+.btn-flat-secondary {
+  background-color: #003049;
+  color: #fff;
+}
+.btn-flat-secondary:hover {
+  background-color: #001F2A;
+}
+
+.btn-flat-success {
+  background-color: #2A9D8F;
+  color: #fff;
+}
+.btn-flat-success:hover {
+  background-color: #227A70;
+}
+
+.btn-flat-warning {
+  background-color: #F77F00;
+  color: #fff;
+}
+.btn-flat-warning:hover {
+  background-color: #CC6500;
+}
+
+.btn-flat-danger {
+  background-color: #9D0208;
+  color: #fff;
+}
+.btn-flat-danger:hover {
+  background-color: #6D0106;
+}
+
+.btn-flat-neutral {
+  background-color: #6C757D;
+  color: #fff;
+}
+.btn-flat-neutral:hover {
+  background-color: #565D64;
+}
+
+.badge {
+  color: #ffffff !important;
+}
+
+
+/* Contêiner do cabeçalho e do botão de hambúrguer no mobile */
+.header-mobile-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    background-color: var(--header-color) !important;
+    /* Adicionamos uma transição para a mudança de cor ficar suave */
+    transition: background-color 0.3s ease;
+}
+
+.dash-grid {
+    display: flex;
+    width: 100%;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 20px;
+    background-color: transparent !important;
+}
+.container-main {
+    flex: 1;
+    width: 100%;
+    background-color: #fffffffd !important;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    overflow-x: hidden;
+}
+
+.kanban-board .card {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+
+/* =========================
+   ESTILOS DOS COMPONENTES
+   ========================= */
+
+/* Novo contêiner para centralizar o conteúdo do grid */
+.dash-grid-wrapper {
+    display: flex;
+    justify-content: center; /* Centraliza horizontalmente */
+    width: 100%;
+    margin: 0 auto; /* Centraliza o contêiner em si */
+    max-width: 1400px; /* Limita a largura máxima para não esticar demais */
+}
+
+/* Estilos para os cards de KPI */
+.kpi-cards-section {
+    display: grid;
+
+}
+
+
+.grid {
+    display: grid;
+    gap: 1rem;
+    width: 100%; /* Garante que o grid ocupe a largura total do seu wrapper */
+}
+
+.grid .banner img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.card{
+  width: 100%;
+}
+.card-header {
+  background-color: #153049;
+  color: #fff;
+}
+
+.container-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+/* Estilos para o modal com largura completa */
+.modal-full-width .modal-dialog {
+  /* CALCULA a largura máxima: 
+     100vw (largura total da tela) 
+     - 280px (largura do seu sidebar) 
+     - 4rem (margem de 2rem para a esquerda e 2rem para a direita)
+  */
+  max-width: calc(100vw - 280px - 4rem);
+  height: 20px;
+  
+  /* POSICIONA o modal:
+     'auto' na esquerda e um valor fixo na direita empurra o modal 
+     para a direita, alinhando-o com sua área de conteúdo.
+  */
+  margin-left: auto;
+  margin-right: 2rem;
+}
+
+.btn-primary {
+  background-color: #1b4b6d;
+}
+
+.btn-primary:hover {
+  background-color: #a72323;
+}
+
+.line-divise {
+  border: none;
+  height: 3px;
+  background-color: rgba(0, 51, 102, 0.2);
+  margin-bottom: 25px;
+}
+
+.link-tab {
+  color: #f00c0c;
+  text-decoration: none;
+}
+/* =========================
+   RESPONSIVO
+   ========================= */
+
+@media (max-width: 768px) {
+    /* Ajustes no layout principal */
+    .main-container {
+        flex-direction: column;
+    }
+
+    .header-mobile-wrapper {
+        justify-content: flex-start;
+    }
+
+   .content-area {
+        margin-left: 0;
+        width: 100vw;
+    }
+
+    .kpi-cards-section {
+        grid-template-columns: 1fr;
+    }
+
+    .dash-grid-wrapper {
+        padding: 0 10px; /* Adiciona padding lateral para não colar nas bordas */
+    }
+}
+
+/* =========================
+   OVERLAY DE CARREGAMENTO (UPLOAD)
+   ========================= */
+.upload-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.85); /* Fundo escuro levemente transparente */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999; /* Fica acima de tudo, inclusive do header e sidebar */
+}
+
+.upload-spinner {
+    width: 70px;
+    height: 70px;
+    border: 6px solid rgba(255, 255, 255, 0.1);
+    border-top: 6px solid var(--highlight-color, #0063c6); /* Cor azul que acompanha o seu tema */
+    border-radius: 50%;
+    animation: spin 1s linear infinite; /* Animação de rotação */
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+    .dash-grid-wrapper {
+        padding: 0 10px; /* Adiciona padding lateral para não colar nas bordas */
+    }

@@ -1,0 +1,490 @@
+import React, { useState, useEffect } from 'react';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Card from 'react-bootstrap/Card';
+import Table from 'react-bootstrap/Table';
+import Badge from 'react-bootstrap/Badge';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import InputGroup from 'react-bootstrap/InputGroup';
+import Spinner from 'react-bootstrap/Spinner';
+import Alert from 'react-bootstrap/Alert';
+import Modal from 'react-bootstrap/Modal';
+import axios from 'axios';
+import { FaEdit, FaTrash, FaUserPlus, FaFileImport, FaBriefcase, FaSitemap, FaSearch, FaUserTimes } from 'react-icons/fa';
+import CargosModal from './CargosModal';
+import SetoresModal from './SetoresModal';
+import ImportModal from './ImportModal'; // 1. IMPORTA O NOVO MODAL
+import '../App.css';
+
+const ManageEmployees = ({ isLoggedIn }) => {
+    const [employees, setEmployees] = useState([]);
+    const [cargos, setCargos] = useState([]);
+    const [setores, setSetores] = useState([]);
+    const [fabricantes, setFabricantes] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [successMessage, setSuccessMessage] = useState(null);
+    const [isCargosModalOpen, setIsCargosModalOpen] = useState(false);
+    const [isSetoresModalOpen, setIsSetoresModalOpen] = useState(false);
+    const [showImportModal, setShowImportModal] = useState(false); // 2. ESTADO PARA O MODAL DE IMPORTAÇÃO
+    const [filtroCargo, setFiltroCargo] = useState(''); 
+    const [filtroSetor, setFiltroSetor] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
+
+    // Estados do formulário
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [contact, setContact] = useState('');
+    const [cargoId, setCargoId] = useState('');
+    const [setorId, setSetorId] = useState('');
+    const [permissions, setPermissions] = useState(['dashboard']);
+    const [selectedFabricantes, setSelectedFabricantes] = useState([]);
+    const [userpicFile, setUserpicFile] = useState(null);
+    const [existingUserpicBase64, setExistingUserpicBase64] = useState('');
+
+    const [editingEmployee, setEditingEmployee] = useState(null);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [employeeToDelete, setEmployeeToDelete] = useState(null);
+    const [showAddEditModal, setShowAddEditModal] = useState(false);
+    
+    const AVAILABLE_PERMISSIONS = [
+        { id: 'admin', label: 'Administrador (Acesso Total)' },
+        { id: 'dashboard', label: 'Visualizar Dashboard e Vendas' },
+        { id: 'metas', label: 'Gerenciar Metas' },
+        { id: 'leads', label: 'Gerenciar Leads e Oportunidades' },
+        { id: 'dtc', label: 'Acesso Módulo DTC' },
+        { id: 'rh', label: 'Recursos Humanos' }
+    ];
+
+    const formatarNome = (nome) => {
+        if (!nome) return '';
+        const palavras = nome.toLowerCase().split(' ');
+        const nomeFormatado = palavras.map(palavra => {
+            if (['de', 'da', 'do', 'dos'].includes(palavra)) {
+                return palavra;
+            }
+            return palavra.charAt(0).toUpperCase() + palavra.slice(1);
+        }).join(' ');
+        return nomeFormatado;
+    };
+
+    const fileToBase64 = (file) => (
+        new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = (error) => reject(error);
+        })
+    );
+
+    const fetchEmployees = async () => {
+        try {
+            setError(null);
+            const response = await axios.get('http://localhost:3000/api/funcionarios', {
+                params: { 
+                    cargoId: filtroCargo,
+                    setorId: filtroSetor 
+                }
+            });
+            setEmployees(response.data);
+        } catch (err) {
+            setError('Erro ao buscar funcionários.');
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+    const fetchCargos = async () => {
+        try {
+            const response = await axios.get('http://localhost:3000/api/cargos');
+            setCargos(response.data);
+        } catch (err) { console.error('Erro ao buscar cargos:', err); }
+    };
+
+    const fetchSetores = async () => {
+        try {
+            const response = await axios.get('http://localhost:3000/api/setores');
+            setSetores(response.data);
+        } catch (err) { console.error('Erro ao buscar setores:', err); }
+    };
+
+    const fetchFabricantes = async () => {
+        try {
+            const response = await axios.get('http://localhost:3000/api/fabricantes');
+            setFabricantes(response.data);
+        } catch (err) { console.error('Erro ao buscar fabricantes:', err); }
+    };
+
+    useEffect(() => {
+        if (isLoggedIn) {
+            setLoading(true);
+            fetchEmployees();
+            if (cargos.length === 0) fetchCargos();
+            if (setores.length === 0) fetchSetores();
+            if (fabricantes.length === 0) fetchFabricantes();
+        } else {
+            setEmployees([]);
+            setLoading(false);
+        }
+    }, [isLoggedIn, filtroCargo, filtroSetor]);
+
+    const handleFormSubmit = async (event) => {
+        event.preventDefault();
+        setSuccessMessage(null);
+        setError(null);
+        if (!name || !email || !setorId) {
+            setError("Nome, e-mail e setor são obrigatórios.");
+            return;
+        }
+        try {
+            const userpicBase64 = userpicFile ? await fileToBase64(userpicFile) : existingUserpicBase64;
+            const employeeData = {
+                nome_completo: name,
+                email,
+                contato: contact,
+                setor_id: setorId ? Number(setorId) : null,
+                userpic_base64: userpicBase64 || null,
+                cargo_id: cargoId ? Number(cargoId) : null,
+                privilegios: permissions.join(',') || 'usuario',
+                fabricantes_ids: selectedFabricantes
+            };
+
+            if (editingEmployee) {
+                await axios.put(`http://localhost:3000/api/funcionarios/${editingEmployee.id}`, employeeData);
+                setSuccessMessage("Funcionário editado com sucesso!");
+            } else {
+                await axios.post('http://localhost:3000/api/funcionarios', employeeData);
+                setSuccessMessage("Funcionário adicionado com sucesso!");
+            }
+
+            handleCloseAddEditModal();
+            await fetchEmployees();
+
+            setTimeout(() => { setSuccessMessage(null); }, 3000);
+        } catch (err) {
+            if (err.response && err.response.status === 409) {
+                setError(err.response.data.error);
+            } else {
+                setError('Ocorreu um erro inesperado ao salvar.');
+            }
+        }
+    };
+
+    const handleEdit = (employee) => {
+        setSuccessMessage(null);
+        setError(null);
+        setEditingEmployee(employee);
+        setName(employee.nome_completo || '');
+        setEmail(employee.email || '');
+        setContact(employee.contato || '');
+        setCargoId(employee.cargo_id || '');
+        setSetorId(employee.setor_id || '');
+        setPermissions(employee.privilegios ? employee.privilegios.split(',') : ['dashboard']);
+        setSelectedFabricantes(employee.fabricantes_ids || []);
+        setExistingUserpicBase64(employee.userpic_base64 || '');
+        setUserpicFile(null);
+        setShowAddEditModal(true);
+    };
+
+    const handleAddClick = () => {
+        setError(null);
+        setEditingEmployee(null);
+        setName(''); setEmail(''); setContact('');
+        setCargoId(''); setSetorId('');
+        setPermissions(['dashboard']); setSelectedFabricantes([]); setUserpicFile(null);
+        setExistingUserpicBase64(''); setShowAddEditModal(true);
+    };
+
+    const handleCloseAddEditModal = () => {
+        setShowAddEditModal(false);
+        setEditingEmployee(null);
+        setName(''); setEmail(''); setContact('');
+        setCargoId(''); setSetorId('');
+        setPermissions(['dashboard']); setSelectedFabricantes([]); setUserpicFile(null);
+        setExistingUserpicBase64('');
+    };
+
+    const handleDeleteClick = (employee) => {
+        setSuccessMessage(null);
+        setEmployeeToDelete(employee);
+        setShowDeleteModal(true);
+    };
+
+    const confirmDelete = async () => {
+        try {
+            await axios.delete(`http://localhost:3000/api/funcionarios/${employeeToDelete.id}`);
+            await fetchEmployees();
+            setShowDeleteModal(false);
+            setEmployeeToDelete(null);
+            setSuccessMessage("Colaborador inativado com sucesso!");
+            setTimeout(() => { setSuccessMessage(null); }, 3000);
+        } catch (err) {
+            setError('Erro ao inativar o colaborador.');
+            setShowDeleteModal(false);
+            setEmployeeToDelete(null);
+        }
+    };
+
+    const cancelDelete = () => {
+        setShowDeleteModal(false);
+        setEmployeeToDelete(null);
+    };
+
+    if (loading) {
+        return (
+            <div className="dash-grid">
+                <div className='container-main'>
+                    <Container className="mt-5 text-center"><Spinner animation="border" /></Container>
+                </div>
+            </div>
+        );
+    }
+
+    // Filtragem por Busca de Texto
+    const filteredEmployees = employees.filter(emp => {
+        const searchLower = searchTerm.toLowerCase();
+        return (
+            emp.nome_completo?.toLowerCase().includes(searchLower) ||
+            emp.email?.toLowerCase().includes(searchLower)
+        );
+    });
+
+    const renderPrivileges = (privString) => {
+        if (!privString || privString === 'usuario') return <Badge bg="info">USUÁRIO</Badge>;
+        if (privString.includes('admin')) return <Badge bg="danger">ADMINISTRADOR</Badge>;
+        const privArray = privString.split(',');
+        if (privArray.length > 2) return <Badge bg="primary">PERSONALIZADO ({privArray.length})</Badge>;
+        return privArray.map(p => <Badge bg="secondary" className="me-1 text-uppercase" key={p}>{p}</Badge>);
+    };
+
+    return (
+        <div className="dash-grid">
+            <div className='container-main p-4' >
+                <Container fluid className="px-0">
+                    {successMessage && <Alert variant="success">{successMessage}</Alert>}
+                    {error && <Alert variant="danger btn-sm">{error}</Alert>}
+                    
+                    {/* Header da Página */}
+                    <div className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                        <div>
+                            <h2 className="fw-bold mb-1 text-dark">Gestão de Colaboradores</h2>
+                            <p className="text-muted mb-0">Cadastre, edite e gerencie permissões da equipe no portal.</p>
+                        </div>
+                    </div>
+
+                    {/* Barra de Ferramentas e Filtros */}
+                    <Card className="shadow-sm border-0 mb-4 bg-light">
+                        <Card.Body className="p-3">
+                            <Row className="align-items-end g-3 mb-3">
+                                <Col md={12} lg={4}>
+                                    <Form.Group>
+                                        <Form.Label className="text-muted small fw-bold mb-1 text-uppercase">Pesquisar Colaborador</Form.Label>
+                                        <InputGroup className="shadow-sm">
+                                            <InputGroup.Text className="bg-white border-end-0"><FaSearch className="text-muted" /></InputGroup.Text>
+                                            <Form.Control placeholder="Nome ou E-mail..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="border-start-0 ps-0 shadow-none" />
+                                        </InputGroup>
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6} lg={4}>
+                                    <Form.Group>
+                                        <Form.Label className="text-muted small fw-bold mb-1 text-uppercase">Filtrar por Cargo</Form.Label>
+                                        <Form.Select value={filtroCargo} onChange={(e) => setFiltroCargo(e.target.value)} className="shadow-none">
+                                            <option value="">Todos os Cargos</option>
+                                            {cargos.map(cargo => (
+                                                <option key={cargo.id} value={cargo.id}>{cargo.nome_cargo}</option>
+                                            ))}
+                                        </Form.Select>
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6} lg={4}>
+                                    <Form.Group>
+                                        <Form.Label className="text-muted small fw-bold mb-1 text-uppercase">Filtrar por Setor</Form.Label>
+                                        <Form.Select value={filtroSetor} onChange={(e) => setFiltroSetor(e.target.value)} className="shadow-none">
+                                            <option value="">Todos os Setores</option>
+                                            {setores.map(setor => (
+                                                <option key={setor.id} value={setor.id}>{setor.nome_setor}</option>
+                                            ))}
+                                        </Form.Select>
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col className="d-flex justify-content-start flex-wrap gap-2 pt-2 border-top">
+                                    <Button variant="primary" className="d-flex align-items-center gap-2 shadow-sm" onClick={handleAddClick}>
+                                        <FaUserPlus /> Novo
+                                    </Button>
+                                    <Button variant="success" className="d-flex align-items-center gap-2 shadow-sm" onClick={() => setShowImportModal(true)}>
+                                        <FaFileImport /> Importar
+                                    </Button>
+                                    <Button variant="outline-secondary" className="d-flex align-items-center gap-2 shadow-sm bg-white" onClick={() => setIsCargosModalOpen(true)}>
+                                        <FaBriefcase /> Cargos
+                                    </Button>
+                                    <Button variant="outline-secondary" className="d-flex align-items-center gap-2 shadow-sm bg-white" onClick={() => setIsSetoresModalOpen(true)}>
+                                        <FaSitemap /> Setores
+                                    </Button>
+                                </Col>
+                            </Row>
+                        </Card.Body>
+                    </Card>
+
+                    {/* Tabela de Colaboradores */}
+                    <Card className="shadow-sm border-0">
+                        <div className="table-responsive">
+                            <Table hover className="align-middle mb-0">
+                                <thead className="table-light text-muted small text-uppercase">
+                                    <tr>
+                                        <th className="px-4 py-3 fw-bold border-0">Colaborador</th>
+                                        <th className="py-3 fw-bold border-0">Contato</th>
+                                        <th className="py-3 fw-bold border-0">Setor / Cargo</th>
+                                        <th className="py-3 fw-bold border-0">Acesso</th>
+                                        <th className="text-end px-4 py-3 fw-bold border-0">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredEmployees.length > 0 ? (
+                                        filteredEmployees.map((employee) => (
+                                            <tr key={employee.id}>
+                                                <td className="px-4 py-3">
+                                                    <div className="d-flex align-items-center">
+                                                        <img src={employee.userpic_base64 || 'default-avatar.png'} alt="Foto" className="rounded-circle me-3 border" style={{ width: '45px', height: '45px', objectFit: 'cover' }} />
+                                                        <div>
+                                                            <div className="fw-bold text-dark">{formatarNome(employee.nome_completo)}</div>
+                                                            <div className="text-muted small">{employee.email}</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="py-3 text-muted">{employee.contato || '-'}</td>
+                                                <td className="py-3">
+                                                    <div className="fw-semibold text-dark">{employee.nome_setor || '-'}</div>
+                                                    <div className="text-muted small">{employee.nome_cargo || '-'}</div>
+                                                </td>
+                                                <td className="py-3">
+                                                    {renderPrivileges(employee.privilegios)}
+                                                </td>
+                                                <td className="text-end px-4 py-3">
+                                                    <Button variant="light" size="sm" className="me-2 shadow-sm text-primary" onClick={() => handleEdit(employee)} title="Editar"><FaEdit /></Button>
+                                                    <Button variant="light" size="sm" className="shadow-sm text-danger" onClick={() => handleDeleteClick(employee)} title="Inativar"><FaUserTimes /></Button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="5" className="text-center py-5 text-muted">
+                                                {isLoggedIn ? "Nenhum colaborador encontrado para o filtro selecionado." : "Efetue login para visualizar."}
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </Table>
+                        </div>
+                    </Card>
+                </Container>
+            </div>
+            
+            <CargosModal show={isCargosModalOpen} onHide={() => setIsCargosModalOpen(false)} onCargosUpdate={fetchCargos} />
+            <SetoresModal show={isSetoresModalOpen} onHide={() => setIsSetoresModalOpen(false)} onSetoresUpdate={fetchSetores} />
+            {/* 4. RENDERIZAÇÃO DO NOVO MODAL DE IMPORTAÇÃO */}
+            <ImportModal 
+                show={showImportModal} 
+                onHide={() => setShowImportModal(false)}
+                onComplete={fetchEmployees}
+            />
+            
+            <Modal show={showAddEditModal} onHide={handleCloseAddEditModal} size="lg">
+                <Modal.Header closeButton>
+                    <Modal.Title>{editingEmployee ? 'Editar Colaborador' : 'Adicionar Novo Colaborador'}</Modal.Title>
+                </Modal.Header>
+                <Form onSubmit={handleFormSubmit}>
+                    <Modal.Body>
+                        <Form.Group className="mb-3"><Form.Label>Nome Completo</Form.Label><Form.Control type="text" value={name} onChange={(e) => setName(e.target.value)} required /></Form.Group>
+                        <Form.Group className="mb-3"><Form.Label>E-mail</Form.Label><Form.Control type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></Form.Group>
+                        <Form.Group className="mb-3"><Form.Label>Contato</Form.Label><Form.Control type="text" value={contact} onChange={(e) => setContact(e.target.value)} /></Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Setor</Form.Label>
+                            <Form.Select value={setorId} onChange={(e) => setSetorId(e.target.value)} required>
+                                <option value="">Selecione o Setor</option>
+                                {setores.map(s => (<option key={s.id} value={s.id}>{s.nome_setor}</option>))}
+                            </Form.Select>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Cargo</Form.Label>
+                            <Form.Select value={cargoId} onChange={(e) => setCargoId(e.target.value)}>
+                                <option value="">Selecione o Cargo</option>
+                                {cargos.map(cargo => (<option key={cargo.id} value={cargo.id}>{cargo.nome_cargo}</option>))}
+                            </Form.Select>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label className="fw-bold text-muted small text-uppercase">Permissões de Acesso</Form.Label>
+                            <div className="d-flex flex-wrap gap-3 p-3 bg-light rounded border">
+                                {AVAILABLE_PERMISSIONS.map(perm => (
+                                    <Form.Check 
+                                        key={perm.id}
+                                        type="checkbox"
+                                        id={`perm-${perm.id}`}
+                                        label={perm.label}
+                                        checked={permissions.includes(perm.id)}
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                setPermissions([...permissions, perm.id]);
+                                            } else {
+                                                setPermissions(permissions.filter(p => p !== perm.id));
+                                            }
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label className="fw-bold text-muted small text-uppercase">Marcas Representadas (Organograma)</Form.Label>
+                            <div className="d-flex flex-wrap gap-3 p-3 bg-light rounded border">
+                                {fabricantes.length > 0 ? fabricantes.map(fab => (
+                                    <Form.Check 
+                                        key={fab.id}
+                                        type="checkbox"
+                                        id={`fab-${fab.id}`}
+                                        label={fab.name}
+                                        checked={selectedFabricantes.includes(fab.id)}
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                setSelectedFabricantes([...selectedFabricantes, fab.id]);
+                                            } else {
+                                                setSelectedFabricantes(selectedFabricantes.filter(id => id !== fab.id));
+                                            }
+                                        }}
+                                    />
+                                )) : <span className="text-muted small">Nenhuma marca cadastrada. Vá até Admin {'>'} Gerenciar Fabricantes para cadastrá-las.</span>}
+                            </div>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Foto do colaborador</Form.Label>
+                            <Form.Control type="file" onChange={(e) => setUserpicFile(e.target.files[0])}/>
+                            {editingEmployee && existingUserpicBase64 && (
+                                <div className="mt-2">
+                                    <small>Foto atual:</small><br />
+                                    <img src={existingUserpicBase64} alt="Foto atual" style={{ width: '50px', height: '50px', objectFit: 'contain' }}/>
+                                </div>
+                            )}
+                        </Form.Group>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary btn-sm" onClick={handleCloseAddEditModal}>Cancelar</Button>
+                        <Button variant="success btn-sm" type="submit">{editingEmployee ? 'Salvar Edição' : 'Adicionar Colaborador'}</Button>
+                    </Modal.Footer>
+                </Form>
+            </Modal>
+            
+            <Modal show={showDeleteModal} onHide={cancelDelete}>
+                <Modal.Header closeButton><Modal.Title>Confirmar Inativação</Modal.Title></Modal.Header>
+                <Modal.Body>Tem certeza que deseja inativar o acesso de <strong>{formatarNome(employeeToDelete?.nome_completo)}</strong>? Ele não poderá mais logar, mas o histórico de projetos será mantido.</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary btn-sm" onClick={cancelDelete}>Cancelar</Button>
+                    <Button variant="danger btn-sm" onClick={confirmDelete}>Inativar</Button>
+                </Modal.Footer>
+            </Modal>
+        </div>
+    );
+};
+
+export default ManageEmployees;

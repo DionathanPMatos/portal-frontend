@@ -1,0 +1,54 @@
+.alert-form {
+  display: flex;
+  gap: 10px; /* Espaço entre o input e o botão */
+  align-items: center;
+  margin-top: 20px; /* Espaço acima do formulário */
+}
+
+.alert-input {
+  flex-grow: 1; /* Permite que o campo de texto ocupe o espaço restante */
+  padding: 10px 15px;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.alert-input:focus {
+  outline: none;
+  border-color: #007bff; /* Cor azul no foco para destaque */
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.alert-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background-color: #007bff; /* Cor azul do Bootstrap */
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.alert-button:hover {
+  background-color: #0056b3; /* Cor mais escura no hover */
+}
+
+.alert-button:active {
+  background-color: #004085; /* Cor mais escura ao clicar */
+}
+
+/* Para telas menores (mobile) */
+@media (max-width: 576px) {
+  .alert-form {
+    flex-direction: column; /* Empilha o input e o botão */
+    gap: 15px;
+  }
+
+  .alert-input,
+  .alert-button {
+    width: 100%; /* Ocupam a largura total */
+  }
+}

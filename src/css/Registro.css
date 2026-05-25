@@ -1,0 +1,43 @@
+/* Registro.css */
+
+/* Cabeçalho do accordion */
+.accordion-button {
+  background-color: #ffffff !important; /* azul escuro */
+  color: #153049 !important;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+/* Ícone do accordion (setinha) */
+.accordion-button::after {
+  filter: invert(1); /* deixa o ícone branco */
+}
+
+/* Quando o accordion está aberto */
+.accordion-button:not(.collapsed) {
+  background-color: #fff !important; /* tom mais escuro */
+  color: #102132 !important;
+}
+
+/* Corpo do accordion */
+.accordion-body {
+  background-color: #ffffff;
+  color: #212529;
+  font-size: 0.95rem;
+}
+
+.accordion-item {
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+}   
+
+/* Ajuste para logo dentro do header */
+.accordion-button img {
+  width: 3rem;
+  height: auto;
+  margin-right: 1rem;
+ 
+}
+

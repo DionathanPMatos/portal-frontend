@@ -1,0 +1,303 @@
+import React, { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
+import {
+  FaHome,
+  FaHandshake,
+  FaProjectDiagram,
+  FaMoneyBill,
+  FaCogs,
+  FaTruck,
+  FaPencilAlt,
+  FaBlog,
+  FaEnvelope,
+  FaShoppingCart,
+  FaSignOutAlt,
+  FaBars,
+} from "react-icons/fa";
+/*import { SiMarketo } from "react-icons/si";*/
+import { GiHumanPyramid } from "react-icons/gi";
+import { AiFillProduct, AiFillVideoCamera } from "react-icons/ai";
+import "../css/sidebar.css";
+import userPic from "../assets/usuarios/dionathan_matos.png";
+import logo from '../assets/logos/dca-logo.png';
+import { useTheme } from '../ThemeContext'; // <-- 1. IMPORTE O HOOK useTheme
+
+
+
+// Constantes de dados
+const iconSize = 24;
+
+const menuItems = [
+  // AQUI É A MUDANÇA: 'Início' agora tem um link para a rota '/'
+  {
+    name: "Início",
+    icon: <FaHome size={iconSize} />,
+    link: "/",
+    subItems: null,
+  },
+  {
+    name: "Comercial",
+    icon: <FaHandshake size={iconSize} />,
+    subItems: [
+      { name: "CRM - Mannesoft", link: "/crm/projetos" },
+      { name: "Clientes", link: "/crm/clientes" },
+      {
+        name: "Email Corporativo",
+        link: "https://outlook.office.com/mail/",
+        target: "_blank",
+      },
+      { name: "Campanhas Vigentes", link: "#" },
+      { name: "Forecast", link: "#", target: "_blank" }, //A REALIZAR
+      { name: "Registro de projetos", link: "/RegisterUser" },
+      { name: "Ferramentas Úteis", link: "/ferramentas/calculadora-solar" },
+      { name: "Politicas Comerciais", link: "#", target: "_blank" },
+    ],
+  },
+  {
+    name: "DTC",
+    icon: <FaProjectDiagram size={iconSize} />,
+    subItems: [
+      {
+        name: "Cadastro de Produtos",
+        link: "https://deltacable-my.sharepoint.com/personal/miria_machado_dca_com_br/Lists/Cadastro%20de%20Produtos?env=WebViewList",
+        target: "_blank",
+      },
+      { name: "Gerente de Produtos", link: "/OrganogramaTecnico" },
+      { name: "DTC", link: "/crm/dashboard-dtc" },
+      { name: "Garantia de Fabricantes", link: "#" },
+      {
+        name: "RMA",
+        link: "https://rma-dev.dca.com.br/support/home",
+        target: "_blank",
+      },
+      { name: "Termos de Referências", link: "#", target: "_blank" },
+    ],
+  },
+  {
+    name: "Financeiro",
+    icon: <FaMoneyBill size={iconSize} />,
+    subItems: [
+      {
+        name: "Adiantamento de Viagem",
+        link: "https://deltacable-my.sharepoint.com/personal/andressa_karvat_dca_com_br/Lists/ADTO%20%20SOLICITAO%20DE%20VIAGEM?env=WebViewList",
+        target: "_blank",
+      },
+      {
+        name: "Analise de Operações",
+        link: "https://deltacable-my.sharepoint.com/personal/miria_machado_dca_com_br/Lists/Anlise%20Operaes%20%20DCA?env=WebViewList",
+        target: "_blank",
+      },
+      {
+        name: "Atendimento de Clientes",
+        link: "https://deltacable-my.sharepoint.com/personal/juliana_borges_dca_com_br/Lists/CADASTROSANALISES?env=WebViewList",
+        target: "_blank",
+      },
+      {
+        name: "Despesas Locais",
+        link: "https://deltacable-my.sharepoint.com/personal/andressa_karvat_dca_com_br/Lists/RELATRIO%20DE%20DESPESAS%20LOCAIS?env=WebViewList",
+        target: "_blank",
+      },
+      {
+        name: "Despesas de Viagens",
+        link: "https://deltacable-my.sharepoint.com/personal/andressa_karvat_dca_com_br/Lists/Prestao%20de%20contas%20viagem?env=WebViewList",
+        target: "_blank",
+      },
+      { name: "Politicas Financeiras", link: "#" },
+    ],
+  },
+  {
+    name: "Logístico",
+    icon: <FaTruck size={iconSize} />,
+    subItems: [
+      { name: "Gestão de Rotas", link: "#" },
+      {
+        name: "Rastreamento de entregas",
+        link: "https://ssw.inf.br/2/rastreamento_dest?pwd=2&id=2",
+        target: "_blank",
+      },
+      { name: "Cotações", link: "#" },
+      { name: "Politicas de Logística", link: "#" },
+    ],
+  },
+  {
+    name: "Marketing",
+    icon: <FaPencilAlt size={iconSize} />,
+    subItems: [
+      { name: "Cases de Sucesso", link: "#" },
+      { name: "Solicitação de Cartão de Visita", link: "#" },
+      { name: "Solicitação de Material", link: "#" },
+      {
+        name: "Reserva Showroom",
+        link: "https://deltacable-my.sharepoint.com/personal/juliana_prestupa_dca_com_br/Lists/Showroom?env=WebViewList",
+        target: "_blank",
+      },
+      { name: "Politica de Marketing", link: "#" },
+    ],
+  },
+  {
+    name: "Compras",
+    icon: <FaShoppingCart size={iconSize} />,
+    subItems: [
+      { name: "Prazos e Importações", link: "#" },
+      { name: "Solicitação de Compras", link: "/compras" },
+      { name: "Equipe de Compras", link: "#" },
+      { name: "Politicas de Compras", link: "#" },
+    ],
+  },
+  {
+    name: "RH",
+    icon: <GiHumanPyramid size={iconSize} />,
+    subItems: [
+      {
+        name: "Folha de pagamento",
+        link: "https://onvio.com.br/portaldoempregado/auth/login",
+        target: "_blank",
+      },
+      {
+        name: "Registro de Ponto",
+        link: "https://app2.pontomais.com.br/meu-ponto",
+        target: "_blank",
+      },
+      {
+        name: "Treinamentos",
+        link: "https://dcacademy.woli.com.br/pt-BR/Login/Index?returnUrl=%2Fpt-BR%2FWorkspace%2FIndex%3Fid%3D88%26hash%3DNDEyOTswMTY%3D",
+        target: "_blank",
+      },
+      { name: "Benefícios", link: "#" },
+      {
+        name: "Oportunidades",
+        link: "https://oportunidades.mindsight.com.br/dca",
+        target: "_blank",
+      },
+      { name: "Ouvidoria", link: "#" },
+      { name: "Colaboradores", link: "/funcionarios" },
+      { name: "Politicas de RH", link: "#" },
+    ],
+  },
+  {
+    name: "Portfólio",
+    icon: <AiFillProduct size={iconSize} />,
+    subItems: [
+      { name: "Gestão de Portfólio", link: "#" },
+      { name: "Análise de Portfólio", link: "#" },
+      { name: "Relatórios de Portfólio", link: "#" },
+    ],
+  },
+  {
+    name: "Soluções",
+    icon: <AiFillVideoCamera size={iconSize} />,
+    subItems: [
+      { name: "Gestão de Projetos", link: "#" },
+      { name: "Colaboração", link: "#" },
+      { name: "Relatórios de Desempenho", link: "#" },
+    ],
+  },
+  {
+    name: "Configurações",
+    icon: <FaCogs size={iconSize} />,
+    link: "/adminpage",
+  },
+];
+
+function Sidebar({ isLoggedIn, user, onLogout }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [hoveredItem, setHoveredItem] = useState(null);
+  const [activeAccordion, setActiveAccordion] = useState(null);
+  const sidebarRef = useRef(null);
+  const { theme } = useTheme(); // <-- Extraindo o theme do contexto
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+        setIsOpen(false);
+        setHoveredItem(null);
+        setActiveAccordion(null);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [sidebarRef]);
+
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const handleAccordionClick = (itemName) => {
+    setActiveAccordion(activeAccordion === itemName ? null : itemName);
+  };
+
+  const logoUrl = theme?.logo_url || logo; // <-- Adicionando optional chaining (?) por segurança
+  return (
+    <>
+      {!isOpen && (
+        <div className="mobile-toggle" onClick={toggleSidebar}>
+          <FaBars />
+        </div>
+      )}
+
+      <div className={`sidebar ${isOpen ? "open" : ""}`} ref={sidebarRef}>
+        <div className="top">
+          {/* 🚀 Bloco da Logomarca na Sidebar */}
+          <div className="sidebar-logo">
+            <img
+              src={logoUrl} 
+              alt="Logo do Sistema" 
+              style={{ height: '40px' }}
+            />
+          </div>
+        </div>
+
+        <ul className="main-menu">
+          {menuItems.map((item) => (
+            <li
+              key={item.name}
+              onMouseEnter={() => item.subItems && setHoveredItem(item.name)}
+              onMouseLeave={() => item.subItems && setHoveredItem(null)}
+              className={item.name === "Início" ? "active" : ""}
+            >
+              {item.subItems ? (
+                // Lógica para itens com submenu
+                <a href="#" onClick={() => handleAccordionClick(item.name)}>
+                  <span className="icon-wrapper">{item.icon}</span>
+                  <span className="item-name">{item.name}</span>
+                </a>
+              ) : (
+                // Lógica para itens sem submenu
+                <Link to={item.link}>
+                  <span className="icon-wrapper">{item.icon}</span>
+                  <span className="item-name">{item.name}</span>
+                </Link>
+              )}
+              {item.subItems && (
+                <ul
+                  className={`subitems ${hoveredItem === item.name || activeAccordion === item.name ? "subitems-open" : ""}`}
+                >
+                  {item.subItems.map((subItem) => (
+                    <li key={subItem.name}>
+                      <Link
+                        to={subItem.link}
+                        {...(subItem.target ? { target: subItem.target } : {})}
+                        rel="noopener noreferrer"
+                      >
+                        {subItem.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))}
+        </ul>
+        <div className="sidebar-footer">
+          <p>&copy; {new Date().getFullYear()} DCA. Todos os direitos reservados.</p>
+        </div>
+      </div>
+      
+
+    </>
+  );
+}
+
+export default Sidebar;

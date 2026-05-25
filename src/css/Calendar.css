@@ -1,0 +1,83 @@
+/* Container principal do calendário */
+.calendar-container {
+    padding: 1rem;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Título do Calendário */
+.calendar-container h3 {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+/* Lista de eventos */
+.event-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Item de evento individual */
+.event-item {
+    background-color: #162d46;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    border-left: 5px solid #ff0000; /* Linha de destaque */
+    transition: transform 0.2s ease;
+}
+.event-item-link {
+    text-decoration: none; /* Remove o sublinhado */
+    color: inherit; /* Mantém a cor do texto do elemento pai */
+}
+.event-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Assunto do evento */
+.event-subject {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #fffffffa;
+}
+
+/* Detalhes do evento */
+.event-details {
+    font-size: 0.9rem;
+    color: #ffffff96;
+    margin: 0.5rem 0;
+}
+
+/* --- */
+
+/* Ajustes para telas menores (smartphones) */
+@media (max-width: 768px) {
+    .calendar-container {
+        padding: 0.75rem; /* Diminui o padding do container */
+    }
+
+    .calendar-container h3 {
+        font-size: 1.1rem; /* Diminui o tamanho da fonte do título */
+        margin-bottom: 1rem;
+    }
+
+    .event-item {
+        padding: 0.75rem; /* Diminui o padding dos itens de evento */
+        margin-bottom: 0.75rem;
+        border-left: 3px solid #007bff; /* Diminui a espessura da linha */
+    }
+
+    .event-subject {
+        font-size: 1rem; /* Diminui o tamanho da fonte do assunto */
+    }
+
+    .event-details {
+        font-size: 0.85rem; /* Diminui o tamanho da fonte dos detalhes */
+    }
+}
