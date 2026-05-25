@@ -14,7 +14,7 @@ const CargosModal = ({ show, onHide, onCargosUpdate }) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await axios.get('http://localhost:3000/api/cargos');
+            const response = await axios.get('/api/cargos');
             setCargos(response.data);
         } catch (err) {
             setError('Falha ao buscar cargos.');
@@ -33,8 +33,8 @@ const CargosModal = ({ show, onHide, onCargosUpdate }) => {
         if (!nomeCargo.trim()) return;
 
         const url = editingCargo
-            ? `http://localhost:3000/api/cargos/${editingCargo.id}`
-            : 'http://localhost:3000/api/cargos';
+            ? `/api/cargos/${editingCargo.id}`
+            : '/api/cargos';
         
         const method = editingCargo ? 'put' : 'post';
 
@@ -51,7 +51,7 @@ const CargosModal = ({ show, onHide, onCargosUpdate }) => {
     const handleDelete = async (id) => {
         if (window.confirm('Tem certeza que deseja excluir este cargo?')) {
             try {
-                await axios.delete(`http://localhost:3000/api/cargos/${id}`);
+                await axios.delete(`/api/cargos/${id}`);
                 await fetchCargos();
                 onCargosUpdate(); // Informa o componente pai
             } catch (err) {

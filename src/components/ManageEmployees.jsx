@@ -82,7 +82,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
     const fetchEmployees = async () => {
         try {
             setError(null);
-            const response = await axios.get('http://localhost:3000/api/funcionarios', {
+            const response = await axios.get('/api/funcionarios', {
                 params: { 
                     cargoId: filtroCargo,
                     setorId: filtroSetor 
@@ -98,21 +98,21 @@ const ManageEmployees = ({ isLoggedIn }) => {
     
     const fetchCargos = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/api/cargos');
+            const response = await axios.get('/api/cargos');
             setCargos(response.data);
         } catch (err) { console.error('Erro ao buscar cargos:', err); }
     };
 
     const fetchSetores = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/api/setores');
+            const response = await axios.get('/api/setores');
             setSetores(response.data);
         } catch (err) { console.error('Erro ao buscar setores:', err); }
     };
 
     const fetchFabricantes = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/api/fabricantes');
+            const response = await axios.get('/api/fabricantes');
             setFabricantes(response.data);
         } catch (err) { console.error('Erro ao buscar fabricantes:', err); }
     };
@@ -152,10 +152,10 @@ const ManageEmployees = ({ isLoggedIn }) => {
             };
 
             if (editingEmployee) {
-                await axios.put(`http://localhost:3000/api/funcionarios/${editingEmployee.id}`, employeeData);
+                await axios.put(`/api/funcionarios/${editingEmployee.id}`, employeeData);
                 setSuccessMessage("Funcionário editado com sucesso!");
             } else {
-                await axios.post('http://localhost:3000/api/funcionarios', employeeData);
+                await axios.post('/api/funcionarios', employeeData);
                 setSuccessMessage("Funcionário adicionado com sucesso!");
             }
 
@@ -214,7 +214,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
 
     const confirmDelete = async () => {
         try {
-            await axios.delete(`http://localhost:3000/api/funcionarios/${employeeToDelete.id}`);
+            await axios.delete(`/api/funcionarios/${employeeToDelete.id}`);
             await fetchEmployees();
             setShowDeleteModal(false);
             setEmployeeToDelete(null);

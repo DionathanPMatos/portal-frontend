@@ -20,7 +20,7 @@ const Funcionarios = () => {
         const fetchGroupedEmployees = async () => {
             try {
                 // Chama a nova rota que criamos no backend
-                const response = await axios.get('http://localhost:3000/api/funcionarios/agrupados');
+                const response = await axios.get('/api/funcionarios/agrupados');
                 setGroupedEmployees(response.data);
             } catch (err) {
                 setError('Não foi possível carregar a lista de funcionários.');

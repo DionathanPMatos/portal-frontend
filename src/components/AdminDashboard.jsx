@@ -26,10 +26,11 @@ const AdminDashboard = () => {
         setUploadStatus('Importando dados, por favor aguarde...');
         const formData = new FormData();
         formData.append('file', selectedFile); // 'file' deve ser o mesmo nome do backend
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
         try {
             // A rota que já criamos no server.js
-            const response = await fetch('http://localhost:3000/api/faturamento/upload', {
+            const response = await fetch(`${API_URL}/api/faturamento/upload`, {
                 method: 'POST',
                 body: formData,
             });

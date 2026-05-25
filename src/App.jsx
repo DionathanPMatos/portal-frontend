@@ -39,7 +39,9 @@ import "./css/Home.css";
 import "./css/AdminPage.css";
 import "./App.css";
 
-axios.defaults.baseURL = 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
+axios.defaults.baseURL = API_URL;
 axios.defaults.withCredentials = true;
 
 function App() {
@@ -54,7 +56,7 @@ function App() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/user-data', {
+        const response = await axios.get('/user-data', {
           withCredentials: true
         });
         setUser(response.data);
@@ -71,7 +73,7 @@ function App() {
   }, []);
 
   const handleLogout = () => {
-    window.location.href = 'http://localhost:3000/auth/microsoft/logout';
+    window.location.href = `${API_URL}/auth/microsoft/logout`;
   };
 
   if (isLoading) {

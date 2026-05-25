@@ -16,7 +16,7 @@ const RegisterUser = () => {
     // Função para buscar os fabricantes e seus documentos
     const fetchManufacturers = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/api/fabricantes');
+            const response = await axios.get('/api/fabricantes');
             setManufacturers(response.data);
             setLoading(false);
         } catch (err) {
@@ -58,6 +58,7 @@ const RegisterUser = () => {
         );
     }
 
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
     return (
         <div className="dash-grid">
             <div className='container-main'>
@@ -87,7 +88,7 @@ const RegisterUser = () => {
                                 <Button 
                                     key={doc.id}
                                     variant="outline-primary"
-                                    href={`http://localhost:3000/${doc.caminho_arquivo}`}
+                                    href={`${API_URL}/${doc.caminho_arquivo}`}
                                     target="_blank"
                                     className="me-2 mt-2"
                                 >

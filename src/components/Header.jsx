@@ -12,9 +12,10 @@ function Header({ isLoggedIn, user, onLogout }) {
       const { theme, isDarkMode, toggleDarkMode } = useTheme();
       const [hasNotifications, setHasNotifications] = useState(true); // Exemplo inicial para mostrar a bolinha
       
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
   // Usa o logo do tema se disponível, senão usa o padrão
   const handleLoginClick = () => {
-    window.location.href = 'http://localhost:3000/auth/microsoft';
+    window.location.href = `${API_URL}/auth/microsoft`;
   };
 
   return (

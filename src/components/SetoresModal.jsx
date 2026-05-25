@@ -14,7 +14,7 @@ const SetoresModal = ({ show, onHide, onSetoresUpdate }) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await axios.get('http://localhost:3000/api/setores');
+            const response = await axios.get('/api/setores');
             setSetores(response.data);
         } catch (err) {
             setError('Falha ao buscar setores.');
@@ -31,7 +31,7 @@ const SetoresModal = ({ show, onHide, onSetoresUpdate }) => {
 
     const handleSave = async () => {
         if (!nomeSetor.trim()) return;
-        const url = editingSetor ? `http://localhost:3000/api/setores/${editingSetor.id}` : 'http://localhost:3000/api/setores';
+        const url = editingSetor ? `/api/setores/${editingSetor.id}` : '/api/setores';
         const method = editingSetor ? 'put' : 'post';
         try {
             await axios[method](url, { nome_setor: nomeSetor });
@@ -46,7 +46,7 @@ const SetoresModal = ({ show, onHide, onSetoresUpdate }) => {
     const handleDelete = async (id) => {
         if (window.confirm('Tem certeza que deseja excluir este setor?')) {
             try {
-                await axios.delete(`http://localhost:3000/api/setores/${id}`);
+                await axios.delete(`/api/setores/${id}`);
                 await fetchSetores();
                 onSetoresUpdate();
             } catch (err) {

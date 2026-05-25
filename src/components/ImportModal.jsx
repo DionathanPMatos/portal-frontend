@@ -26,7 +26,7 @@ const ImportModal = ({ show, onHide, onComplete }) => {
         formData.append('file', selectedFile);
 
         try {
-            const response = await axios.post('http://localhost:3000/api/funcionarios/import', formData, {
+            const response = await axios.post('/api/funcionarios/import', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }

@@ -30,7 +30,7 @@ const AdminTheme = () => {
     useEffect(() => {
         const loadSettings = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/api/settings');
+                const response = await axios.get('/api/settings');
                 const loaded = response.data;
                 // 2. CARREGA OS DADOS DO MODO ESCURO DA API
                 setSettings({
@@ -96,7 +96,7 @@ const AdminTheme = () => {
         if (files.faviconFile) formData.append('faviconFile', files.faviconFile);
 
         try {
-            const response = await axios.post('http://localhost:3000/api/settings', formData, {
+            const response = await axios.post('/api/settings', formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
             });
             setSuccess(response.data.message + " A página será recarregada para aplicar as mudanças.");

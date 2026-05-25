@@ -29,7 +29,7 @@ const formatarNome = (nome) => {
 
     const fetchEmployees = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/api/funcionarios-tecnicos');
+            const response = await axios.get('/api/funcionarios-tecnicos');
             setEmployees(Array.isArray(response.data) ? response.data : []);
         } catch (err) {
             setError('Erro ao buscar o organograma.');

@@ -14,7 +14,7 @@ function Calendar({ isLoggedIn }) {
       setLoading(true);
       const fetchCalendarEvents = async () => {
         try {
-          const response = await axios.get('http://localhost:3000/calendar', {
+          const response = await axios.get('/calendar', {
             withCredentials: true
           });
 

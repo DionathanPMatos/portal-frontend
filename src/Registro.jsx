@@ -157,6 +157,7 @@ const Registro = () => {
     };
 
     if (loading) return <Container className="text-center mt-5"><Spinner animation="border" /></Container>;
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
     return (
         <div className="container-main" style={{padding: '2rem 3rem', gap: '2rem'}}>
@@ -205,7 +206,7 @@ const Registro = () => {
                             </Form.Group>
                             <Table striped bordered hover responsive size="sm">
                                 <thead><tr><th>Arquivo</th><th>Descrição</th><th>Data do Upload</th><th>Ações</th></tr></thead>
-                                <tbody>{selectedManufacturer.documentos?.map(doc => (<tr key={doc.id}><td><a href={`http://localhost:3000${doc.caminho_arquivo}`} target="_blank" rel="noopener noreferrer">{doc.nome_arquivo}</a></td><td>{doc.descricao}</td><td>{new Date(doc.data_upload).toLocaleDateString()}</td><td><Button size="sm" variant="outline-danger" onClick={() => handleDeleteDocumento(doc.id)}>Excluir</Button></td></tr>))}</tbody>
+                                <tbody>{selectedManufacturer.documentos?.map(doc => (<tr key={doc.id}><td><a href={`${API_URL}${doc.caminho_arquivo}`} target="_blank" rel="noopener noreferrer">{doc.nome_arquivo}</a></td><td>{doc.descricao}</td><td>{new Date(doc.data_upload).toLocaleDateString()}</td><td><Button size="sm" variant="outline-danger" onClick={() => handleDeleteDocumento(doc.id)}>Excluir</Button></td></tr>))}</tbody>
                             </Table>
                         </Tab>
                     </Tabs>
