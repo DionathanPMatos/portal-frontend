@@ -15,8 +15,8 @@ import axios from 'axios';
 import { FaEdit, FaTrash, FaUserPlus, FaFileImport, FaBriefcase, FaSitemap, FaSearch, FaUserTimes } from 'react-icons/fa';
 import CargosModal from './CargosModal';
 import SetoresModal from './SetoresModal';
-import ImportModal from './ImportModal'; // 1. IMPORTA O NOVO MODAL
-import '../App.css';
+import ImportModal from '../ImportModal'; // 1. IMPORTA O NOVO MODAL
+import '../../App.css';
 
 const ManageEmployees = ({ isLoggedIn }) => {
     const [employees, setEmployees] = useState([]);

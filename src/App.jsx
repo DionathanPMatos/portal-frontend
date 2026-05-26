@@ -8,27 +8,30 @@ import axios from 'axios';
 // Component imports
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
-import Dashboard from "./components/Dashboard";
-import Registro from "./Registro";
-import AdminPage from "./components/adminpage";
+import Dashboard from "./modulos/Dashboard";
+import Registro from "./modulos/Modulo_CRM/Registro";
+import AdminPage from "./modulos/Modulo_Configuracao/adminpage";
 import RegisterUser from "./components/RegisterUser";
-import OrganogramaTecnico from "./components/OrganogramaTecnico";
-import ManageEmployees from "./components/ManageEmployees";
-import Funcionarios from "./components/Funcionarios";
-import DashboardCompras from './crm/DashboardCompras';
-import AdminTheme from "./components/AdminTheme";
-import CalculadoraSolar from "./ferramentas/CalculadoraSolar";   
-import PainelProspeccao from "./prospeccao/PainelProspeccao";
-import AdminDashboard from './components/AdminDashboard'; 
-import GerenciamentoLeads from './prospeccao/GerenciamentoLeads';  
+import OrganogramaTecnico from "./modulos/Modulo_Departamento_Tecnico/OrganogramaTecnico";
+import ManageEmployees from "./modulos/Modulo_RH/ManageEmployees";
+import Funcionarios from "./modulos/Modulo_RH/Funcionarios";
+import DashboardCompras from './modulos/modulo_crm/DashboardCompras';
+import AdminTheme from "./modulos/Modulo_Configuracao/AdminTheme";
+import CalculadoraSolar from "./modulos/Modulo_Ferramentas/CalculadoraSolar";   
+import PainelProspeccao from "./modulos/Modulo_Agente_Prospeccao/PainelProspeccao";
+import AdminDashboard from './modulos/Modulo_Visitantes/AdminDashboard'; 
+import GerenciamentoLeads from './modulos/Modulo_Agente_Prospeccao/GerenciamentoLeads';  
 // Imports do CRM
-import DashboardProjetos from "./crm/DashboardProjetos";
-import DetalhesProjeto from "./crm/DetalhesProjeto";
-import ProjetosPerdidos from "./crm/ProjetosPerdidos";
-import DashboardDTC from "./crm/DashboardDTC";
+import DashboardProjetos from "./modulos/modulo_crm/DashboardProjetos";
+import DetalhesProjeto from "./modulos/modulo_crm/DetalhesProjeto";
+import ProjetosPerdidos from "./modulos/modulo_crm/ProjetosPerdidos";
+import DashboardDTC from "./modulos/modulo_crm/DashboardDTC";
 
-import Clientes from "./crm/Clientes";
-import ClienteDetalhe from "./crm/ClienteDetalhe";
+import Clientes from "./modulos/modulo_crm/Clientes";
+import ClienteDetalhe from "./modulos/modulo_crm/ClienteDetalhe";
+import Visitas from "./modulos/Modulo_Visitantes/Visitas";
+import NewsManager from "./modulos/Modulo_Noticias/NewsManager";
+import NewsPage from "./modulos/Modulo_Noticias/NewsPage";
 
 // CSS imports
 
@@ -97,11 +100,15 @@ function App() {
             {/* --- ALTERAÇÃO AQUI: Passando o 'user' como prop --- */}
             <Route path="/crm/projetos/:id" element={<DetalhesProjeto user={user} />} />
             
+            <Route path="/crm/visitas" element={<Visitas user={user} />} />
+
             {/* OUTRAS ROTAS */}
             <Route path="/registro" element={<Registro />} />
             <Route path="/adminpage" element={<AdminPage />} />
             <Route path="/admin/theme" element={<AdminTheme />} />
             <Route path="/RegisterUser" element={<RegisterUser />} />
+            <Route path="/admin/noticias" element={<NewsManager />} />
+            <Route path="/noticias" element={<NewsPage />} />
             <Route path="/OrganogramaTecnico" element={<OrganogramaTecnico />} />
             <Route path="/manage-employees" element={<ManageEmployees isLoggedIn={isLoggedIn} />} />
             <Route path="/funcionarios" element={<Funcionarios />} />

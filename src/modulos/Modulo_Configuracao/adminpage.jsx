@@ -8,7 +8,7 @@ import { SiHomeassistantcommunitystore } from "react-icons/si";
 import { GiFloorHatch } from "react-icons/gi";
 import { RiTeamFill, RiProjectorFill } from "react-icons/ri";
 import { IoColorPalette } from "react-icons/io5"; // Novo ícone
-import { FaChartPie, FaDatabase } from "react-icons/fa"; // Escolha um
+import { FaChartPie, FaRegNewspaper } from "react-icons/fa"; 
 import { FaSearchDollar } from "react-icons/fa";
 
 // Estrutura de dados organizada por seções
@@ -118,6 +118,12 @@ const dashboardSections = [
                 text: 'Customize as cores e o fundo do sistema.',
                 icon: <IoColorPalette size={24} />,
                 link: '/admin/theme',
+            },
+            {
+                title: 'Mural de Avisos (News)',
+                text: 'Gerencie notícias e comunicados para a equipe.',
+                icon: <FaRegNewspaper size={24} />,
+                link: '/admin/noticias',
             },
         ],
     },

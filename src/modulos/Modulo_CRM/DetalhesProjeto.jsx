@@ -1,12 +1,12 @@
-import { useAuth } from '../AuthContext'; // Ajuste o caminho se necessário
+import { useAuth } from '../../components/AuthContext'; // Ajuste o caminho se necessário
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Container, Spinner, Alert, Card, Row, Col, Breadcrumb, Button, Modal, Form, ListGroup, InputGroup, Badge, Tabs, Tab, FormCheck, Accordion, Table } from 'react-bootstrap';
 import axios from 'axios';
 import ProjetoFormModal from './ProjetoFormModal';
 import PedidoErpModal from './PedidoErpModal';
-import '../App.css'
-import '../crm/Crm.css';
+import '../../App.css'
+import './crm.css';
 
 
 // --- SUB-COMPONENTE CORRIGIDO PARA GERENCIAR UM ÚNICO PEDIDO ---

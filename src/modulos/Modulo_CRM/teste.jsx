@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import ProjetoFormModal from './ProjetoFormModal';
 import SortableItem from './SortableItem';
 import './crm.css';
-import '../App.css';
+import '../../App.css';
 
 
 

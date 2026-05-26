@@ -13,6 +13,9 @@ import {
   FaShoppingCart,
   FaSignOutAlt,
   FaBars,
+  FaRegNewspaper,
+  FaChevronDown,
+  FaChevronRight,
 } from "react-icons/fa";
 /*import { SiMarketo } from "react-icons/si";*/
 import { GiHumanPyramid } from "react-icons/gi";
@@ -20,7 +23,7 @@ import { AiFillProduct, AiFillVideoCamera } from "react-icons/ai";
 import "../css/sidebar.css";
 import userPic from "../assets/usuarios/dionathan_matos.png";
 import logo from '../assets/logos/dca-logo.png';
-import { useTheme } from '../ThemeContext'; // <-- 1. IMPORTE O HOOK useTheme
+import { useTheme } from '../modulos/Modulo_Configuracao/ThemeContext'; // <-- 1. IMPORTE O HOOK useTheme
 
 
 
@@ -41,6 +44,7 @@ const menuItems = [
     subItems: [
       { name: "CRM - Mannesoft", link: "/crm/projetos" },
       { name: "Clientes", link: "/crm/clientes" },
+      { name: "Visitas Comerciais", link: "/crm/visitas" },
       {
         name: "Email Corporativo",
         link: "https://outlook.office.com/mail/",
@@ -193,6 +197,14 @@ const menuItems = [
     ],
   },
   {
+    name: "Notícias",
+    icon: <FaRegNewspaper size={iconSize} />,
+    subItems: [
+      { name: "Mural de Notícias", link: "/noticias" },
+      { name: "Gerenciar Notícias", link: "/admin/noticias", restricted: true },
+    ],
+  },
+  {
     name: "Configurações",
     icon: <FaCogs size={iconSize} />,
     link: "/adminpage",
@@ -201,7 +213,6 @@ const menuItems = [
 
 function Sidebar({ isLoggedIn, user, onLogout }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [hoveredItem, setHoveredItem] = useState(null);
   const [activeAccordion, setActiveAccordion] = useState(null);
   const sidebarRef = useRef(null);
   const { theme } = useTheme(); // <-- Extraindo o theme do contexto
@@ -210,7 +221,6 @@ function Sidebar({ isLoggedIn, user, onLogout }) {
     function handleClickOutside(event) {
       if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
         setIsOpen(false);
-        setHoveredItem(null);
         setActiveAccordion(null);
       }
     }
@@ -253,15 +263,22 @@ function Sidebar({ isLoggedIn, user, onLogout }) {
           {menuItems.map((item) => (
             <li
               key={item.name}
-              onMouseEnter={() => item.subItems && setHoveredItem(item.name)}
-              onMouseLeave={() => item.subItems && setHoveredItem(null)}
               className={item.name === "Início" ? "active" : ""}
             >
               {item.subItems ? (
                 // Lógica para itens com submenu
-                <a href="#" onClick={() => handleAccordionClick(item.name)}>
-                  <span className="icon-wrapper">{item.icon}</span>
-                  <span className="item-name">{item.name}</span>
+                <a 
+                  href="#" 
+                  onClick={(e) => { e.preventDefault(); handleAccordionClick(item.name); }} 
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <span className="icon-wrapper">{item.icon}</span>
+                    <span className="item-name">{item.name}</span>
+                  </div>
+                  <span className="item-name pe-3">
+                    {activeAccordion === item.name ? <FaChevronDown size={12} /> : <FaChevronRight size={12} />}
+                  </span>
                 </a>
               ) : (
                 // Lógica para itens sem submenu
@@ -272,19 +289,25 @@ function Sidebar({ isLoggedIn, user, onLogout }) {
               )}
               {item.subItems && (
                 <ul
-                  className={`subitems ${hoveredItem === item.name || activeAccordion === item.name ? "subitems-open" : ""}`}
+                  className={`subitems ${activeAccordion === item.name ? "subitems-open" : ""}`}
+                  style={{ display: activeAccordion === item.name ? 'block' : 'none' }}
                 >
-                  {item.subItems.map((subItem) => (
-                    <li key={subItem.name}>
-                      <Link
-                        to={subItem.link}
-                        {...(subItem.target ? { target: subItem.target } : {})}
-                        rel="noopener noreferrer"
-                      >
-                        {subItem.name}
-                      </Link>
-                    </li>
-                  ))}
+                  {item.subItems.map((subItem) => {
+                    if (subItem.restricted && (!user?.privilegios || (!user.privilegios.includes('Admin') && !user.privilegios.includes('Gestor') && !user.privilegios.includes('rh')))) {
+                        return null;
+                    }
+                    return (
+                      <li key={subItem.name}>
+                        <Link
+                          to={subItem.link}
+                          {...(subItem.target ? { target: subItem.target } : {})}
+                          rel="noopener noreferrer"
+                        >
+                          {subItem.name}
+                        </Link>
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
             </li>

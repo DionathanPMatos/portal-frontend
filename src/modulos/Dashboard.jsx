@@ -3,6 +3,7 @@ import axios from 'axios';
 import { FaDollarSign, FaCalendarAlt, FaBullseye, FaTrophy, FaUpload, FaTrash, FaEdit } from "react-icons/fa";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import "../css/Dashboard.css";
+import NewsWidget from "./Modulo_Noticias/NewsWidget";
 
 function Dashboard({ isLoggedIn }) {
   const [metrics, setMetrics] = useState(null);
@@ -511,6 +512,11 @@ function Dashboard({ isLoggedIn }) {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* 🚀 MURAL DE NOTÍCIAS INTERATIVO INSERIDO AO FINAL DA PÁGINA */}
+      <div className="mt-5">
+        <NewsWidget />
       </div>
 
     </div>

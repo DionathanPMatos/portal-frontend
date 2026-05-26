@@ -7,8 +7,8 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import ProjetoFormModal from './ProjetoFormModal';
 import SortableItem from './SortableItem';
-import './Crm.css';
-import '../App.css';
+import './crm.css';
+import '../../App.css';
 
 // Lista de etapas para as colunas do Kanban
 // (Excluímos "Perdido" e os status de entrega, que não são colunas ativas do funil)

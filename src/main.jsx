@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import App from './App.jsx'
 import './App.css'
-import { ThemeProvider } from './ThemeContext'; // <-- 1. IMPORTE O PROVEDOR
+import { ThemeProvider } from './modulos/Modulo_Configuracao/ThemeContext'; // <-- 1. IMPORTE O PROVEDOR
 
 
 createRoot(document.getElementById('root')).render(

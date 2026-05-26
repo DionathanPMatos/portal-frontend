@@ -3,8 +3,8 @@ import axios from 'axios';
 import { Container, Spinner, Alert, Card, Row, Col, Button, Modal, Form, Tabs, Tab, Table, Breadcrumb } from 'react-bootstrap';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import './App.css';
-import './css/Dashboard.css';
+import '../../App.css';
+import '../../css/Dashboard.css';
 import {
   FaHome, FaHandshake, FaProjectDiagram, FaMoneyBill, FaCogs, FaTruck,
   FaPencilAlt, FaBlog, FaEnvelope, FaShoppingCart, FaSignOutAlt, FaBars,

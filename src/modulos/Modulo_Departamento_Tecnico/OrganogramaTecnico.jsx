@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Spinner, Alert, Form, InputGroup } from 'react-bootstrap';
 import { FaSearch, FaUserTie, FaIndustry } from 'react-icons/fa';
 import axios from 'axios';
-import '../App.css';
+import '../../App.css';
 
 const OrganogramaTecnico = () => {
     const [employees, setEmployees] = useState([]);
@@ -178,9 +178,9 @@ const formatarNome = (nome) => {
                                                 <div className="d-flex flex-wrap justify-content-center gap-2">
                                                     {employee.fabricantes_nomes ? (
                                                         employee.fabricantes_nomes.split(', ').map(fab => (
-                                                            <span key={fab} className="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle px-2 py-1 shadow-sm" style={{ fontSize: '0.75rem' }}>
-                                                                {fab}
-                                                            </span>
+                                                            <span key={fab} className="badge bg-primary bg-gradient px-2.5 py-1.5 shadow-sm border border-primary" style={{ fontSize: '0.75rem', backgroundColor: '#0f4c81' }}>
+    {fab}
+</span>
                                                         ))
                                                     ) : (
                                                         <span className="text-muted small fst-italic">Nenhuma marca vinculada</span>
