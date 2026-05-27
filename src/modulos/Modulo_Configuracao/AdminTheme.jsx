@@ -1,224 +1,221 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Card, Form, Button, Spinner, Alert, Row, Col } from 'react-bootstrap';
+import { Form, Button, Container, Row, Col, Card, Alert, Spinner } from 'react-bootstrap';
 import axios from 'axios';
+import { useTheme } from './ThemeContext';
 
-const AdminTheme = () => {
-    // 1. ADICIONADOS ESTADOS PARA AS CORES DO MODO ESCURO
-    const [settings, setSettings] = useState({
-        backgroundType: 'image',
-        backgroundColor: '#f0f4f7',
-        sidebarColor: '#153049',
-        headerColor: '#ffffff',
-        pageTitle: '',
-        sidebarIconColor: '#ffffff',
-        sidebarActiveColor: '#a72323',
-        lightModeSurface: 'rgba(255, 255, 255, 0.92)',
-        darkModeBackground: '#121212',
-        darkModeSurface: '#1E1E1E',
-        darkModePrimaryText: '#E1E1E1',
-        darkModeSecondaryText: '#BBBBBB'
-    });
-    const [files, setFiles] = useState({
-        backgroundImageFile: null,
-        logoFile: null,
-        faviconFile: null
-    });
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
+function AdminTheme() {
+  const { refreshTheme } = useTheme();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
 
-    useEffect(() => {
-        const loadSettings = async () => {
-            try {
-                const response = await axios.get('/api/settings');
-                const loaded = response.data;
-                // 2. CARREGA OS DADOS DO MODO ESCURO DA API
-                setSettings({
-                    backgroundType: loaded.background?.startsWith('url(') ? 'image' : 'color',
-                    backgroundColor: loaded.background?.startsWith('url(') ? '#f0f4f7' : loaded.background,
-                    sidebarColor: loaded.sidebar_color,
-                    headerColor: loaded.header_color,
-                    pageTitle: loaded.page_title,
-                    sidebarIconColor: loaded.sidebar_icon_color,
-                    sidebarActiveColor: loaded.sidebar_active_color,
-                    lightModeSurface: loaded.light_mode_surface,
-                    darkModeBackground: loaded.dark_mode_background,
-                    darkModeSurface: loaded.dark_mode_surface,
-                    darkModePrimaryText: loaded.dark_mode_primary_text,
-                    darkModeSecondaryText: loaded.dark_mode_secondary_text
-                });
-            } catch (err) {
-                setError('Falha ao carregar configurações atuais.');
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadSettings();
-    }, []);
+  // State for form fields
+  const [pageTitle, setPageTitle] = useState('');
+  const [sidebarColor, setSidebarColor] = useState('#153049');
+  const [headerColor, setHeaderColor] = useState('#ffffff');
+  const [sidebarIconColor, setSidebarIconColor] = useState('#ffffff');
+  const [sidebarActiveColor, setSidebarActiveColor] = useState('#a72323');
+  const [cardHeaderBg, setCardHeaderBg] = useState('#153049');
+  const [cardHeaderText, setCardHeaderText] = useState('#ffffff');
+  
+  // New login theme states
+  const [login_bg_color, setLoginBgColor] = useState('#e9ecef');
+  const [loginBgImageFile, setLoginBgImageFile] = useState(null);
+  const [loginBgImageUrl, setLoginBgImageUrl] = useState('');
+  const [loginLogoFile, setLoginLogoFile] = useState(null);
+  const [loginLogoUrl, setLoginLogoUrl] = useState('');
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setSettings(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handleFileChange = (e) => {
-        const { name, files: selectedFiles } = e.target;
-        setFiles(prev => ({ ...prev, [name]: selectedFiles[0] }));
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setError('');
-        setSuccess('');
-
-        const formData = new FormData();
+  // Other existing states
+  const [logoFile, setLogoFile] = useState(null);
+  const [logoUrl, setLogoUrl] = useState('');
+  
+  useEffect(() => {
+    axios.get('/api/settings')
+      .then(response => {
+        const data = response.data;
+        setPageTitle(data.page_title || 'Portal DCA');
+        setSidebarColor(data.sidebar_color || '#153049');
+        setHeaderColor(data.header_color || '#ffffff');
+        setSidebarIconColor(data.sidebar_icon_color || '#ffffff');
+        setSidebarActiveColor(data.sidebar_active_color || '#a72323');
+        setCardHeaderBg(data.card_header_bg || '#153049');
+        setCardHeaderText(data.card_header_text || '#ffffff');
+        setLogoUrl(data.logo_url || '');
         
-        formData.append('backgroundType', settings.backgroundType);
-        if (settings.backgroundType === 'color') {
-            formData.append('backgroundColor', settings.backgroundColor);
-        }
-        formData.append('sidebarColor', settings.sidebarColor);
-        formData.append('headerColor', settings.headerColor);
-        formData.append('pageTitle', settings.pageTitle);
-        formData.append('sidebarIconColor', settings.sidebarIconColor);
-        formData.append('sidebarActiveColor', settings.sidebarActiveColor);
-        formData.append('lightModeSurface', settings.lightModeSurface);
-        
-        // 3. ADICIONA OS DADOS DO MODO ESCURO AO ENVIO
-        formData.append('darkModeBackground', settings.darkModeBackground);
-        formData.append('darkModeSurface', settings.darkModeSurface);
-        formData.append('darkModePrimaryText', settings.darkModePrimaryText);
-        formData.append('darkModeSecondaryText', settings.darkModeSecondaryText);
+        // Set new login theme values
+        setLoginBgColor(data.login_bg_color || '#e9ecef');
+        setLoginBgImageUrl(data.login_bg_image || '');
+        setLoginLogoUrl(data.login_logo_url || '');
 
-        if (files.backgroundImageFile) formData.append('backgroundImageFile', files.backgroundImageFile);
-        if (files.logoFile) formData.append('logoFile', files.logoFile);
-        if (files.faviconFile) formData.append('faviconFile', files.faviconFile);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error("Erro ao buscar configurações:", error);
+        setMessage({ type: 'danger', text: 'Não foi possível carregar as configurações atuais.' });
+        setLoading(false);
+      });
+  }, []);
 
-        try {
-            const response = await axios.post('/api/settings', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-            });
-            setSuccess(response.data.message + " A página será recarregada para aplicar as mudanças.");
-            setTimeout(() => window.location.reload(), 2000);
-        } catch (err) {
-            setError('Erro ao salvar as configurações.');
-        } finally {
-            setLoading(false);
-        }
-    };
+  const handleSave = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setMessage({ type: '', text: '' });
+
+    const formData = new FormData();
+    formData.append('pageTitle', pageTitle);
+    formData.append('sidebarColor', sidebarColor);
+    formData.append('headerColor', headerColor);
+    formData.append('sidebarIconColor', sidebarIconColor);
+    formData.append('sidebarActiveColor', sidebarActiveColor);
+    formData.append('card_header_bg', cardHeaderBg);
+    formData.append('card_header_text', cardHeaderText);
     
-    if (loading) return <Container className="mt-5 text-center"><Spinner/></Container>;
+    // Append new login theme data
+    formData.append('login_bg_color', login_bg_color);
+    if (loginBgImageFile) {
+      formData.append('loginBgImageFile', loginBgImageFile);
+    }
+    if (loginLogoFile) {
+      formData.append('loginLogoFile', loginLogoFile);
+    }
 
-    // O resto do seu JSX continua igual, pois já estava correto.
-    return (
-        <Container className="my-5 ">
-            <Row className="justify-content-center">
-                <Col md={10} lg={8}>
-                    <Card>
-                        <Card.Header><h4 style={{ color: '#fff' }}>Configurações de Aparência e Identidade</h4></Card.Header>
-                        <Card.Body>
-                            {error && <Alert variant="danger">{error}</Alert>}
-                            {success && <Alert variant="success">{success}</Alert>}
-                            <Form onSubmit={handleSubmit}>
-                                {/* ... Seção de Identidade Visual ... */}
-                                <fieldset className="mb-4 p-3 border rounded">
-                                    <legend className="h6">Identidade Visual</legend>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Título da Página (Aba do Navegador)</Form.Label>
-                                        <Form.Control type="text" name="pageTitle" value={settings.pageTitle || ''} onChange={handleInputChange} />
-                                    </Form.Group>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Logo do Cabeçalho</Form.Label>
-                                        <Form.Control type="file" name="logoFile" onChange={handleFileChange} />
-                                        <Form.Text>Envie um novo arquivo para substituir o logo atual.</Form.Text>
-                                    </Form.Group>
-                                    <Form.Group>
-                                        <Form.Label>Ícone da Página (Favicon)</Form.Label>
-                                        <Form.Control type="file" name="faviconFile" onChange={handleFileChange} />
-                                        <Form.Text>Recomendado: .ico ou .png (32x32 pixels).</Form.Text>
-                                    </Form.Group>
-                                </fieldset>
+    if (logoFile) {
+      formData.append('logoFile', logoFile);
+    }
 
-                                {/* ... Seção de Fundo do Sistema ... */}
-                                <fieldset className="mb-4 p-3 border rounded">
-                                    <legend className="h6">Fundo do Sistema</legend>
-                                    <Form.Check type="radio" name="backgroundType" label="Usar Imagem" value="image" checked={settings.backgroundType === 'image'} onChange={handleInputChange} />
-                                    <Form.Check type="radio" name="backgroundType" label="Usar Cor Sólida" value="color" checked={settings.backgroundType === 'color'} onChange={handleInputChange} />
+    try {
+      await axios.post('/api/settings', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setMessage({ type: 'success', text: 'Tema atualizado com sucesso! A página será recarregada.' });
+      
+      setTimeout(() => {
+        refreshTheme(); // This should trigger a fetch in ThemeContext
+        window.location.reload(); // Force reload to see all changes
+      }, 2000);
 
-                                    {settings.backgroundType === 'image' && (
-                                        <Form.Group className="mt-2">
-                                            <Form.Label>Enviar nova imagem de fundo</Form.Label>
-                                            <Form.Control type="file" name="backgroundImageFile" onChange={handleFileChange} />
-                                        </Form.Group>
-                                    )}
-                                    {settings.backgroundType === 'color' && (
-                                        <Form.Group className="mt-2">
-                                            <Form.Label>Escolha a cor de fundo</Form.Label>
-                                            <Form.Control type="color" name="backgroundColor" value={settings.backgroundColor} onChange={handleInputChange} />
-                                        </Form.Group>
-                                    )}
-                                </fieldset>
+    } catch (error) {
+      console.error("Erro ao salvar configurações:", error);
+      setMessage({ type: 'danger', text: 'Erro ao salvar as configurações.' });
+    } finally {
+      setSaving(false);
+    }
+  };
 
-                                {/* ... Seção Cores da Interface ... */}
-                                <fieldset className="p-3 border rounded">
-                                    <legend className="h6">Cores da Interface (Modo Claro)</legend>
-                                    <Form.Group as={Row} className="mb-3 align-items-center">
-                                        <Form.Label column sm={4}>Superfícies (Cards)</Form.Label>
-                                        <Col sm={8}><Form.Control style={{ height: '40px' }} type="color" name="lightModeSurface" value={settings.lightModeSurface} onChange={handleInputChange} /></Col>
-                                    </Form.Group>
+  return (
+    
+    <Container fluid className="p-4">
+      <Row>
+        <Col>
+          <Card>
+            <Card.Header>
+              <Card.Title as="h4">Personalização do Tema</Card.Title>
+            </Card.Header>
+            <Card.Body>
+              {message.text && <Alert variant={message.type}>{message.text}</Alert>}
+              {loading ? <div className="text-center"><Spinner animation="border" /></div> : (
+                <Form onSubmit={handleSave}>
+                  <Row>
+                    {/* General Settings Column */}
+                    <Col md={6} className="border-end">
+                      <h5>Geral e Cores do Sistema</h5>
+                      <hr/>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Título da Página</Form.Label>
+                        <Form.Control type="text" value={pageTitle} onChange={e => setPageTitle(e.target.value)} />
+                      </Form.Group>
+                      
+                      <Form.Group className="mb-4">
+                        <Form.Label>Logo do Sistema (Topo do Menu)</Form.Label>
+                        {logoUrl && <img src={logoUrl} alt="Logo atual" style={{ display: 'block', height: '40px', marginBottom: '10px', background: '#ccc', padding: '5px', borderRadius: '4px' }} />}
+                        <Form.Control type="file" accept="image/png, image/jpeg, image/svg+xml" onChange={e => setLogoFile(e.target.files[0])} />
+                      </Form.Group>
+                      
+                      <Form.Group as={Row} className="mb-3 align-items-center">
+                        <Form.Label column sm="4">Cor do Menu Lateral</Form.Label>
+                        <Col sm="8">
+                          <Form.Control type="color" value={sidebarColor} onChange={e => setSidebarColor(e.target.value)} style={{height: '40px'}} />
+                        </Col>
+                      </Form.Group>
+                      <Form.Group as={Row} className="mb-3 align-items-center">
+                        <Form.Label column sm="4">Cor do Cabeçalho</Form.Label>
+                        <Col sm="8">
+                          <Form.Control type="color" value={headerColor} onChange={e => setHeaderColor(e.target.value)} style={{height: '40px'}} />
+                        </Col>
+                      </Form.Group>
+                      <Form.Group as={Row} className="mb-3 align-items-center">
+                        <Form.Label column sm="4">Cor dos Ícones do Menu</Form.Label>
+                        <Col sm="8">
+                          <Form.Control type="color" value={sidebarIconColor} onChange={e => setSidebarIconColor(e.target.value)} style={{height: '40px'}} />
+                        </Col>
+                      </Form.Group>
+                      <Form.Group as={Row} className="mb-3 align-items-center">
+                        <Form.Label column sm="4">Cor do Item Ativo no Menu</Form.Label>
+                        <Col sm="8">
+                          <Form.Control type="color" value={sidebarActiveColor} onChange={e => setSidebarActiveColor(e.target.value)} style={{height: '40px'}} />
+                        </Col>
+                      </Form.Group>
+                      
+                      <h5 className="mt-4">Cabeçalho dos Cards (Padrão)</h5>
+                      <hr/>
+                      <Form.Group as={Row} className="mb-3 align-items-center">
+                        <Form.Label column sm="4">Cor de Fundo</Form.Label>
+                        <Col sm="8">
+                          <Form.Control type="color" value={cardHeaderBg} onChange={e => setCardHeaderBg(e.target.value)} style={{height: '40px'}} />
+                        </Col>
+                      </Form.Group>
+                      <Form.Group as={Row} className="mb-3 align-items-center">
+                        <Form.Label column sm="4">Cor do Texto</Form.Label>
+                        <Col sm="8">
+                          <Form.Control type="color" value={cardHeaderText} onChange={e => setCardHeaderText(e.target.value)} style={{height: '40px'}} />
+                        </Col>
+                      </Form.Group>
+                    </Col>
 
-                                    <Form.Group as={Row} className="mb-3 align-items-center">
-                                        <Form.Label column sm={4}>Cor do Cabeçalho</Form.Label>
-                                        <Col sm={8}><Form.Control style={{ height: '40px' }} type="color" name="headerColor" value={settings.headerColor} onChange={handleInputChange} /></Col>
-                                    </Form.Group>
-                                    <Form.Group as={Row} className="align-items-center mb-3">
-                                        <Form.Label column sm={4}>Cor da Barra Lateral</Form.Label>
-                                        <Col sm={8}><Form.Control style={{ height: '40px' }} type="color" name="sidebarColor" value={settings.sidebarColor} onChange={handleInputChange} /></Col>
-                                    </Form.Group>
-                                    <Form.Group as={Row} className="mb-3 align-items-center">
-                                        <Form.Label column sm={4}>Cor dos Ícones (Sidebar)</Form.Label>
-                                        <Col sm={8}><Form.Control style={{ height: '40px' }} type="color" name="sidebarIconColor" value={settings.sidebarIconColor} onChange={handleInputChange} /></Col>
-                                    </Form.Group>
-                                    <Form.Group as={Row} className="align-items-center">
-                                        <Form.Label column sm={4}>Cor do Ícone Ativo (Sidebar)</Form.Label>
-                                        <Col sm={8}><Form.Control style={{ height: '40px' }} type="color" name="sidebarActiveColor" value={settings.sidebarActiveColor} onChange={handleInputChange} /></Col>
-                                    </Form.Group>
-                                </fieldset>
+                    {/* Login Screen Settings Column */}
+                    <Col md={6}>
+                      <h5>Tela de Login</h5>
+                      <hr/>
+                      <Form.Group as={Row} className="mb-3 align-items-center">
+                        <Form.Label column sm="4">Cor de Fundo (atrás da imagem)</Form.Label>
+                        <Col sm="8">
+                          <Form.Control type="color" value={login_bg_color} onChange={e => setLoginBgColor(e.target.value)} style={{height: '40px'}} />
+                        </Col>
+                      </Form.Group>
 
-                                {/* ... Seção Cores do Modo Escuro ... */}
-                                <fieldset className="p-3 border rounded mt-4">
-                                    <legend className="h6">Cores do Modo Escuro</legend>
-                                    <Form.Group as={Row} className="mb-3 align-items-center">
-                                        <Form.Label column sm={4}>Fundo</Form.Label>
-                                        <Col sm={8}><Form.Control style={{ height: '40px' }} type="color" name="darkModeBackground" value={settings.darkModeBackground} onChange={handleInputChange} /></Col>
-                                    </Form.Group>
-                                    <Form.Group as={Row} className="mb-3 align-items-center">
-                                        <Form.Label column sm={4}>Superfícies (Cards)</Form.Label>
-                                        <Col sm={8}><Form.Control style={{ height: '40px' }} type="color" name="darkModeSurface" value={settings.darkModeSurface} onChange={handleInputChange} /></Col>
-                                    </Form.Group>
-                                    <Form.Group as={Row} className="mb-3 align-items-center">
-                                        <Form.Label column sm={4}>Texto Principal</Form.Label>
-                                        <Col sm={8}><Form.Control style={{ height: '40px' }} type="color" name="darkModePrimaryText" value={settings.darkModePrimaryText} onChange={handleInputChange} /></Col>
-                                    </Form.Group>
-                                    <Form.Group as={Row} className="align-items-center">
-                                        <Form.Label column sm={4}>Texto Secundário</Form.Label>
-                                        <Col sm={8}><Form.Control style={{ height: '40px' }} type="color" name="darkModeSecondaryText" value={settings.darkModeSecondaryText} onChange={handleInputChange} /></Col>
-                                    </Form.Group>
-                                </fieldset>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Imagem de Fundo (1920x800 recomendado)</Form.Label>
+                        {loginBgImageUrl && <img src={loginBgImageUrl} alt="Fundo atual" style={{ display: 'block', width: '100%', marginBottom: '10px', objectFit: 'cover', height: '100px', borderRadius: '4px', border: '1px solid #ddd' }} />}
+                        <Form.Control type="file" accept="image/*" onChange={e => setLoginBgImageFile(e.target.files[0])} />
+                        <Form.Text className="text-muted">
+                          Esta imagem aparecerá como uma faixa horizontal na tela de login.
+                        </Form.Text>
+                      </Form.Group>
 
-                                <div className="text-end mt-4">
-                                    <Button type="submit" disabled={loading}>
-                                        {loading ? <Spinner as="span" size="sm" /> : 'Salvar Alterações'}
-                                    </Button>
-                                </div>
-                            </Form>
-                        </Card.Body>
-                    </Card>
-                </Col>
-            </Row>
-        </Container>
-    );
-};
+                      <Form.Group className="mb-3">
+                        <Form.Label>Logo da Tela de Login (Opcional)</Form.Label>
+                        {loginLogoUrl && <img src={loginLogoUrl} alt="Logo Login atual" style={{ display: 'block', height: '40px', marginBottom: '10px', background: '#ccc', padding: '5px', borderRadius: '4px' }} />}
+                        <Form.Control type="file" accept="image/png, image/jpeg, image/svg+xml" onChange={e => setLoginLogoFile(e.target.files[0])} />
+                        <Form.Text className="text-muted">
+                          Se não for enviada, a logo do sistema será usada como padrão.
+                        </Form.Text>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+
+                  <div className="d-flex justify-content-end mt-4">
+                    <Button variant="primary" type="submit" disabled={saving} size="lg">
+                      {saving ? <><Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> Salvando...</> : 'Salvar Alterações'}
+                    </Button>
+                  </div>
+                </Form>
+              )}
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
+  );
+}
 
 export default AdminTheme;

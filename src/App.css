@@ -298,9 +298,17 @@ a {
 .card{
   width: 100%;
 }
+/* Padronização global dos Cabeçalhos de Card usando as variáveis do banco */
 .card-header {
-  background-color: #153049;
-  color: #fff;
+  background-color: var(--card-header-bg, #153049) !important;
+  color: var(--card-header-text, #ffffff) !important;
+  border-bottom: none !important;
+}
+
+/* Garante que o texto (ex: Card.Title) herde a cor de texto definida pelo admin */
+.card-header *, .card-header .card-title {
+  color: inherit !important;
+  margin-bottom: 0;
 }
 
 .container-modal {

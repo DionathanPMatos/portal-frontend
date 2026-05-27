@@ -39,6 +39,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
     const [contact, setContact] = useState('');
     const [cargoId, setCargoId] = useState('');
     const [setorId, setSetorId] = useState('');
+    const [gestorId, setGestorId] = useState('');
     const [permissions, setPermissions] = useState(['dashboard']);
     const [selectedFabricantes, setSelectedFabricantes] = useState([]);
     const [userpicFile, setUserpicFile] = useState(null);
@@ -148,7 +149,8 @@ const ManageEmployees = ({ isLoggedIn }) => {
                 userpic_base64: userpicBase64 || null,
                 cargo_id: cargoId ? Number(cargoId) : null,
                 privilegios: permissions.join(',') || 'usuario',
-                fabricantes_ids: selectedFabricantes
+                fabricantes_ids: selectedFabricantes,
+                gestor_id: gestorId ? Number(gestorId) : null
             };
 
             if (editingEmployee) {
@@ -181,6 +183,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
         setContact(employee.contato || '');
         setCargoId(employee.cargo_id || '');
         setSetorId(employee.setor_id || '');
+        setGestorId(employee.gestor_id || '');
         setPermissions(employee.privilegios ? employee.privilegios.split(',') : ['dashboard']);
         setSelectedFabricantes(employee.fabricantes_ids || []);
         setExistingUserpicBase64(employee.userpic_base64 || '');
@@ -193,7 +196,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
         setEditingEmployee(null);
         setName(''); setEmail(''); setContact('');
         setCargoId(''); setSetorId('');
-        setPermissions(['dashboard']); setSelectedFabricantes([]); setUserpicFile(null);
+        setGestorId(''); setPermissions(['dashboard']); setSelectedFabricantes([]); setUserpicFile(null);
         setExistingUserpicBase64(''); setShowAddEditModal(true);
     };
 
@@ -201,7 +204,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
         setShowAddEditModal(false);
         setEditingEmployee(null);
         setName(''); setEmail(''); setContact('');
-        setCargoId(''); setSetorId('');
+        setCargoId(''); setSetorId(''); setGestorId('');
         setPermissions(['dashboard']); setSelectedFabricantes([]); setUserpicFile(null);
         setExistingUserpicBase64('');
     };
@@ -413,6 +416,17 @@ const ManageEmployees = ({ isLoggedIn }) => {
                             <Form.Select value={cargoId} onChange={(e) => setCargoId(e.target.value)}>
                                 <option value="">Selecione o Cargo</option>
                                 {cargos.map(cargo => (<option key={cargo.id} value={cargo.id}>{cargo.nome_cargo}</option>))}
+                            </Form.Select>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Reporta a (Gestor/Supervisor)</Form.Label>
+                            <Form.Select value={gestorId} onChange={(e) => setGestorId(e.target.value)}>
+                                <option value="">Nenhum (Responde à Diretoria)</option>
+                                {employees
+                                    .filter(emp => !editingEmployee || emp.id !== editingEmployee.id) // Evita que o funcionário seja chefe de si mesmo
+                                    .map(emp => (
+                                        <option key={emp.id} value={emp.id}>{emp.nome_completo}</option>
+                                ))}
                             </Form.Select>
                         </Form.Group>
                         <Form.Group className="mb-3">

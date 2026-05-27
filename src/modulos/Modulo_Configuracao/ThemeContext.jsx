@@ -74,6 +74,8 @@ export const ThemeProvider = ({ children }) => {
                 root.style.setProperty('--dark-mode-primary-text', settings.dark_mode_primary_text);
                 root.style.setProperty('--light-mode-surface', settings.light_mode_surface);
                 root.style.setProperty('--dark-mode-secondary-text', settings.dark_mode_secondary_text);
+                root.style.setProperty('--card-header-bg', settings.card_header_bg || '#153049');
+                root.style.setProperty('--card-header-text', settings.card_header_text || '#ffffff');
 
             } catch (error) {
                 console.error("Erro ao carregar tema, usando valores padrão.", error);

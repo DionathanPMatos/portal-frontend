@@ -9,6 +9,7 @@ import axios from 'axios';
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./modulos/Dashboard";
+import Login from "./components/Login";
 import Registro from "./modulos/Modulo_CRM/Registro";
 import AdminPage from "./modulos/Modulo_Configuracao/adminpage";
 import RegisterUser from "./components/RegisterUser";
@@ -85,6 +86,13 @@ function App() {
 
   return (
     <BrowserRouter>
+      {!isLoggedIn ? (
+        <Routes>
+          {/* Se o usuário não estiver logado, qualquer rota exibirá o Login */}
+          <Route path="*" element={<Login />} />
+        </Routes>
+      ) : (
+        /* Estrutura do sistema para usuários autenticados */
       <div className="main-container">
         <div className="header-mobile-wrapper">
           <Sidebar isLoggedIn={isLoggedIn} user={user} onLogout={handleLogout} />
@@ -124,6 +132,7 @@ function App() {
           </Routes>
         </div>
       </div>
+      )}
     </BrowserRouter>
   );
 }
