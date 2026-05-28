@@ -87,9 +87,9 @@ const dashboardSections = [
             },
             {
                 title: 'Benefícios',
-                text: 'Edite a seção de benefícios do RH.',
+                text: 'Gerencie os benefícios oferecidos pela empresa.',
                 icon: <GiFloorHatch size={24} />,
-                link: '/admin/relatorios',
+                link: '/admin/beneficios',
             },
         ],
     },

@@ -68,6 +68,7 @@ const menuItems = [
       },
       { name: "Gerente de Produtos", link: "/OrganogramaTecnico" },
       { name: "DTC", link: "/crm/dashboard-dtc" },
+      { name: "Repositório Técnico", link: "/dtc/repositorio" },
       { name: "Garantia de Fabricantes", link: "#" },
       {
         name: "RMA",
@@ -167,7 +168,7 @@ const menuItems = [
         link: "https://dcacademy.woli.com.br/pt-BR/Login/Index?returnUrl=%2Fpt-BR%2FWorkspace%2FIndex%3Fid%3D88%26hash%3DNDEyOTswMTY%3D",
         target: "_blank",
       },
-      { name: "Benefícios", link: "#" },
+      { name: "Benefícios", link: "/beneficios" },
       {
         name: "Oportunidades",
         link: "https://oportunidades.mindsight.com.br/dca",

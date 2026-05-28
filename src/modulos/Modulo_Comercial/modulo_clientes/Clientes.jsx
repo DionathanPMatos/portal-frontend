@@ -10,10 +10,12 @@ import {
   Breadcrumb,
   Row,
   Col,
+  Card,
   Form,
   Modal,
   InputGroup,
 } from "react-bootstrap";
+import { FaUser } from "react-icons/fa";
 
 const onlyDigits = (v = "") => String(v || "").replace(/\D/g, "");
 
@@ -518,20 +520,25 @@ export default function Clientes() {
   }
 
   return (
-    <div className="dash-grid">
-      <div className="container-main">
-        <Container className="mt-4">
-          <Breadcrumb>
-            <Breadcrumb.Item linkAs={Link} linkProps={{ to: "/crm/projetos" }}>
-              CRM
-            </Breadcrumb.Item>
-            <Breadcrumb.Item active>Clientes</Breadcrumb.Item>
-          </Breadcrumb>
 
+        <Container fluid className="px-4">
+            <Row>
+              <Col> 
+                    <Card className="shadow-sm border-0">
+                        <Card.Header>
+                            <Card.Title as="h4"> <FaUser /> Gestão de Clientes</Card.Title>
+                        </Card.Header>
+                        <Card.Body>
+                            {/* Header Padrão do Sistema */}
+                            <div className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                                <div>
+                                    <h4 className="fw-bold mb-1 text-dark">
+                                       Gerencie os clientes, visualize detalhes e acompanhe os projetos relacionados.</h4>
+                                  
+                                </div>
+                            </div>
           <Row className="align-items-center mb-3">
-            <Col>
-              <h2 className="mb-0">Clientes</h2>
-            </Col>
+ 
             <Col className="text-end">
               <Button variant="primary" onClick={openNew} className="me-2">
                 Novo Cliente
@@ -744,8 +751,11 @@ export default function Clientes() {
               </Button>
             </Modal.Footer>
           </Modal>
+                        </Card.Body>
+                    </Card>
+                </Col>
+            </Row>
         </Container>
-      </div>
-    </div>
+
   );
 }

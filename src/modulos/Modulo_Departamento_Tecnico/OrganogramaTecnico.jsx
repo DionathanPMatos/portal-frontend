@@ -156,16 +156,17 @@ const formatarNome = (nome) => {
                         <Col>
                         <Card className="shadow-sm border-0">
                         <Card.Header>
-                            <Card.Title as="h4">Departamento Técnico</Card.Title>
+                            <Card.Title as="h4"> <FaUserTie />&nbsp;Departamento Técnico</Card.Title>
                         </Card.Header>
                         <Card.Body>
                             {/* Cabecalho da página */}
                             <div className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
                                 <div>
-                                    <h2 className="fw-bold mb-1 text-dark d-flex align-items-center gap-2">
-                                        <FaUserTie className="text-primary" /> Organograma da Equipe Técnica
-                                    </h2>
-                                    <p className="text-muted mb-0">Conheça os gerentes de produto e as marcas que representam.</p>
+                                    <h4 className="fw-bold mb-1 text-dark d-flex align-items-center gap-2">
+                                        Conheça os gerentes de produto e as marcas que representam.
+
+
+                                    </h4>
                                 </div>
                             </div>
 

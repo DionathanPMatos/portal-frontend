@@ -5,8 +5,8 @@ import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useDroppable } from '@dnd-kit/core';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import ProjetoFormModal from './ProjetoFormModal';
-import SortableItem from './SortableItem';
+import ProjetoFormModal from './modulo_crm/ProjetoFormModal';
+import SortableItem from './modulo_crm/SortableItem';
 import './crm.css';
 import '../../App.css';
 
