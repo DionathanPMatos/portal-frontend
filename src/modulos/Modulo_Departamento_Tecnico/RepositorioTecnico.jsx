@@ -158,7 +158,7 @@ const RepositorioTecnico = () => {
     };
 
     return (
-        <Container fluid className="px-4 mt-4">
+        <Container fluid className="px-4">
             <Row>
                 <Col>
                     <Card className="shadow-sm border-0">

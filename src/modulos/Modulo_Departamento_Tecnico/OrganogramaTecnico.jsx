@@ -151,6 +151,7 @@ const formatarNome = (nome) => {
     );
 
     return (
+            
                 <Container fluid className="px-4">
                     <Row>
                         <Col>

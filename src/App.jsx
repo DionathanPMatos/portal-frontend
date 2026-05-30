@@ -31,6 +31,10 @@ import DashboardCompras from "./modulos/Modulo_Comercial/DashboardCompras";
 import DashboardDTC from "./modulos/Modulo_Departamento_Tecnico/DashboardDTC";
 import OrganogramaTecnico from "./modulos/Modulo_Departamento_Tecnico/OrganogramaTecnico";
 import RepositorioTecnico from "./modulos/Modulo_Departamento_Tecnico/RepositorioTecnico";
+import FabricantesList from "./modulos/Modulo_Departamento_Tecnico/FabricantesList";
+import FabricantePerfil from "./modulos/Modulo_Departamento_Tecnico/FabricantePerfil";
+import GerenciarFabricantes from "./modulos/Modulo_Departamento_Tecnico/GerenciarFabricantes";
+import FerramentasUteis from "./modulos/Modulo_Departamento_Tecnico/FerramentasUteis";
 
 // ==========================================
 // MÓDULO VISITANTES
@@ -145,6 +149,11 @@ function App() {
             <Route path="/crm/projetos/:id" element={<DetalhesProjeto user={user} />} />
             
             <Route path="/crm/visitas" element={<Visitas user={user} />} />
+
+            <Route path="/dtc/fabricantes" element={<FabricantesList />} />
+            <Route path="/dtc/fabricantes/:id" element={<FabricantePerfil />} />
+            <Route path="/admin/fabricantes" element={<GerenciarFabricantes />} />
+            <Route path="/dtc/ferramentas" element={<FerramentasUteis />} />
 
             {/* OUTRAS ROTAS */}
             <Route path="/registro" element={<Registro />} />

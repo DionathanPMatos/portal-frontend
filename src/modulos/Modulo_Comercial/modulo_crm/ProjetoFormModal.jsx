@@ -1,20 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Modal, Button, Form, Spinner, Alert, Row, Col } from 'react-bootstrap';
+import { Modal, Button, Form, Spinner, Alert, Row, Col, InputGroup } from 'react-bootstrap';
+import { FaCheck } from 'react-icons/fa';
 import axios from 'axios';
 
 // A lista de etapas foi mantida
 // Lista completa de etapas selecionáveis no formulário
 const ETAPAS_DO_FUNIL_COMPLETA = [
-    '05% - Prospecção',
-    '25% - Especificação de Projeto',
-    '35% - POC',
-    '55% - Envio de Proposta - Projeto',
-    '75% - Aguardando Aprovação',
-    '95% - Pedido Fechado',
-    '98% - Parcialmente Entregue',
-    '100% - Faturado e Entregue',
-    '0% - Projeto Perdido', // "Perdido" agora é uma opção
+    'Prospeccao',
+    'Dtc',
+    'Poc',
+    'Negociacao',
+    'Aprovação',
+    'Fechado',
+    'Perdido',
     'Ganho' // Mantendo 'Ganho' por segurança
 ];
 
@@ -48,6 +47,11 @@ const ProjetoFormModal = ({ show, onHide, onSuccess, projetoParaEditar, defaultS
     const [fabricantes, setFabricantes] = useState([]);
     const [integradores, setIntegradores] = useState([]);
 
+    const [showNewSegInput, setShowNewSegInput] = useState(false);
+    const [newSegText, setNewSegText] = useState('');
+    const [showNewVertInput, setShowNewVertInput] = useState(false);
+    const [newVertText, setNewVertText] = useState('');
+
     const [loading, setLoading] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState(null);
@@ -56,8 +60,12 @@ const ProjetoFormModal = ({ show, onHide, onSuccess, projetoParaEditar, defaultS
     // 3. useEffect atualizado para buscar todos os dados necessários em paralelo
     useEffect(() => {
         if (show) {
-            setLoading(true);
             setError(null);
+            
+            // Bloqueia a tela APENAS se os dados ainda não foram carregados na sessão
+            if (clientes.length === 0) {
+                setLoading(true);
+            }
 
             const endpoints = [
                 axios.get('/api/clientes'),
@@ -69,16 +77,20 @@ const ProjetoFormModal = ({ show, onHide, onSuccess, projetoParaEditar, defaultS
                 axios.get('/api/integradores')
             ];
 
-            Promise.all(endpoints)
-                .then(axios.spread((...responses) => {
-                    setClientes(responses[0].data || []);
-                    setVendedores(responses[1].data || []);
-                    setFuncionarios(responses[2].data || []);
-                    setSegmentacoes(responses[3].data || []);
-                    setVerticais(responses[4].data || []);
-                    setFabricantes(responses[5].data || []);
-                    setIntegradores(responses[6].data || []);
-                }))
+            Promise.allSettled(endpoints)
+                .then((results) => {
+                    setClientes(results[0].status === 'fulfilled' ? results[0].value.data : []);
+                    setVendedores(results[1].status === 'fulfilled' ? results[1].value.data : []);
+                    setFuncionarios(results[2].status === 'fulfilled' ? results[2].value.data : []);
+                    setSegmentacoes(results[3].status === 'fulfilled' ? results[3].value.data : []);
+                    setVerticais(results[4].status === 'fulfilled' ? results[4].value.data : []);
+                    setFabricantes(results[5].status === 'fulfilled' ? results[5].value.data : []);
+                    setIntegradores(results[6].status === 'fulfilled' ? results[6].value.data : []);
+                    
+                    if (results.some(r => r.status === 'rejected')) {
+                        console.warn("Aviso: Algumas listas de apoio não puderam ser carregadas do servidor.");
+                    }
+                })
                 .catch(() => setError('Erro ao carregar dados de apoio.'))
                 .finally(() => setLoading(false));
 
@@ -107,9 +119,43 @@ const ProjetoFormModal = ({ show, onHide, onSuccess, projetoParaEditar, defaultS
     }, [temRegistro]);
 
 
+    const handleAddNewSegmentacao = async () => {
+        if (!newSegText.trim()) return;
+        try {
+            const res = await axios.post('/api/segmentacoes', { nome: newSegText.trim() });
+            setSegmentacoes([...segmentacoes, res.data]);
+            setFormData(prev => ({ ...prev, segmentacao_id: res.data.id }));
+            setShowNewSegInput(false);
+            setNewSegText('');
+        } catch (err) { alert('Erro ao criar segmentação. Verifique se ela já existe.'); }
+    };
+
+    const handleAddNewVertical = async () => {
+        if (!newVertText.trim()) return;
+        try {
+            const res = await axios.post('/api/verticais', { nome: newVertText.trim() });
+            setVerticais([...verticais, res.data]);
+            setFormData(prev => ({ ...prev, vertical_id: res.data.id }));
+            setShowNewVertInput(false);
+            setNewVertText('');
+        } catch (err) { alert('Erro ao criar vertical. Verifique se ela já existe.'); }
+    };
+
     // 4. HandleChange atualizado para lidar com campos de multi-seleção
     const handleChange = (e) => {
         const { name, value, options } = e.target;
+
+        if (name === 'segmentacao_id' && value === 'CREATE_NEW') {
+            setShowNewSegInput(true);
+            setFormData(prev => ({ ...prev, segmentacao_id: '' }));
+            return;
+        }
+        if (name === 'vertical_id' && value === 'CREATE_NEW') {
+            setShowNewVertInput(true);
+            setFormData(prev => ({ ...prev, vertical_id: '' }));
+            return;
+        }
+
         if (e.target.multiple) {
             const selectedValues = Array.from(options)
                 .filter(option => option.selected)
@@ -132,7 +178,7 @@ const ProjetoFormModal = ({ show, onHide, onSuccess, projetoParaEditar, defaultS
             }
             onSuccess();
         } catch (err) {
-            setError(err.response?.data?.message || 'Erro ao salvar o projeto.');
+            setError(err.response?.data?.error || err.response?.data?.message || 'Erro ao salvar o projeto.');
         } finally {
             setSubmitting(false);
         }
@@ -140,6 +186,7 @@ const ProjetoFormModal = ({ show, onHide, onSuccess, projetoParaEditar, defaultS
 
     return (
         // Aumentei o tamanho do modal para 'lg' (large) para comportar os novos campos
+    
         <Modal show={show} onHide={onHide} size="xl">
             <Form onSubmit={handleSubmit}>
                 <Modal.Header closeButton>
@@ -273,17 +320,35 @@ const ProjetoFormModal = ({ show, onHide, onSuccess, projetoParaEditar, defaultS
                             <Row>
                                 <Col md={6}><Form.Group className="mb-3">
                                     <Form.Label>Segmentação</Form.Label>
-                                    <Form.Select name="segmentacao_id" value={formData.segmentacao_id || ''} onChange={handleChange}>
-                                        <option value="">Nenhuma</option>
-                                        {segmentacoes.map(s => <option key={s.id} value={s.id}>{s.nome}</option>)}
-                                    </Form.Select>
+                                    {!showNewSegInput ? (
+                                        <Form.Select name="segmentacao_id" value={formData.segmentacao_id || ''} onChange={handleChange}>
+                                            <option value="">Nenhuma</option>
+                                            {segmentacoes.map(s => <option key={s.id} value={s.id}>{s.nome}</option>)}
+                                            <option value="CREATE_NEW" className="fw-bold text-primary">[+] Criar Nova Segmentação</option>
+                                        </Form.Select>
+                                    ) : (
+                                        <InputGroup>
+                                            <Form.Control type="text" placeholder="Nova segmentação" value={newSegText} onChange={(e) => setNewSegText(e.target.value)} autoFocus />
+                                            <Button variant="success" onClick={handleAddNewSegmentacao}><FaCheck /></Button>
+                                            <Button variant="outline-secondary" onClick={() => setShowNewSegInput(false)}>X</Button>
+                                        </InputGroup>
+                                    )}
                                 </Form.Group></Col>
                                 <Col md={6}><Form.Group className="mb-3">
                                     <Form.Label>Vertical</Form.Label>
-                                    <Form.Select name="vertical_id" value={formData.vertical_id || ''} onChange={handleChange}>
-                                        <option value="">Nenhuma</option>
-                                        {verticais.map(v => <option key={v.id} value={v.id}>{v.nome}</option>)}
-                                    </Form.Select>
+                                    {!showNewVertInput ? (
+                                        <Form.Select name="vertical_id" value={formData.vertical_id || ''} onChange={handleChange}>
+                                            <option value="">Nenhuma</option>
+                                            {verticais.map(v => <option key={v.id} value={v.id}>{v.nome}</option>)}
+                                            <option value="CREATE_NEW" className="fw-bold text-primary">[+] Criar Nova Vertical</option>
+                                        </Form.Select>
+                                    ) : (
+                                        <InputGroup>
+                                            <Form.Control type="text" placeholder="Nova vertical" value={newVertText} onChange={(e) => setNewVertText(e.target.value)} autoFocus />
+                                            <Button variant="success" onClick={handleAddNewVertical}><FaCheck /></Button>
+                                            <Button variant="outline-secondary" onClick={() => setShowNewVertInput(false)}>X</Button>
+                                        </InputGroup>
+                                    )}
                                 </Form.Group></Col>
                             </Row>
 

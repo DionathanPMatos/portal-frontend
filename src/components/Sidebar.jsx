@@ -53,7 +53,6 @@ const menuItems = [
       { name: "Campanhas Vigentes", link: "#" },
       { name: "Forecast", link: "#", target: "_blank" }, //A REALIZAR
       { name: "Registro de projetos", link: "/RegisterUser" },
-      { name: "Ferramentas Úteis", link: "/ferramentas/calculadora-solar" },
       { name: "Politicas Comerciais", link: "#", target: "_blank" },
     ],
   },
@@ -67,15 +66,15 @@ const menuItems = [
         target: "_blank",
       },
       { name: "Gerente de Produtos", link: "/OrganogramaTecnico" },
-      { name: "DTC", link: "/crm/dashboard-dtc" },
+      { name: "Fabricantes", link: "/dtc/fabricantes" },
+      { name: "Ferramentas Úteis", link: "/dtc/ferramentas" },
+      { name: "Solicitação de Propostas", link: "/crm/dashboard-dtc" },
       { name: "Repositório Técnico", link: "/dtc/repositorio" },
-      { name: "Garantia de Fabricantes", link: "#" },
       {
         name: "RMA",
         link: "https://rma-dev.dca.com.br/support/home",
         target: "_blank",
       },
-      { name: "Termos de Referências", link: "#", target: "_blank" },
     ],
   },
   {
@@ -317,10 +316,12 @@ function Sidebar({ isLoggedIn, user, onLogout }) {
         <div className="sidebar-footer">
           <p>&copy; {new Date().getFullYear()} DCA. Todos os direitos reservados.</p>
         </div>
-      </div>
+        </div>
+    </>
+      
       
 
-    </>
+    
   );
 }
 
