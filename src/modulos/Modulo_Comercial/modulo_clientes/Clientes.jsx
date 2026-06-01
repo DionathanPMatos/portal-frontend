@@ -14,6 +14,7 @@ import {
   Form,
   Modal,
   InputGroup,
+  Pagination,
 } from "react-bootstrap";
 import { FaUser } from "react-icons/fa";
 
@@ -391,13 +392,20 @@ export default function Clientes() {
   const navigate = useNavigate();
 
   const [clientes, setClientes] = useState([]);
+  const [totalClientes, setTotalClientes] = useState(0);
+  const [totalProjetosAndamento, setTotalProjetosAndamento] = useState(0);
+  const [totalClientesMes, setTotalClientesMes] = useState(0);
   const [loading, setLoading] = useState(true);
+
+  const [page, setPage] = useState(1);
+  const limit = 10;
 
   const [err, setErr] = useState("");
   const [success, setSuccess] = useState("");
 
   const [search, setSearch] = useState("");
   const [uf, setUf] = useState("");
+  const [cidade, setCidade] = useState("");
   const [perfil, setPerfil] = useState("");
   const [segmento, setSegmento] = useState("");
 
@@ -409,7 +417,7 @@ export default function Clientes() {
   const [importFile, setImportFile] = useState(null);
   const [importResult, setImportResult] = useState(null);
 
-  const fetchClientes = async () => {
+  const fetchClientes = async (currentPage = page) => {
     setErr("");
     setLoading(true);
     try {
@@ -417,12 +425,18 @@ export default function Clientes() {
         params: {
           ativo: 1,
           uf: uf || undefined,
+          cidade: cidade || undefined,
           perfil: perfil || undefined,
           segmento: segmento || undefined,
           search: search || undefined,
+          page: currentPage,
+          limit,
         },
       });
-      setClientes(res.data || []);
+      setClientes(res.data?.data || []);
+      setTotalClientes(res.data?.total || 0);
+      setTotalProjetosAndamento(res.data?.totalProjetosAndamento || 0);
+      setTotalClientesMes(res.data?.totalClientesMes || 0);
     } catch (e) {
       console.error(e);
       setErr("Erro ao buscar clientes.");
@@ -437,20 +451,18 @@ export default function Clientes() {
   }, []);
 
   useEffect(() => {
-    const t = setTimeout(() => fetchClientes(), 300);
+    fetchClientes(page);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page]);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      if (page !== 1) setPage(1);
+      else fetchClientes(1);
+    }, 300);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, uf, perfil, segmento]);
-
-  const filteredLocal = useMemo(() => {
-    const t = search.trim().toLowerCase();
-    if (!t) return clientes;
-    return clientes.filter((c) => {
-      const a = (c.nome_cliente || "").toLowerCase();
-      const b = (c.cnpj_cpf || "").toLowerCase();
-      return a.includes(t) || b.includes(t);
-    });
-  }, [clientes, search]);
+  }, [search, uf, cidade, perfil, segmento]);
 
   const openNew = () => {
     setEditing(null);
@@ -511,6 +523,20 @@ export default function Clientes() {
     }
   };
 
+  const downloadSampleCSV = () => {
+    const csvContent = "nome_cliente,cnpj_cpf,razao_social,nome_fantasia,segmento,perfil,cep,logradouro,numero,complemento,bairro,cidade,uf,site,inscricao_estadual,observacoes\nCliente Exemplo,00000000000000,Razao Exemplo LTDA,Exemplo,Tecnologia,Cliente Final,00000000,Rua Exemplo,123,Sala 1,Centro,Sao Paulo,SP,https://exemplo.com,ISENTO,Observacao de teste";
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "modelo_importacao_clientes.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const totalPages = Math.ceil(totalClientes / limit);
+
   if (loading) {
     return (
       <Container className="mt-5 text-center">
@@ -537,6 +563,35 @@ export default function Clientes() {
                                   
                                 </div>
                             </div>
+
+          {/* KPIs da Diretoria */}
+          <Row className="mb-4">
+            <Col md={4}>
+              <Card className="shadow-sm border-0 bg-primary text-white h-100">
+                <Card.Body>
+                  <h6>Total de Clientes Ativos</h6>
+                  <h3 className="mb-0">{totalClientes}</h3>
+                </Card.Body>
+              </Card>
+            </Col>
+            <Col md={4}>
+              <Card className="shadow-sm border-0 bg-success text-white h-100">
+                <Card.Body>
+                  <h6>Clientes Adicionados no Mês</h6>
+                  <h3 className="mb-0">{totalClientesMes}</h3>
+                </Card.Body>
+              </Card>
+            </Col>
+            <Col md={4}>
+              <Card className="shadow-sm border-0 bg-info text-white h-100">
+                <Card.Body>
+                  <h6>Projetos em Andamento</h6>
+                  <h3 className="mb-0">{totalProjetosAndamento}</h3>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+
           <Row className="align-items-center mb-3">
  
             <Col className="text-end">
@@ -573,7 +628,7 @@ export default function Clientes() {
               </InputGroup>
             </Col>
 
-            <Col md={2}>
+            <Col md={1}>
               <Form.Select value={uf} onChange={(e) => setUf(e.target.value)}>
                 <option value="">UF</option>
                 {UFS.map((u) => (
@@ -582,6 +637,14 @@ export default function Clientes() {
                   </option>
                 ))}
               </Form.Select>
+            </Col>
+
+            <Col md={2}>
+              <Form.Control
+                placeholder="Cidade"
+                value={cidade}
+                onChange={(e) => setCidade(e.target.value)}
+              />
             </Col>
 
             <Col md={3}>
@@ -611,6 +674,7 @@ export default function Clientes() {
                 onClick={() => {
                   setSearch("");
                   setUf("");
+                  setCidade("");
                   setPerfil("");
                   setSegmento("");
                 }}
@@ -629,6 +693,7 @@ export default function Clientes() {
                 <th>Cliente</th>
                 <th>CNPJ</th>
                 <th>UF</th>
+                <th>Cidade</th>
                 <th>Perfil</th>
                 <th>Segmento</th>
                 <th>Criado em</th>
@@ -638,8 +703,8 @@ export default function Clientes() {
             </thead>
 
             <tbody>
-              {filteredLocal.length > 0 ? (
-                filteredLocal.map((c) => (
+              {clientes.length > 0 ? (
+                clientes.map((c) => (
                   <tr key={c.id}>
                     <td>
                       <Link to={`/crm/clientes/${c.id}`} style={{ textDecoration: "none" }}>
@@ -648,6 +713,7 @@ export default function Clientes() {
                     </td>
                     <td>{c.cnpj_cpf || "-"}</td>
                     <td>{c.uf || "-"}</td>
+                    <td>{c.cidade || "-"}</td>
                     <td>{c.perfil || "-"}</td>
                     <td>{c.segmento || "-"}</td>
                     <td>{formatDateBR(c.created_at)}</td>
@@ -688,6 +754,18 @@ export default function Clientes() {
             </tbody>
           </Table>
 
+          {totalPages > 1 && (
+            <Pagination className="justify-content-center mt-3">
+              <Pagination.Prev onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} />
+              {[...Array(totalPages)].map((_, i) => (
+                <Pagination.Item key={i + 1} active={i + 1 === page} onClick={() => setPage(i + 1)}>
+                  {i + 1}
+                </Pagination.Item>
+              ))}
+              <Pagination.Next onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} />
+            </Pagination>
+          )}
+
           <ClienteFormModal
             show={showModal}
             onHide={() => setShowModal(false)}
@@ -701,6 +779,11 @@ export default function Clientes() {
               <Modal.Title>Importar Clientes</Modal.Title>
             </Modal.Header>
             <Modal.Body>
+              <div className="text-end mb-3">
+                <Button variant="outline-info" size="sm" onClick={downloadSampleCSV}>
+                  Baixar Planilha Modelo (CSV)
+                </Button>
+              </div>
               <Form.Group className="mb-3">
                 <Form.Label>Arquivo (.xlsx ou .csv)</Form.Label>
                 <Form.Control

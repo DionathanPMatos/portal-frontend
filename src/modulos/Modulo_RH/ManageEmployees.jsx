@@ -15,6 +15,7 @@ import axios from 'axios';
 import { FaEdit, FaTrash, FaUserPlus, FaFileImport, FaBriefcase, FaSitemap, FaSearch, FaUserTimes } from 'react-icons/fa';
 import CargosModal from './CargosModal';
 import SetoresModal from './SetoresModal';
+import UnidadesModal from './UnidadesModal';
 import ImportModal from '../ImportModal'; // 1. IMPORTA O NOVO MODAL
 import '../../App.css';
 
@@ -22,12 +23,14 @@ const ManageEmployees = ({ isLoggedIn }) => {
     const [employees, setEmployees] = useState([]);
     const [cargos, setCargos] = useState([]);
     const [setores, setSetores] = useState([]);
+    const [unidades, setUnidades] = useState([]);
     const [fabricantes, setFabricantes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
     const [isCargosModalOpen, setIsCargosModalOpen] = useState(false);
     const [isSetoresModalOpen, setIsSetoresModalOpen] = useState(false);
+    const [isUnidadesModalOpen, setIsUnidadesModalOpen] = useState(false);
     const [showImportModal, setShowImportModal] = useState(false); // 2. ESTADO PARA O MODAL DE IMPORTAÇÃO
     const [filtroCargo, setFiltroCargo] = useState(''); 
     const [filtroSetor, setFiltroSetor] = useState('');
@@ -40,10 +43,13 @@ const ManageEmployees = ({ isLoggedIn }) => {
     const [cargoId, setCargoId] = useState('');
     const [setorId, setSetorId] = useState('');
     const [gestorId, setGestorId] = useState('');
+    const [unidadeId, setUnidadeId] = useState('');
     const [permissions, setPermissions] = useState(['dashboard']);
     const [selectedFabricantes, setSelectedFabricantes] = useState([]);
     const [userpicFile, setUserpicFile] = useState(null);
     const [existingUserpicBase64, setExistingUserpicBase64] = useState('');
+    const [cnhNumero, setCnhNumero] = useState('');
+    const [cnhValidade, setCnhValidade] = useState('');
 
     const [editingEmployee, setEditingEmployee] = useState(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -111,6 +117,13 @@ const ManageEmployees = ({ isLoggedIn }) => {
         } catch (err) { console.error('Erro ao buscar setores:', err); }
     };
 
+    const fetchUnidades = async () => {
+        try {
+            const response = await axios.get('/api/unidades');
+            setUnidades(response.data);
+        } catch (err) { console.error('Erro ao buscar unidades:', err); }
+    };
+
     const fetchFabricantes = async () => {
         try {
             const response = await axios.get('/api/fabricantes');
@@ -124,6 +137,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
             fetchEmployees();
             if (cargos.length === 0) fetchCargos();
             if (setores.length === 0) fetchSetores();
+            if (unidades.length === 0) fetchUnidades();
             if (fabricantes.length === 0) fetchFabricantes();
         } else {
             setEmployees([]);
@@ -150,7 +164,10 @@ const ManageEmployees = ({ isLoggedIn }) => {
                 cargo_id: cargoId ? Number(cargoId) : null,
                 privilegios: permissions.join(',') || 'usuario',
                 fabricantes_ids: selectedFabricantes,
-                gestor_id: gestorId ? Number(gestorId) : null
+                gestor_id: gestorId ? Number(gestorId) : null,
+                unidade_id: unidadeId ? Number(unidadeId) : null,
+                cnh_numero: cnhNumero || null,
+                cnh_validade: cnhValidade || null
             };
 
             if (editingEmployee) {
@@ -184,10 +201,13 @@ const ManageEmployees = ({ isLoggedIn }) => {
         setCargoId(employee.cargo_id || '');
         setSetorId(employee.setor_id || '');
         setGestorId(employee.gestor_id || '');
+        setUnidadeId(employee.unidade_id || '');
         setPermissions(employee.privilegios ? employee.privilegios.split(',') : ['dashboard']);
         setSelectedFabricantes(employee.fabricantes_ids || []);
         setExistingUserpicBase64(employee.userpic_base64 || '');
         setUserpicFile(null);
+        setCnhNumero(employee.cnh_numero || '');
+        setCnhValidade(employee.cnh_validade ? employee.cnh_validade.split('T')[0] : '');
         setShowAddEditModal(true);
     };
 
@@ -195,8 +215,8 @@ const ManageEmployees = ({ isLoggedIn }) => {
         setError(null);
         setEditingEmployee(null);
         setName(''); setEmail(''); setContact('');
-        setCargoId(''); setSetorId('');
-        setGestorId(''); setPermissions(['dashboard']); setSelectedFabricantes([]); setUserpicFile(null);
+        setCargoId(''); setSetorId(''); setUnidadeId('');
+        setGestorId(''); setPermissions(['dashboard']); setSelectedFabricantes([]); setUserpicFile(null); setCnhNumero(''); setCnhValidade('');
         setExistingUserpicBase64(''); setShowAddEditModal(true);
     };
 
@@ -204,8 +224,8 @@ const ManageEmployees = ({ isLoggedIn }) => {
         setShowAddEditModal(false);
         setEditingEmployee(null);
         setName(''); setEmail(''); setContact('');
-        setCargoId(''); setSetorId(''); setGestorId('');
-        setPermissions(['dashboard']); setSelectedFabricantes([]); setUserpicFile(null);
+        setCargoId(''); setSetorId(''); setGestorId(''); setUnidadeId('');
+        setPermissions(['dashboard']); setSelectedFabricantes([]); setUserpicFile(null); setCnhNumero(''); setCnhValidade('');
         setExistingUserpicBase64('');
     };
 
@@ -327,6 +347,9 @@ const ManageEmployees = ({ isLoggedIn }) => {
                                     <Button variant="outline-secondary" className="d-flex align-items-center gap-2 shadow-sm bg-white" onClick={() => setIsSetoresModalOpen(true)}>
                                         <FaSitemap /> Setores
                                     </Button>
+                                    <Button variant="outline-secondary" className="d-flex align-items-center gap-2 shadow-sm bg-white" onClick={() => setIsUnidadesModalOpen(true)}>
+                                        <FaSitemap /> Filiais / Unidades
+                                    </Button>
                                 </Col>
                             </Row>
                         </Card.Body>
@@ -355,6 +378,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
                                                         <div>
                                                             <div className="fw-bold text-dark">{formatarNome(employee.nome_completo)}</div>
                                                             <div className="text-muted small">{employee.email}</div>
+                                                            {employee.nome_unidade && <Badge bg="light" text="dark" className="border mt-1">{employee.nome_unidade}</Badge>}
                                                         </div>
                                                     </div>
                                                 </td>
@@ -388,6 +412,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
             
             <CargosModal show={isCargosModalOpen} onHide={() => setIsCargosModalOpen(false)} onCargosUpdate={fetchCargos} />
             <SetoresModal show={isSetoresModalOpen} onHide={() => setIsSetoresModalOpen(false)} onSetoresUpdate={fetchSetores} />
+            <UnidadesModal show={isUnidadesModalOpen} onHide={() => setIsUnidadesModalOpen(false)} onUnidadesUpdate={fetchUnidades} />
             {/* 4. RENDERIZAÇÃO DO NOVO MODAL DE IMPORTAÇÃO */}
             <ImportModal 
                 show={showImportModal} 
@@ -405,6 +430,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
                         <Form.Group className="mb-3"><Form.Label>E-mail</Form.Label><Form.Control type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></Form.Group>
                         <Form.Group className="mb-3"><Form.Label>Contato</Form.Label><Form.Control type="text" value={contact} onChange={(e) => setContact(e.target.value)} /></Form.Group>
                         <Form.Group className="mb-3">
+                            
                             <Form.Label>Setor</Form.Label>
                             <Form.Select value={setorId} onChange={(e) => setSetorId(e.target.value)} required>
                                 <option value="">Selecione o Setor</option>
@@ -419,6 +445,13 @@ const ManageEmployees = ({ isLoggedIn }) => {
                             </Form.Select>
                         </Form.Group>
                         <Form.Group className="mb-3">
+                            <Form.Label>Unidade / Filial</Form.Label>
+                            <Form.Select value={unidadeId} onChange={(e) => setUnidadeId(e.target.value)}>
+                                <option value="">Não Vinculado</option>
+                                {unidades.map(u => (<option key={u.id} value={u.id}>{u.nome_unidade}</option>))}
+                            </Form.Select>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
                             <Form.Label>Reporta a (Gestor/Supervisor)</Form.Label>
                             <Form.Select value={gestorId} onChange={(e) => setGestorId(e.target.value)}>
                                 <option value="">Nenhum (Responde à Diretoria)</option>
@@ -429,6 +462,14 @@ const ManageEmployees = ({ isLoggedIn }) => {
                                 ))}
                             </Form.Select>
                         </Form.Group>
+                        <Row>
+                            <Col md={6}>
+                                <Form.Group className="mb-3"><Form.Label>Nº CNH (Frota)</Form.Label><Form.Control type="text" value={cnhNumero} onChange={(e) => setCnhNumero(e.target.value)} placeholder="Opcional" /></Form.Group>
+                            </Col>
+                            <Col md={6}>
+                                <Form.Group className="mb-3"><Form.Label>Validade CNH</Form.Label><Form.Control type="date" value={cnhValidade} onChange={(e) => setCnhValidade(e.target.value)} /></Form.Group>
+                            </Col>
+                        </Row>
                         <Form.Group className="mb-3">
                             <Form.Label className="fw-bold text-muted small text-uppercase">Permissões de Acesso</Form.Label>
                             <div className="d-flex flex-wrap gap-3 p-3 bg-light rounded border">

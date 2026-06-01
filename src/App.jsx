@@ -43,6 +43,11 @@ import Visitas from "./modulos/Modulo_Visitantes/Visitas";
 import AdminDashboard from './modulos/Modulo_Visitantes/AdminDashboard'; 
 
 // ==========================================
+//MÓDULO DE CONTROLE DE FROTA
+// ==========================================
+import Frota from "./modulos/Modulo_Controle_Frota/Frota";
+
+// ==========================================
 // MÓDULO AGENTE PROSPECÇÃO (IA E LEADS)
 // ==========================================
 import PainelProspeccao from "./modulos/Modulo_Agente_Prospeccao/PainelProspeccao";
@@ -176,6 +181,9 @@ function App() {
             <Route path="/admin/gerenciar-leads" element={<GerenciamentoLeads />} />
             <Route path="/crm/clientes" element={<Clientes />} />
             <Route path="/crm/clientes/:id" element={<ClienteDetalhe user={user} />} />
+
+            {/* NOVA ROTA PARA O MÓDULO DE CONTROLE DE FROTA */}
+            <Route path="/frota" element={<Frota />} />
 
           </Routes>
         </div>

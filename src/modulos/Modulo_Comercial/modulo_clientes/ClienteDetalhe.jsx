@@ -75,6 +75,14 @@ const emptyFilial = {
   uf: "",
 };
 
+const getStatusVariant = (status) => {
+  const s = (status || "").toLowerCase();
+  if (s.includes("bom") || s.includes("aprovado") || s.includes("verde") || s.includes("positivo")) return "success";
+  if (s.includes("alerta") || s.includes("amarelo") || s.includes("pendente")) return "warning";
+  if (s.includes("ruim") || s.includes("reprovado") || s.includes("vermelho") || s.includes("bloqueado")) return "danger";
+  return "secondary";
+};
+
 function ClienteEditModal({ show, onHide, value, onSaved }) {
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
@@ -624,6 +632,7 @@ export default function ClienteDetalhe() {
   const [cliente, setCliente] = useState(null);
   const [contatos, setContatos] = useState([]);
   const [projetos, setProjetos] = useState([]);
+  const [interacoes, setInteracoes] = useState([]);
 
   const [showEdit, setShowEdit] = useState(false);
 
@@ -666,9 +675,19 @@ export default function ClienteDetalhe() {
     }
   };
 
+  const fetchInteracoes = async () => {
+    try {
+      const res = await axios.get(`/api/clientes/${id}/interacoes`);
+      setInteracoes(res.data || []);
+    } catch (e) {
+      console.error("Erro ao buscar interações", e);
+    }
+  };
+
   useEffect(() => {
     fetchAll();
     fetchFiliais();
+    fetchInteracoes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -837,7 +856,15 @@ export default function ClienteDetalhe() {
 
       <Row className="align-items-center mb-3">
         <Col>
-          <h4 className="mb-0">{headerTitle}</h4>
+          <h4 className="mb-0">
+            {headerTitle}
+            {cliente.tier_estrategico && (
+              <Badge bg="info" className="ms-2">{cliente.tier_estrategico}</Badge>
+            )}
+            {cliente.status_credito && (
+              <Badge bg={getStatusVariant(cliente.status_credito)} className="ms-2">{cliente.status_credito}</Badge>
+            )}
+          </h4>
           <div className="text-muted">
             Criado em: {formatDateBR(cliente.created_at)} • Atualizado:{" "}
             {formatDateBR(cliente.updated_at)}
@@ -1235,6 +1262,41 @@ export default function ClienteDetalhe() {
                   )}
                 </tbody>
               </Table>
+            </Tab>
+
+            <Tab eventKey="interacoes" title={`Interações (${interacoes.length})`}>
+              <div className="mt-3">
+                {interacoes.length > 0 ? (
+                  <Table striped bordered hover responsive>
+                    <thead>
+                      <tr>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th>Descrição</th>
+                        <th>Responsável</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {interacoes.map((int, idx) => (
+                        <tr key={idx}>
+                          <td>{formatDateBR(int.data)}</td>
+                          <td>
+                            <Badge bg={int.tipo?.includes('Visita') ? 'primary' : 'secondary'}>
+                              {int.tipo}
+                            </Badge>
+                          </td>
+                          <td>{int.descricao || "-"}</td>
+                          <td>{int.responsavel || "-"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                ) : (
+                  <Alert variant="secondary" className="text-center">
+                    Nenhuma interacción registrada para este cliente.
+                  </Alert>
+                )}
+              </div>
             </Tab>
 
             <Tab eventKey="pedidos" title="Pedidos">

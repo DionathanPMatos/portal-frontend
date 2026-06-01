@@ -57,6 +57,15 @@ const menuItems = [
     ],
   },
   {
+    name: "Frota",
+    icon: <FaTruck size={iconSize} />,
+    subItems: [
+      { name: "Controle de Frota", link: "/frota" },
+    
+      
+    ],
+  },
+  {
     name: "DTC",
     icon: <FaProjectDiagram size={iconSize} />,
     subItems: [
