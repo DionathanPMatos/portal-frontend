@@ -3,6 +3,8 @@ import { Container, Row, Col, Spinner, Alert, Card, Form, InputGroup } from 'rea
 import { FaUserTie, FaSearch } from 'react-icons/fa';
 import axios from 'axios';
 
+
+
 const Funcionarios = () => {
     // Estado para guardar os funcionários já agrupados pelo backend
     const [groupedEmployees, setGroupedEmployees] = useState({});

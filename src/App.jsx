@@ -48,6 +48,11 @@ import AdminDashboard from './modulos/Modulo_Visitantes/AdminDashboard';
 import Frota from "./modulos/Modulo_Controle_Frota/Frota";
 
 // ==========================================
+// MÓDULO FACILITIES
+// ==========================================
+import Facilities from "./modulos/Modulo_Facilities/Facilities";
+
+// ==========================================
 // MÓDULO AGENTE PROSPECÇÃO (IA E LEADS)
 // ==========================================
 import PainelProspeccao from "./modulos/Modulo_Agente_Prospeccao/PainelProspeccao";
@@ -184,6 +189,9 @@ function App() {
 
             {/* NOVA ROTA PARA O MÓDULO DE CONTROLE DE FROTA */}
             <Route path="/frota" element={<Frota />} />
+            
+            {/* ROTA FACILITIES */}
+            <Route path="/facilities" element={<Facilities />} />
 
           </Routes>
         </div>

@@ -16,6 +16,7 @@ import {
   FaRegNewspaper,
   FaChevronDown,
   FaChevronRight,
+  FaBuilding,
 } from "react-icons/fa";
 /*import { SiMarketo } from "react-icons/si";*/
 import { GiHumanPyramid } from "react-icons/gi";
@@ -63,6 +64,13 @@ const menuItems = [
       { name: "Controle de Frota", link: "/frota" },
     
       
+    ],
+  },
+  {
+    name: "Facilities",
+    icon: <FaBuilding size={iconSize} />,
+    subItems: [
+      { name: "Gestão de Ativos", link: "/facilities" },
     ],
   },
   {
