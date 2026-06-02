@@ -36,7 +36,7 @@ export default function ModalManutencao({ show, onHide, manutData, setManutData,
           ))}
 
           <Col md={12}><h6 className="border-bottom pb-2 text-success fw-bold mt-4">Aprovação e Conclusão</h6></Col>
-          <Col md={6}><Form.Group><Form.Label>Prestador Escolhido / Aprovado</Form.Label>
+          <Col md={4}><Form.Group><Form.Label>Prestador Escolhido / Aprovado</Form.Label>
             <Form.Select value={manutData.prestador_aprovado_id} onChange={e => setManutData({...manutData, prestador_aprovado_id: e.target.value})}>
               <option value="">Ainda em cotação...</option>
               {prestadores.map(p => <option key={p.id} value={p.id}>{p.nome_fantasia}</option>)}
@@ -44,6 +44,9 @@ export default function ModalManutencao({ show, onHide, manutData, setManutData,
           </Form.Group></Col>
           <Col md={3}><Form.Group><Form.Label>Custo Final (R$)</Form.Label><Form.Control type="number" step="0.01" value={manutData.custo_final} onChange={e => setManutData({...manutData, custo_final: e.target.value})} /></Form.Group></Col>
           <Col md={3}><Form.Group><Form.Label>Status</Form.Label><Form.Select value={manutData.status} onChange={e => setManutData({...manutData, status: e.target.value})}><option>Aberta</option><option>Em Andamento</option><option>Concluída</option></Form.Select></Form.Group></Col>
+          {manutData.status === 'Concluída' && (
+            <Col md={2}><Form.Group><Form.Label>Conclusão</Form.Label><Form.Control type="date" value={manutData.data_conclusao} onChange={e => setManutData({...manutData, data_conclusao: e.target.value})} /></Form.Group></Col>
+          )}
         </Row>
       </Modal.Body>
       <Modal.Footer><Button variant="secondary" onClick={onHide}>Cancelar</Button><Button variant="success" onClick={onSave} disabled={!manutData.equipamento_id || !manutData.data_solicitacao}>Salvar Solicitação</Button></Modal.Footer>

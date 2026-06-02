@@ -51,6 +51,7 @@ import Frota from "./modulos/Modulo_Controle_Frota/Frota";
 // MÓDULO FACILITIES
 // ==========================================
 import Facilities from "./modulos/Modulo_Facilities/Facilities";
+import GestaoObras from "./modulos/Modulo_Facilities/GestaoObras";
 
 // ==========================================
 // MÓDULO AGENTE PROSPECÇÃO (IA E LEADS)
@@ -192,6 +193,7 @@ function App() {
             
             {/* ROTA FACILITIES */}
             <Route path="/facilities" element={<Facilities />} />
+            <Route path="/facilities/gestao-obras" element={<GestaoObras />} />
 
           </Routes>
         </div>

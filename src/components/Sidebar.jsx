@@ -71,6 +71,7 @@ const menuItems = [
     icon: <FaBuilding size={iconSize} />,
     subItems: [
       { name: "Gestão de Ativos", link: "/facilities" },
+      { name: "Gestão de Obras", link: "/facilities/gestao-obras" },
     ],
   },
   {

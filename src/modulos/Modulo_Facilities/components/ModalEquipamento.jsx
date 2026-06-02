@@ -34,7 +34,17 @@ export default function ModalEquipamento({ show, onHide, equipData, setEquipData
           <Col md={4}><Form.Group><Form.Label>Data de Aquisição</Form.Label><Form.Control type="date" value={equipData.data_aquisicao} onChange={e => setEquipData({...equipData, data_aquisicao: e.target.value})} /></Form.Group></Col>
           <Col md={4}><Form.Group><Form.Label>Valor de Aquisição (R$)</Form.Label><Form.Control type="number" step="0.01" value={equipData.valor_aquisicao} onChange={e => setEquipData({...equipData, valor_aquisicao: e.target.value})} /></Form.Group></Col>
           <Col md={4}><Form.Group><Form.Label>Garantia (Meses)</Form.Label><Form.Control type="number" value={equipData.garantia_meses} onChange={e => setEquipData({...equipData, garantia_meses: e.target.value})} /></Form.Group></Col>
-          
+          <Col md={12}>
+  <Form.Group className="mt-3">
+    <Form.Check 
+      type="switch"
+      id="exige-manutencao-switch"
+      label="Equipamento exige programação de manutenção constante"
+      checked={equipData.exige_manutencao_programada || false}
+      onChange={(e) => setEquipData({ ...equipData, exige_manutencao_programada: e.target.checked })}
+    />
+  </Form.Group>
+</Col>
           <Col md={6}><Form.Group><Form.Label>Fornecedor (Opcional)</Form.Label>
             <Form.Control 
               list="prestadores-list" 

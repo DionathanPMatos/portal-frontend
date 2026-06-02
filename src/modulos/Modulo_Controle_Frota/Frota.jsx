@@ -450,9 +450,7 @@ export default function Frota() {
                   <i className="bi bi-currency-dollar"></i> Lançar Despesa
                 </Button>
               )}
-              <Button variant="outline-primary" className="me-2" onClick={() => { setVeiculoData(emptyVeiculo); setShowVeiculoModal(true); }}>
-                + Cadastrar Veículo
-              </Button>
+
               <Button variant="primary" onClick={() => { setReservaData(emptyReserva); setShowReservaModal(true); }}>
                 Nova Reserva
               </Button>
@@ -552,7 +550,11 @@ export default function Frota() {
             </Tab>
 
             <Tab eventKey="veiculos" title="Inventário de Veículos">
+                <Button variant="btn btn-primary" className="me-2" onClick={() => { setVeiculoData(emptyVeiculo); setShowVeiculoModal(true); }}>
+                + Cadastrar Veículo
+                </Button>
               <Table striped bordered hover responsive className="mt-3">
+                
                 <thead>
                   <tr>
                     <th>Modelo</th>
@@ -578,9 +580,9 @@ export default function Frota() {
                       <td><Badge bg={getStatusBadge(v.status)}>{v.status}</Badge></td>
                       <td>{renderAlertas(v)}</td>
                       <td>
-                        <Button size="sm" variant="outline-primary" className="me-2 mb-1" onClick={() => handleOpenManutencao(v)}>Manutenção</Button>
-                        <Button size="sm" variant="outline-secondary" className="me-2 mb-1" onClick={() => handleEditVeiculo(v)}>Editar</Button>
-                        <Button size="sm" variant="outline-danger" className="mb-1" onClick={() => handleInactivateVeiculo(v.id)}>Inativar</Button>
+                        <Button size="sm" variant="btn btn-primary" className="me-2 mb-1" onClick={() => handleOpenManutencao(v)}>Manutenção</Button>
+                        <Button size="sm" variant="btn btn- secondary" className="me-2 mb-1" onClick={() => handleEditVeiculo(v)}>Editar</Button>
+                        <Button size="sm" variant="danger" className="mb-1" onClick={() => handleInactivateVeiculo(v.id)}>Inativar</Button>
                       </td>
                     </tr>
                   ))}

@@ -1,0 +1,51 @@
+.gestao-obras-container {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.gestao-obras-container h1 {
+  color: #333;
+  font-weight: 700;
+  margin-bottom: 2rem;
+}
+
+.projeto-list {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.projeto-item {
+  border-left: 4px solid #007bff;
+  transition: all 0.3s ease;
+}
+
+.projeto-item:hover {
+  background-color: #f8f9fa !important;
+  border-left-color: #0056b3;
+}
+
+.projeto-item.active {
+  border-left-color: #28a745;
+  background-color: #e8f5e9;
+}
+
+.progress-sm {
+  height: 16px;
+  font-size: 10px;
+}
+
+.border-left-4 {
+  border-left: 4px solid #007bff;
+  padding-left: 16px;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .projeto-list {
+    max-height: 400px;
+  }
+}
