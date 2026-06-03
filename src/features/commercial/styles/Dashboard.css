@@ -1,0 +1,111 @@
+
+.container-main {
+  padding: 24px;
+}
+
+/* Estilização dos Cards */
+.card {
+  border: none;
+  border-radius: 12px; /* Bordas mais arredondadas */
+  background-color: var(--cor-fundo-card, #ffffff);
+  box-shadow: var(--sombra-card, 0 4px 12px rgba(0, 0, 0, 0.08));
+  transition: all 0.3s ease;
+  overflow: hidden; /* Garante que o conteúdo respeite as bordas arredondadas */
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  background-color: var(--cor-fundo-card, #ffffff);
+  border-bottom: 1px solid var(--cor-borda, #eef2f5);
+  padding: 1rem 1.5rem;
+  font-weight: 600;
+  color: #4d5c6a;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+/* Estilos específicos para o Kanban */
+.kanban-board {
+  display: flex;
+  gap: 1.5rem; /* Aumenta o espaçamento entre colunas */
+  overflow-x: auto;
+  padding: 1rem 0.5rem;
+}
+
+.kanban-column {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: 300px; /* Colunas um pouco mais largas */
+  background-color: transparent; /* Fundo da coluna transparente */
+  border-radius: 12px;
+}
+
+.kanban-column-title {
+  padding: 1rem;
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--cor-texto-secundario, #8a949f);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.kanban-column-content {
+  padding: 0 0.5rem;
+  min-height: 120px;
+  border-radius: 12px;
+  flex-grow: 1;
+}
+
+.kanban-card {
+  background-color: var(--cor-fundo-card, #ffffff);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--sombra-card, 0 4px 12px rgba(0, 0, 0, 0.08));
+  cursor: grab;
+  border-left: 4px solid var(--cor-destaque, #0063c6); /* Adiciona uma barra lateral colorida */
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.kanban-card:hover {
+   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+.kanban-card strong {
+  color: var(--cor-texto-primario, #333);
+}
+
+.kanban-card p {
+  color: var(--cor-texto-secundario, #8a949f);
+}
+
+/* Para o novo cabeçalho da página */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: var(--cor-fundo-card, #fff);
+  border-radius: 12px;
+  box-shadow: var(--sombra-card, 0 4px 12px rgba(0, 0, 0, 0.08));
+}
+
+.page-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--cor-texto-primario, #333);
+  margin: 0;
+}
+
+.page-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}

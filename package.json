@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite --open",
     "build": "vite build",
+    "tunnel:local": "node scripts/tunnel.js local 5174",
+    "tunnel:ngrok": "node scripts/tunnel.js ngrok 5174",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -18,6 +20,7 @@
     "axios": "^1.11.0",
     "bootstrap": "^5.3.7",
     "date-fns": "^4.4.0",
+    "dist": "^0.1.2",
     "firebase": "^12.2.0",
     "moment": "^2.30.1",
     "react": "^19.1.1",
@@ -40,6 +43,8 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
+    "localtunnel": "^2.0.2",
+    "ngrok": "^4.3.3",
     "open": "^10.2.0",
     "sass": "^1.90.0",
     "vite": "^7.1.2"

@@ -6,10 +6,20 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      '/api': 'http://localhost:3000',
-      '/auth': 'http://localhost:3000',
-      '/user-data': 'http://localhost:3000',
-      '/calendar': 'http://localhost:3000',
-    },
+      '/api': {
+        target: 'http://localhost:3000', changeOrigin: true,
+      },
+      '/auth': {
+        target: 'http://localhost:3000', changeOrigin: true,
+      },
+      '/user-data': {
+        target: 'http://localhost:3000', changeOrigin: true,
+      },
+      '/calendar': {
+        target: 'http://localhost:3000', changeOrigin: true,
+      },
   },
+
+}
+
 });
