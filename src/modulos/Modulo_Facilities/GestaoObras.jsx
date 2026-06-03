@@ -232,7 +232,7 @@ export default function GestaoObras() {
                     >
                       <div className="d-flex justify-content-between align-items-start">
                         <div className="flex-grow-1">
-                          <h6 className="mb-1">{p.nome_projeto}</h6>
+                          <h6 className="mb-1" style={{textTransform: 'uppercase'}}>{p.nome_projeto}</h6>
                           <small className="text-muted d-block">{p.filial_nome}</small>
                         </div>
                         <Badge bg={statusColors[p.status]}>{p.status}</Badge>
@@ -258,7 +258,7 @@ export default function GestaoObras() {
               <Tab eventKey="visao" title="Visão Geral">
                 <Card className="shadow-sm">
                   <Card.Header className="d-flex justify-content-between align-items-center">
-                    <h5>{projetoSelecionado.nome_projeto}</h5>
+                    <h5 style={{textTransform: 'uppercase'}}>{projetoSelecionado.nome_projeto}</h5>
                     <div>
                       <Button
                         variant="primary"

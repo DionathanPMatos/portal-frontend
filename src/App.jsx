@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
+axios.defaults.withCredentials = true;
 
 
 // ==========================================
@@ -94,7 +95,8 @@ import "./css/Home.css";
 import "./css/AdminPage.css";
 import "./App.css";
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+// 🚀 CORREÇÃO: Quando compilado (Túnel/Produção), usa a URL raiz dinamicamente sem forçar IPs
+const API_URL = import.meta.env.DEV ? 'http://localhost:3000' : '';
 
 axios.defaults.baseURL = API_URL;
 axios.defaults.withCredentials = true;

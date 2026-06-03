@@ -142,7 +142,8 @@ const DashboardProjetos = () => {
     };
 
     const handleOpenModal = (etapa = '') => {
-        setDefaultStage(etapa);
+        // Evita que o evento de clique do mouse seja passado como 'etapa' causando tela branca
+        setDefaultStage(typeof etapa === 'string' ? etapa : '');
         setShowModal(true);
     };
 

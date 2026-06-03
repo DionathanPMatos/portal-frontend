@@ -8,6 +8,8 @@ import ModalManutencao from "./components/ModalManutencao";
 import ModalProgManutencaoEquip from "./components/ModalProgManutencaoEquip";
 import ModalInativarEquip from "./components/ModalInativarEquip";
 import ModalHistoricoEquip from "./components/ModalHistoricoEquip";
+import ModalImportarEquip from "./components/ModalImportarEquip";
+import ModalImportarPrestador from "./components/ModalImportarPrestador";
 
 const emptyEquip = { nome: "", categoria: "Ar Condicionado", marca: "", modelo: "", numero_serie: "", data_aquisicao: "", valor_aquisicao: "", garantia_meses: "", filial_id: "", centro_custo: "", fornecedor_id: "", fornecedor_nome: "", status: "Ativo", notas: "", exige_manutencao_programada: false };
 const emptyPrestador = { 
@@ -32,9 +34,13 @@ export default function Facilities() {
   const [dashFilial, setDashFilial] = useState("");
   const [err, setErr] = useState("");
   const [success, setSuccess] = useState("");
+  const [activeTab, setActiveTab] = useState("dashboard");
 
   const [showEquip, setShowEquip] = useState(false);
   const [equipData, setEquipData] = useState(emptyEquip);
+
+  const [showImportar, setShowImportar] = useState(false);
+  const [showImportarPrestador, setShowImportarPrestador] = useState(false);
 
   const [showPrestador, setShowPrestador] = useState(false);
   const [prestadorData, setPrestadorData] = useState(emptyPrestador);
@@ -325,7 +331,8 @@ export default function Facilities() {
         
         <Card.Body>
           <Tabs 
-            defaultActiveKey="dashboard" 
+            activeKey={activeTab}
+            onSelect={(k) => setActiveTab(k)}
             variant="pills" 
             className="mb-4 p-2 bg-light rounded-4 shadow-sm d-flex flex-nowrap overflow-auto"
             style={{ whiteSpace: "nowrap", gap: "0.5rem" }}
@@ -481,9 +488,14 @@ export default function Facilities() {
                   {unidades.map(u => <option key={u.id} value={u.id}>{u.nome_unidade}</option>)}
                 </Form.Select>
               </div>
-              <Button variant="primary" onClick={() => { setEquipData(emptyEquip); setShowEquip(true); }}>
-                + Cadastrar Equipamento
-              </Button>
+              <div className="d-flex gap-2">
+                <Button variant="success" onClick={() => setShowImportar(true)}>
+                  <i className="bi bi-file-earmark-spreadsheet me-1"></i> Importar
+                </Button>
+                <Button variant="primary" onClick={() => { setEquipData(emptyEquip); setShowEquip(true); }}>
+                  + Cadastrar Equipamento
+                </Button>
+              </div>
             </div>
             <Table striped bordered hover responsive>
                 <thead>
@@ -603,9 +615,14 @@ export default function Facilities() {
                     <option value="false">Inativos</option>
                   </Form.Select>
                 </div>
-                <Button variant="primary" onClick={() => { setPrestadorData(emptyPrestador); setShowPrestador(true); }}>
-                  + Novo Prestador
-                </Button>
+                <div className="d-flex gap-2">
+                  <Button variant="success" onClick={() => setShowImportarPrestador(true)}>
+                    <i className="bi bi-file-earmark-spreadsheet me-1"></i> Importar
+                  </Button>
+                  <Button variant="primary" onClick={() => { setPrestadorData(emptyPrestador); setShowPrestador(true); }}>
+                    + Novo Prestador
+                  </Button>
+                </div>
               </div>
               <Table striped bordered hover responsive>
                 <thead>
@@ -640,6 +657,24 @@ export default function Facilities() {
         show={showEquip} onHide={() => setShowEquip(false)} 
         equipData={equipData} setEquipData={setEquipData} 
         unidades={unidades} prestadores={prestadores.filter(p => p.ativo)} onSave={handleSaveEquip} 
+      />
+
+      <ModalImportarEquip 
+        show={showImportar} 
+        onHide={() => setShowImportar(false)} 
+        onSave={() => {
+          setShowImportar(false);
+          fetchData();
+        }} 
+      />
+
+      <ModalImportarPrestador 
+        show={showImportarPrestador} 
+        onHide={() => setShowImportarPrestador(false)} 
+        onSave={() => {
+          setShowImportarPrestador(false);
+          fetchData();
+        }} 
       />
 
       <ModalPrestador 

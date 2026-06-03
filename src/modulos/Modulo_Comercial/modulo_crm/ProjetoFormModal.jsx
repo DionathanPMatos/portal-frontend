@@ -1,110 +1,67 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Modal, Button, Form, Spinner, Alert, Row, Col, InputGroup } from 'react-bootstrap';
+import { Modal, Button, Form, Spinner, Alert, Row, Col, InputGroup, ListGroup, Badge } from 'react-bootstrap';
 import { FaCheck } from 'react-icons/fa';
 import axios from 'axios';
 
-// A lista de etapas foi mantida
-// Lista completa de etapas selecionáveis no formulário
 const ETAPAS_DO_FUNIL_COMPLETA = [
-    'Prospeccao',
-    'Dtc',
-    'Poc',
-    'Negociacao',
-    'Aprovação',
-    'Fechado',
-    'Perdido',
-    'Ganho' // Mantendo 'Ganho' por segurança
+    '0% - Projeto Perdido', '05% - Prospecção', '25% - Especificação de Projeto',
+    '35% - POC', '55% - Envio de Proposta - Projeto', '75% - Aguardando Aprovação',
+    '95% - Pedido Fechado', '98% - Parcialmente Entregue', '100% - Faturado e Entregue', 'Ganho'
 ];
 
 const TIPOS_PROJETO = ['Público', 'Privado'];
 
 const ProjetoFormModal = ({ show, onHide, onSuccess, projetoParaEditar, defaultStage }) => {
-    // 1. Estado inicial expandido para incluir os novos campos
     const initialState = {
         nome_projeto: '', cliente_id: '', vendedor_id: '', valor_estimado: '',
         data_fechamento_prevista: '', etapa_funil: defaultStage || ETAPAS_DO_FUNIL_COMPLETA[0],
-        // --- NOVOS CAMPOS ---
-        tipo_projeto: 'Privado',
-        segmentacao_id: '',
-        vertical_id: '',
-        integrador_id: '',
-        colaboradores_ids: [], // Para multi-seleção
-        fabricantes_ids: [],   // Para multi-seleção
-        numero_registro_fabricante: '',
+        tipo_projeto: 'Privado', segmentacao_id: '', vertical_id: '', integrador_id: '',
+        colaboradores_ids: [], fabricantes_ids: [], numero_registro_fabricante: '',
     };
 
     const [formData, setFormData] = useState(initialState);
-
     const [temRegistro, setTemRegistro] = useState('Nao');
-
-    // 2. Novos estados para armazenar as listas de opções
-    const [clientes, setClientes] = useState([]);
     const [vendedores, setVendedores] = useState([]);
     const [funcionarios, setFuncionarios] = useState([]);
     const [segmentacoes, setSegmentacoes] = useState([]);
     const [verticais, setVerticais] = useState([]);
     const [fabricantes, setFabricantes] = useState([]);
     const [integradores, setIntegradores] = useState([]);
-
+    const [clienteSearch, setClienteSearch] = useState('');
+    const [clienteResults, setClienteResults] = useState([]);
+    const [showClienteDropdown, setShowClienteDropdown] = useState(false);
+    const [clienteSelecionadoNome, setClienteSelecionadoNome] = useState('');
+    const [colabSearch, setColabSearch] = useState('');
+    const [showColabDropdown, setShowColabDropdown] = useState(false);
+    const [showNewClienteModal, setShowNewClienteModal] = useState(false);
+    const [newClienteData, setNewClienteData] = useState({ nome_cliente: '', cnpj_cpf: '', razao_social: '', nome_fantasia: '' });
     const [showNewSegInput, setShowNewSegInput] = useState(false);
     const [newSegText, setNewSegText] = useState('');
     const [showNewVertInput, setShowNewVertInput] = useState(false);
     const [newVertText, setNewVertText] = useState('');
-
     const [loading, setLoading] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState(null);
     const isEditMode = !!projetoParaEditar;
 
-    // 3. useEffect atualizado para buscar todos os dados necessários em paralelo
     useEffect(() => {
         if (show) {
             setError(null);
-            
-            // Bloqueia a tela APENAS se os dados ainda não foram carregados na sessão
-            if (clientes.length === 0) {
-                setLoading(true);
-            }
-
-            const endpoints = [
-                axios.get('/api/clientes'),
-                axios.get('/api/vendedores'),
-                axios.get('/api/funcionarios'),
-                axios.get('/api/segmentacoes'),
-                axios.get('/api/verticais'),
-                axios.get('/api/fabricantes'),
-                axios.get('/api/integradores')
-            ];
-
-            Promise.allSettled(endpoints)
-                .then((results) => {
-                    setClientes(results[0].status === 'fulfilled' ? results[0].value.data : []);
-                    setVendedores(results[1].status === 'fulfilled' ? results[1].value.data : []);
-                    setFuncionarios(results[2].status === 'fulfilled' ? results[2].value.data : []);
-                    setSegmentacoes(results[3].status === 'fulfilled' ? results[3].value.data : []);
-                    setVerticais(results[4].status === 'fulfilled' ? results[4].value.data : []);
-                    setFabricantes(results[5].status === 'fulfilled' ? results[5].value.data : []);
-                    setIntegradores(results[6].status === 'fulfilled' ? results[6].value.data : []);
-                    
-                    if (results.some(r => r.status === 'rejected')) {
-                        console.warn("Aviso: Algumas listas de apoio não puderam ser carregadas do servidor.");
-                    }
-                })
-                .catch(() => setError('Erro ao carregar dados de apoio.'))
-                .finally(() => setLoading(false));
+            if (vendedores.length === 0) setLoading(true);
+            const endpoints = [axios.get('/api/vendedores'), axios.get('/api/funcionarios'), axios.get('/api/segmentacoes'), axios.get('/api/verticais'), axios.get('/api/fabricantes'), axios.get('/api/integradores')];
+            Promise.allSettled(endpoints).then((results) => {
+                setVendedores(results[0].status === 'fulfilled' ? results[0].value.data : []);
+                setFuncionarios(results[1].status === 'fulfilled' ? results[1].value.data : []);
+                setSegmentacoes(results[2].status === 'fulfilled' ? results[2].value.data : []);
+                setVerticais(results[3].status === 'fulfilled' ? results[3].value.data : []);
+                setFabricantes(results[4].status === 'fulfilled' ? results[4].value.data : []);
+                setIntegradores(results[5].status === 'fulfilled' ? results[5].value.data : []);
+            }).finally(() => setLoading(false));
 
             if (isEditMode) {
-                // Prepara os dados para edição, garantindo que os campos de array existam
-                setFormData({
-                    ...initialState, // Garante que todos os campos existam
-                    ...projetoParaEditar,
-                    colaboradores_ids: projetoParaEditar.colaboradores?.map(c => c.id) || [],
-                    fabricantes_ids: projetoParaEditar.fabricantes?.map(f => f.id) || [],
-                    data_fechamento_prevista: projetoParaEditar.data_fechamento_prevista ? projetoParaEditar.data_fechamento_prevista.split('T')[0] : '',
-                    numero_registro_fabricante: projetoParaEditar.numero_registro_fabricante || '',
-
-                });
+                setFormData({ ...initialState, ...projetoParaEditar, colaboradores_ids: projetoParaEditar.colaboradores?.map(c => c.id) || [], fabricantes_ids: projetoParaEditar.fabricantes?.map(f => f.id) || [], data_fechamento_prevista: projetoParaEditar.data_fechamento_prevista?.split('T')[0] || '', numero_registro_fabricante: projetoParaEditar.numero_registro_fabricante || '' });
+                setClienteSelecionadoNome(projetoParaEditar.nome_cliente || '');
             } else {
                 setFormData({ ...initialState, etapa_funil: defaultStage || ETAPAS_DO_FUNIL_COMPLETA[0] });
             }
@@ -117,6 +74,25 @@ const ProjetoFormModal = ({ show, onHide, onSuccess, projetoParaEditar, defaultS
             setFormData(prev => ({ ...prev, numero_registro_fabricante: '' }));
         }
     }, [temRegistro]);
+    // --- EFEITO PARA BUSCA DE CLIENTES NA API ---
+    useEffect(() => {
+        if (clienteSearch.length >= 2) {
+            const fetchClientes = async () => {
+                try {
+                    const res = await axios.get(`/api/clientes?search=${clienteSearch}&limit=10`);
+                    setClienteResults(res.data.data || []);
+                    setShowClienteDropdown(true);
+                } catch (err) {
+                    console.error(err);
+                }
+            };
+            const delay = setTimeout(fetchClientes, 400);
+            return () => clearTimeout(delay);
+        } else {
+            setClienteResults([]);
+            setShowClienteDropdown(false);
+        }
+    }, [clienteSearch]);
 
 
     const handleAddNewSegmentacao = async () => {
@@ -184,9 +160,26 @@ const ProjetoFormModal = ({ show, onHide, onSuccess, projetoParaEditar, defaultS
         }
     };
 
+    const handleCreateCliente = async () => {
+        try {
+            const res = await axios.post('/api/clientes', newClienteData);
+            setFormData(prev => ({ ...prev, cliente_id: res.data.id }));
+            setClienteSelecionadoNome(newClienteData.nome_cliente);
+            setShowNewClienteModal(false);
+            setNewClienteData({ nome_cliente: '', cnpj_cpf: '', razao_social: '', nome_fantasia: '' });
+        } catch (err) {
+            alert(err.response?.data?.error || 'Erro ao criar cliente');
+        }
+    };
+
+    // Filtro de colaboradores no client-side
+    const filteredColabs = funcionarios.filter(f => 
+        f.nome_completo.toLowerCase().includes(colabSearch.toLowerCase()) && 
+        !formData.colaboradores_ids.includes(f.id)
+    );
+
     return (
-        // Aumentei o tamanho do modal para 'lg' (large) para comportar os novos campos
-    
+        <>
         <Modal show={show} onHide={onHide} size="xl">
             <Form onSubmit={handleSubmit}>
                 <Modal.Header closeButton>
@@ -204,12 +197,47 @@ const ProjetoFormModal = ({ show, onHide, onSuccess, projetoParaEditar, defaultS
 
                             <Row>
                                 <Col md={6}>
-                                    <Form.Group className="mb-3">
+                                    <Form.Group className="mb-3" style={{ position: 'relative' }}>
                                         <Form.Label>Cliente</Form.Label>
-                                        <Form.Select name="cliente_id" value={formData.cliente_id || ''} onChange={handleChange} required>
-                                            <option value="">Selecione...</option>
-                                            {clientes.map(c => <option key={c.id} value={c.id}>{c.nome_cliente}</option>)}
-                                        </Form.Select>
+                                        {formData.cliente_id ? (
+                                            <div className="d-flex align-items-center">
+                                                <Form.Control type="text" value={clienteSelecionadoNome} readOnly disabled />
+                                                <Button variant="outline-danger" className="ms-2" onClick={() => {
+                                                    setFormData(prev => ({ ...prev, cliente_id: '' }));
+                                                    setClienteSelecionadoNome('');
+                                                    setClienteSearch('');
+                                                }}>X</Button>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <InputGroup>
+                                                    <Form.Control 
+                                                        type="text" 
+                                                        placeholder="Buscar por nome, CNPJ..." 
+                                                        value={clienteSearch}
+                                                        onChange={(e) => setClienteSearch(e.target.value)}
+                                                        onFocus={() => { if (clienteSearch.length >= 2) setShowClienteDropdown(true); }}
+                                                        onBlur={() => setTimeout(() => setShowClienteDropdown(false), 200)}
+                                                    />
+                                                    <Button variant="outline-success" onClick={() => setShowNewClienteModal(true)} title="Criar Novo Cliente">+ Novo</Button>
+                                                </InputGroup>
+                                                {showClienteDropdown && (
+                                                    <ListGroup style={{ position: 'absolute', zIndex: 1050, width: '100%', maxHeight: '200px', overflowY: 'auto', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+                                                        {clienteResults.length > 0 ? clienteResults.map(c => (
+                                                            <ListGroup.Item action key={c.id} onMouseDown={() => {
+                                                                setFormData(prev => ({ ...prev, cliente_id: c.id }));
+                                                                setClienteSelecionadoNome(c.nome_cliente);
+                                                                setShowClienteDropdown(false);
+                                                            }}>
+                                                                {c.nome_cliente} <small className="text-muted">{c.cnpj_cpf ? `(${c.cnpj_cpf})` : ''}</small>
+                                                            </ListGroup.Item>
+                                                        )) : (
+                                                            <ListGroup.Item className="text-muted">Nenhum cliente encontrado.</ListGroup.Item>
+                                                        )}
+                                                    </ListGroup>
+                                                )}
+                                            </>
+                                        )}
                                     </Form.Group>
                                 </Col>
                                 <Col md={6}>
@@ -223,12 +251,40 @@ const ProjetoFormModal = ({ show, onHide, onSuccess, projetoParaEditar, defaultS
                                 </Col>
                             </Row>
 
-                            <Form.Group className="mb-3">
+                            <Form.Group className="mb-3" style={{ position: 'relative' }}>
                                 <Form.Label>Colaboradores</Form.Label>
-                                <Form.Select name="colaboradores_ids" value={formData.colaboradores_ids} onChange={handleChange} multiple>
-                                    {/* Idealmente, aqui viria uma biblioteca de multi-select mais amigável, mas o padrão já funciona */}
-                                    {funcionarios.map(f => <option key={f.id} value={f.id}>{f.nome_completo}</option>)}
-                                </Form.Select>
+                                <Form.Control 
+                                    type="text" 
+                                    placeholder="Buscar colaborador para adicionar..." 
+                                    value={colabSearch}
+                                    onChange={(e) => setColabSearch(e.target.value)}
+                                    onFocus={() => setShowColabDropdown(true)}
+                                    onBlur={() => setTimeout(() => setShowColabDropdown(false), 200)}
+                                />
+                                {showColabDropdown && filteredColabs.length > 0 && (
+                                    <ListGroup style={{ position: 'absolute', zIndex: 1050, width: '100%', maxHeight: '150px', overflowY: 'auto', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+                                        {filteredColabs.map(f => (
+                                            <ListGroup.Item action key={f.id} onMouseDown={() => {
+                                                setFormData(prev => ({ ...prev, colaboradores_ids: [...prev.colaboradores_ids, f.id] }));
+                                                setColabSearch('');
+                                                setShowColabDropdown(false);
+                                            }}>{f.nome_completo}</ListGroup.Item>
+                                        ))}
+                                    </ListGroup>
+                                )}
+                                <div className="mt-2 d-flex flex-wrap gap-2">
+                                    {formData.colaboradores_ids.map(id => {
+                                        const func = funcionarios.find(f => f.id === id);
+                                        return func ? (
+                                            <Badge bg="secondary" key={id} className="d-flex align-items-center gap-1 p-2">
+                                                {func.nome_completo}
+                                                <span style={{ cursor: 'pointer', fontWeight: 'bold' }} onClick={() => {
+                                                    setFormData(prev => ({ ...prev, colaboradores_ids: prev.colaboradores_ids.filter(cid => cid !== id) }));
+                                                }}>&times;</span>
+                                            </Badge>
+                                        ) : null;
+                                    })}
+                                </div>
                             </Form.Group>
 
                             <hr />
@@ -376,6 +432,50 @@ const ProjetoFormModal = ({ show, onHide, onSuccess, projetoParaEditar, defaultS
                 </Modal.Footer>
             </Form>
         </Modal>
+        
+        {/* MODAL SECUNDÁRIO PARA CRIAR NOVO CLIENTE */}
+        <Modal show={showNewClienteModal} onHide={() => setShowNewClienteModal(false)} size="lg" style={{ zIndex: 1060 }}>
+            <Modal.Header closeButton>
+                <Modal.Title>Criar Novo Cliente (Cadastro Rápido)</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <Row>
+                    <Col md={6}>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Nome do Cliente *</Form.Label>
+                            <Form.Control type="text" value={newClienteData.nome_cliente} onChange={e => setNewClienteData({ ...newClienteData, nome_cliente: e.target.value })} placeholder="Obrigatório" />
+                        </Form.Group>
+                    </Col>
+                    <Col md={6}>
+                        <Form.Group className="mb-3">
+                            <Form.Label>CNPJ / CPF</Form.Label>
+                            <Form.Control type="text" value={newClienteData.cnpj_cpf} onChange={e => setNewClienteData({ ...newClienteData, cnpj_cpf: e.target.value })} placeholder="Apenas números" />
+                        </Form.Group>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col md={6}>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Razão Social</Form.Label>
+                            <Form.Control type="text" value={newClienteData.razao_social} onChange={e => setNewClienteData({ ...newClienteData, razao_social: e.target.value })} />
+                        </Form.Group>
+                    </Col>
+                    <Col md={6}>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Nome Fantasia</Form.Label>
+                            <Form.Control type="text" value={newClienteData.nome_fantasia} onChange={e => setNewClienteData({ ...newClienteData, nome_fantasia: e.target.value })} />
+                        </Form.Group>
+                    </Col>
+                </Row>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={() => setShowNewClienteModal(false)}>Cancelar</Button>
+                <Button variant="primary" onClick={handleCreateCliente} disabled={!newClienteData.nome_cliente}>Salvar e Selecionar</Button>
+            </Modal.Footer>
+        </Modal>
+        </>
     );
 };
+
 export default ProjetoFormModal;
+    

@@ -12,8 +12,8 @@ function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Define o URL Base
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+  // 🚀 CORREÇÃO: URL Inteligente
+  const API_URL = import.meta.env.DEV ? 'http://localhost:3000' : '';
 
   // Aplica classe no body para ocultar o chat da IA apenas na tela de login
   useEffect(() => {
@@ -29,8 +29,8 @@ function Login() {
     setLoading(true);
     setError('');
     try {
-      // A rota '/auth/local' precisará ser tratada no seu Backend
-      const response = await axios.post('/auth/local', { email, password });
+      // Fazendo a requisição para a rota correta do nosso backend
+      const response = await axios.post('/api/auth/login', { email, password });
       if (response.status === 200) {
           // Redireciona para o root após autenticação com sucesso
           window.location.href = '/'; 

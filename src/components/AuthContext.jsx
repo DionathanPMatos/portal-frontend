@@ -6,7 +6,7 @@ import { Spinner, Container } from 'react-bootstrap';
 // 🚀 CONFIGURAÇÃO GLOBAL DO AXIOS
 // ==========================================
 // Aponta todas as requisições para a API correta
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.DEV ? 'http://localhost:3000' : '';
 axios.defaults.baseURL = API_URL;
 
 // O SEGREDO DO LOGIN: Permite que o navegador envie os cookies (sessão) para o Backend
