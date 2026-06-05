@@ -49,6 +49,7 @@ const RepositorioTecnico = () => {
             setDocumentos(response.data);
             setError(null);
         } catch (err) {
+            console.error('Erro ao carregar os documentos do repositório:', err);
             setError('Falha ao carregar os documentos do repositório.');
         } finally {
             setLoading(false);
@@ -138,6 +139,7 @@ const RepositorioTecnico = () => {
             fetchDocumentos();
             handleCloseModal();
         } catch (err) {
+                console.error('Erro ao enviar o documento:', err);
             alert('Erro ao enviar o documento. Tente novamente.');
         } finally {
             setUploading(false);
@@ -150,6 +152,7 @@ const RepositorioTecnico = () => {
                 await apiClient.delete(`/api/repositorio/${id}`);
                 setDocumentos(documentos.filter(doc => doc.id !== id));
             } catch (err) {
+                console.error('Erro ao deletar o documento:', err);
                 alert('Erro ao deletar o documento.');
             }
         }
@@ -241,7 +244,7 @@ const RepositorioTecnico = () => {
                                                         {doc.descricao || '-'}
                                                     </td>
                                                     <td className="py-3 text-end px-4">
-                                                        <a href={`${apiClient.defaults.baseURL}/${doc.caminho_arquivo}`} target="_blank" rel="noopener noreferrer" className="btn btn-light btn-sm me-2 shadow-sm text-primary" title="Abrir Arquivo">
+                                                        <a href={doc.caminho_arquivo} target="_blank" rel="noopener noreferrer" className="btn btn-light btn-sm me-2 shadow-sm text-primary" title="Abrir Arquivo">
                                                             <FaExternalLinkAlt />
                                                         </a>
                                                         <Button variant="light" size="sm" className="shadow-sm text-danger" title="Excluir" onClick={() => handleDeleteDocument(doc.id)}>

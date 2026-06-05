@@ -45,7 +45,7 @@ import AdminDashboard from './features/visitors/pages/AdminDashboardPage.jsx'; /
 // ==========================================
 //MÓDULO DE CONTROLE DE FROTA
 // ==========================================
-import FrotaPage from "./features/fleet-management/pages/Frota.jsx"; // Movido e renomeado
+import Frota from "./features/fleet-management/pages/Frota.jsx"; // Ajustado para o nome correto do componente
 
 // ==========================================
 // MÓDULO FACILITIES
@@ -91,9 +91,6 @@ import "./styles/Header.css"; // Movido para styles
 import "./styles/sidebar.css"; // Movido para styles
 import "./styles/AdminPage.css";
 import "./styles/App.css"; // Movido para styles
-
-// Importa a instância configurada do Axios para uso em handleLogout (se necessário)
-import apiClient from './services/api';
 
 function App() {
   // Consome o contexto de autenticação
@@ -162,7 +159,7 @@ function App() {
             <Route path="/crm/clientes/:id" element={<ClientDetailPage user={user} />} />
 
             {/* NOVA ROTA PARA O MÓDULO DE CONTROLE DE FROTA */}
-            <Route path="/frota" element={<FrotaPage />} />
+            <Route path="/frota" element={<Frota />} />
             
             {/* ROTAS FACILITIES */}
             <Route path="/facilities" element={<FacilitiesPage />} />

@@ -361,7 +361,7 @@ function Dashboard({ isLoggedIn }) {
         <div className="col-12 col-lg-8">
           <div className="card h-100">
             <div className="card-header bg-white border-bottom py-3">
-              <h5 className="mb-0 font-weight-bold text-dark">Evolução de Vendas Mês a Mês (Comparativo Ano Anterior)</h5>
+              <h5 className="mb-0 -bold text-dark">Evolução de Vendas Mês a Mês (Comparativo Ano Anterior)</h5>
             </div>
             <div className="card-body">
             <div style={{ height: '350px', width: '100%' }}>
@@ -384,7 +384,7 @@ function Dashboard({ isLoggedIn }) {
         {/* Card Direito: Ranking de Vendedores */}
         <div className="col-12 col-lg-4">
           <div className="card h-100">
-            <div className="card-header bg-white border-bottom py-3 d-flex align-items-center gap-2">
+            <div className="card-header"  className="bg-white border-bottom py-3 d-flex align-items-center gap-2">
               <FaTrophy className="text-warning" />
               <h5 className="mb-0 font-weight-bold text-dark">Top Vendedores do Mês</h5>
             </div>

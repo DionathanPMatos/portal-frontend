@@ -30,7 +30,8 @@ const Funcionarios = () => {
                 // Chama a nova rota que criamos no backend
                 const response = await apiClient.get('/api/funcionarios/agrupados');
                 setGroupedEmployees(response.data);
-            } catch (err) {
+            } catch (err) { 
+                console.error('Erro ao buscar funcionários:', err);
                 setError('Não foi possível carregar a lista de funcionários.');
             } finally {
                 setLoading(false);
@@ -155,7 +156,7 @@ const Funcionarios = () => {
                                                         <Card.Body>
                                                             <div className="d-flex align-items-center mb-3 pb-3 border-bottom">
                                                                 <img
-                                                                    src={employee.userpic_base64 || 'default-avatar.png'}
+                                                                    src={employee.userpic_url || 'default-avatar.png'}
                                                                     alt={formatarNome(employee.nome_completo)}
                                                                     className="me-3 shadow-sm border"
                                                                     style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '50%' }}

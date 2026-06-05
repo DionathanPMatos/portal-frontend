@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Card, Button, Table, Modal, Form, Spinner, Row, Col, Tabs, Tab } from 'react-bootstrap';
 import { FaPlus, FaEdit, FaTrash, FaIndustry } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
 import apiClient from '../../../services/api'; // Importa a instância configurada do Axios
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
@@ -11,13 +10,14 @@ const GerenciarFabricantesPage = () => { // Renomeado
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [editMode, setEditMode] = useState(false);
-    const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
         id: null, name: '', logo_base64: '', resumo: '', key_accounts: '',
-        registros_projetos: '', garantias: '', prazos_compras: '',
-        certificacoes_treinamentos: '', contatos_suporte: '', links_uteis: ''
+        registros_projetos: '', garantias: '', prazos_compras: '', logo_url: '',
+        certificacoes_treinamentos: '', contatos_suporte: '', links_uteis: '',
     });
+    const [logoFile, setLogoFile] = useState(null);
+    const [previewUrl, setPreviewUrl] = useState('');
 
     const fetchFabricantes = async () => {
         try {
@@ -32,41 +32,61 @@ const GerenciarFabricantesPage = () => { // Renomeado
 
     const handleClose = () => {
         setShowModal(false);
-        setFormData({ id: null, name: '', logo_base64: '', resumo: '', key_accounts: '', registros_projetos: '', garantias: '', prazos_compras: '', certificacoes_treinamentos: '', contatos_suporte: '', links_uteis: '' });
+        setFormData({ id: null, name: '', logo_url: '', resumo: '', key_accounts: '', registros_projetos: '', garantias: '', prazos_compras: '', certificacoes_treinamentos: '', contatos_suporte: '', links_uteis: '' });
+        setLogoFile(null);
+        setPreviewUrl('');
     };
 
     const handleShow = (fab = null) => {
         if (fab) {
             setEditMode(true);
             setFormData(fab);
+            setPreviewUrl(fab.logo_url || '');
         } else {
             setEditMode(false);
+            setFormData({ id: null, name: '', logo_url: '', resumo: '', key_accounts: '', registros_projetos: '', garantias: '', prazos_compras: '', certificacoes_treinamentos: '', contatos_suporte: '', links_uteis: '' });
+            setPreviewUrl('');
         }
+        setLogoFile(null);
         setShowModal(true);
     };
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setFormData({ ...formData, logo_base64: reader.result });
-            };
-            reader.readAsDataURL(file);
+            setLogoFile(file);
+            setPreviewUrl(URL.createObjectURL(file));
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const dataToSubmit = new FormData();
+
+        // Append all text/CKEditor fields
+        Object.keys(formData).forEach(key => {
+            if (formData[key] !== null && key !== 'logo_url') {
+                dataToSubmit.append(key, formData[key]);
+            }
+        });
+
+        // Append the new file if it exists
+        if (logoFile) {
+            dataToSubmit.append('logo_file', logoFile);
+        } else {
+            dataToSubmit.append('logo_url', formData.logo_url || '');
+        }
+
         try {
             if (editMode) {
-                await apiClient.put(`/api/fabricantes/${formData.id}`, formData);
+                await apiClient.put(`/api/fabricantes/${formData.id}`, dataToSubmit, { headers: { 'Content-Type': 'multipart/form-data' } });
             } else {
-                await apiClient.post('/api/fabricantes', formData);
-            } // Mantido
+                await apiClient.post('/api/fabricantes', dataToSubmit, { headers: { 'Content-Type': 'multipart/form-data' } });
+            }
             fetchFabricantes();
             handleClose();
         } catch (err) {
+            console.error(err);
             alert("Erro ao salvar fabricante.");
         }
     };
@@ -76,7 +96,10 @@ const GerenciarFabricantesPage = () => { // Renomeado
             try {
                 await apiClient.delete(`/api/fabricantes/${id}`);
                 fetchFabricantes();
-            } catch (err) { alert("Erro ao remover."); }
+            } catch (err) {
+                console.error(err);
+                alert("Erro ao remover.");
+            }
         }
     };
 
@@ -116,7 +139,7 @@ const GerenciarFabricantesPage = () => { // Renomeado
                                                 {fabricantes.map(fab => (
                                                     <tr key={fab.id}>
                                                         <td className="px-4 py-3">
-                                                            {fab.logo_base64 ? <img src={fab.logo_base64} alt={fab.name} style={{ width: '40px', height: '40px', objectFit: 'contain' }}/> : <FaIndustry size={24} className="text-muted"/>}
+                                                            {fab.logo_url ? <img src={fab.logo_url} alt={fab.name} style={{ width: '40px', height: '40px', objectFit: 'contain' }}/> : <FaIndustry size={24} className="text-muted"/>}
                                                         </td>
                                                         <td className="fw-semibold">{fab.name}</td>
                                                         <td className="text-end px-4 py-3">
@@ -154,7 +177,7 @@ const GerenciarFabricantesPage = () => { // Renomeado
                                     <Form.Group className="mb-3">
                                         <Form.Label className="fw-semibold">Logotipo</Form.Label>
                                         <Form.Control type="file" accept="image/*" onChange={handleFileChange} />
-                                        {formData.logo_base64 && <div className="mt-2 text-center border rounded p-2"><img src={formData.logo_base64} alt="Preview" style={{ maxHeight: '50px', objectFit: 'contain' }} /></div>}
+                                        {previewUrl && <div className="mt-2 text-center border rounded p-2"><img src={previewUrl} alt="Preview" style={{ maxHeight: '50px', objectFit: 'contain' }} /></div>}
                                     </Form.Group>
                                 </Col>
                             </Row>

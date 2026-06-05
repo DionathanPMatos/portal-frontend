@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import {
   Container, Card, Row, Col, Button, Table, Badge, Modal, Form, Alert, Spinner, Tabs, Tab
 } from "react-bootstrap";
@@ -16,6 +15,7 @@ import ModalMulta from "../components/ModalMulta";
 import ModalPneu from "../components/ModalPneu";
 import ModalSinistro from "../components/ModalSinistro";
 import ModalLavagem from "../components/ModalLavagem";
+import apiClient from "../../../services/api";
 
 const locales = {
   'pt-BR': ptBR,
@@ -50,13 +50,7 @@ const emptyMulta = {
 
 const emptyInspecao = {
    tipo: "Saída", quilometragem: "", nivel_combustivel: "Cheio", avarias: "", 
-  fotos: {
-    frente: { status: 'OK', base64: '' },
-    lateral_direita: { status: 'OK', base64: '' },
-    lateral_esquerda: { status: 'OK', base64: '' },
-    traseira: { status: 'OK', base64: '' },
-    interno: { status: 'OK', base64: '' }
-  }
+  fotos: [] // Array to hold File objects
 };
 
 const emptyPneu = {
@@ -64,7 +58,7 @@ const emptyPneu = {
 };
 
 const emptySinistro = {
-  veiculo_id: "", motorista_id: "", data_sinistro: "", descricao: "", terceiros_envolvidos: "", numero_bo: "", seguradora_acionada: false, custo_estimado: "", status: "Aberto", foto_base64: ""
+  veiculo_id: "", motorista_id: "", data_sinistro: "", descricao: "", terceiros_envolvidos: "", numero_bo: "", seguradora_acionada: false, custo_estimado: "", status: "Aberto", foto_file: null, foto_url: ""
 };
 
 const emptyLavagem = {
@@ -127,17 +121,17 @@ export default function Frota() {
     setLoading(true);
     try {
       const [resUser, resVeiculos, resReservas, resUnidades, resDashboard, resMultas, resFunc, resCustos, resPneus, resSinistros, resLavagens] = await Promise.all([
-        axios.get("/user-data").catch(() => ({ data: null })),
-        axios.get("/api/frota/veiculos"),
-        axios.get("/api/frota/reservas"),
-        axios.get("/api/unidades"),
-        axios.get("/api/frota/dashboard").catch(() => ({ data: null })),
-        axios.get("/api/frota/multas").catch(() => ({ data: [] })),
-        axios.get("/api/funcionarios").catch(() => ({ data: [] })),
-        axios.get("/api/frota/custos").catch(() => ({ data: [] })),
-        axios.get("/api/frota/pneus").catch(() => ({ data: [] })),
-        axios.get("/api/frota/sinistros").catch(() => ({ data: [] })),
-        axios.get("/api/frota/lavagens").catch(() => ({ data: [] }))
+        apiClient.get("/user-data").catch(() => ({ data: null })),
+        apiClient.get("/api/frota/veiculos"),
+        apiClient.get("/api/frota/reservas"),
+        apiClient.get("/api/unidades"),
+        apiClient.get("/api/frota/dashboard").catch(() => ({ data: null })),
+        apiClient.get("/api/frota/multas").catch(() => ({ data: [] })),
+        apiClient.get("/api/funcionarios").catch(() => ({ data: [] })),
+        apiClient.get("/api/frota/custos").catch(() => ({ data: [] })),
+        apiClient.get("/api/frota/pneus").catch(() => ({ data: [] })),
+        apiClient.get("/api/frota/sinistros").catch(() => ({ data: [] })),
+        apiClient.get("/api/frota/lavagens").catch(() => ({ data: [] }))
       ]);
       setCurrentUser(resUser.data);
       setVeiculos(resVeiculos.data || []);
@@ -180,27 +174,30 @@ export default function Frota() {
   const handleInactivateVeiculo = async (id) => {
     if(!window.confirm("Atenção: Deseja inativar este veículo da frota?")) return;
     try {
-      await axios.delete(`/api/frota/veiculos/${id}`);
+      await apiClient.delete(`/api/frota/veiculos/${id}`);
       setSuccess("Veículo inativado.");
       fetchData();
       setTimeout(() => setSuccess(""), 3000);
-    } catch (e) { setErr("Erro ao inativar veículo."); }
-  };
+} catch (e) { 
+  console.error(e);
+  setErr("Erro ao inativar veículo."); 
+}  };
 
   const handleSaveVeiculo = async () => {
     setErr("");
     try {
       if (veiculoData.id) {
-        await axios.put(`/api/frota/veiculos/${veiculoData.id}`, veiculoData);
+        await apiClient.put(`/api/frota/veiculos/${veiculoData.id}`, veiculoData);
         setSuccess("Veículo atualizado com sucesso.");
       } else {
-        await axios.post("/api/frota/veiculos", veiculoData);
+        await apiClient.post("/api/frota/veiculos", veiculoData);
         setSuccess("Veículo cadastrado com sucesso.");
       }
       setShowVeiculoModal(false);
       fetchData();
       setTimeout(() => setSuccess(""), 3000);
     } catch (e) {
+      console.error(e);   
       setErr(e.response?.data?.error || "Erro ao salvar veículo.");
     }
   };
@@ -218,12 +215,13 @@ export default function Frota() {
   const handleSaveManutencao = async () => {
     setErr("");
     try {
-      await axios.patch(`/api/frota/veiculos/${manutencaoData.id}/manutencao`, manutencaoData);
+      await apiClient.patch(`/api/frota/veiculos/${manutencaoData.id}/manutencao`, manutencaoData);
       setSuccess("Manutenção programada com sucesso.");
       setShowManutencaoModal(false);
       fetchData();
       setTimeout(() => setSuccess(""), 3000);
     } catch (e) {
+            console.error(e); 
       setErr("Erro ao programar manutenção.");
     }
   };
@@ -255,7 +253,7 @@ export default function Frota() {
         data_fim: end
       };
 
-      const res = await axios.post("/api/frota/reservas", payload);
+      const res = await apiClient.post("/api/frota/reservas", payload);
       if (res.data.aviso) setAvisoCnh(res.data.aviso);
       else setSuccess("Reserva solicitada com sucesso!");
       
@@ -270,11 +268,12 @@ export default function Frota() {
   const handleUpdateReservaStatus = async (id, status) => {
     setErr("");
     try {
-      await axios.patch(`/api/frota/reservas/${id}/status`, { status });
+      await apiClient.patch(`/api/frota/reservas/${id}/status`, { status });
       setSuccess(`Reserva ${status.toLowerCase()} com sucesso.`);
       fetchData();
       setTimeout(() => setSuccess(""), 3000);
     } catch (e) {
+      console.error(e);
       setErr("Erro ao atualizar status da reserva.");
     }
   };
@@ -285,12 +284,15 @@ export default function Frota() {
   const handleSaveCusto = async () => {
     setErr("");
     try {
-      await axios.post("/api/frota/custos", custoData);
+      await apiClient.post("/api/frota/custos", custoData);
       setSuccess("Custo/Despesa financeira registrada!");
       setShowCustoModal(false);
       fetchData(); // Atualiza Dashboard na hora
       setTimeout(() => setSuccess(""), 3000);
-    } catch (e) { setErr("Erro ao registrar custo."); }
+    } catch (e) { 
+      console.error(e);
+      setErr("Erro ao registrar custo."); 
+    }
   };
 
   // -----------------------------------------------------
@@ -300,44 +302,74 @@ export default function Frota() {
     setErr("");
     try {
       if (multaData.id) {
-        await axios.put(`/api/frota/multas/${multaData.id}`, multaData);
+        await apiClient.put(`/api/frota/multas/${multaData.id}`, multaData);
         setSuccess("Condutor identificado / Multa atualizada com sucesso.");
       } else {
-        await axios.post("/api/frota/multas", multaData);
+        await apiClient.post("/api/frota/multas", multaData);
         setSuccess("Registro de infração criado com sucesso.");
       }
       setShowMultaModal(false);
       fetchData();
       setTimeout(() => setSuccess(""), 3000);
-    } catch (e) { setErr("Erro ao salvar multa."); }
+    } catch (e) { 
+      console.error(e);
+      setErr("Erro ao salvar multa."); 
+    }
   };
 
   // MÓDULOS NOVOS
   const handleSavePneu = async () => {
     setErr("");
     try {
-      await axios.post("/api/frota/pneus", pneuData);
+      await apiClient.post("/api/frota/pneus", pneuData);
       setSuccess("Pneu cadastrado com sucesso.");
-      setShowPneuModal(false); fetchData(); setTimeout(() => setSuccess(""), 3000);
-    } catch(e){ setErr("Erro ao salvar pneu.")}
+      setShowPneuModal(false);
+      fetchData();
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (e) {
+      setErr(e.response?.data?.error || "Erro ao salvar pneu.");
+    }
   };
 
   const handleSaveSinistro = async () => {
     setErr("");
     try {
-      await axios.post("/api/frota/sinistros", sinistroData);
+      const formData = new FormData();
+      // Append all scalar fields
+      Object.keys(sinistroData).forEach(key => {
+        if (key !== 'foto_file' && key !== 'foto_url') {
+          formData.append(key, sinistroData[key]);
+        }
+      });
+      // Append the file if it exists
+      if (sinistroData.foto_file) {
+        formData.append('foto_file', sinistroData.foto_file);
+      }
+
+      await apiClient.post("/api/frota/sinistros", formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       setSuccess("Sinistro registrado.");
-      setShowSinistroModal(false); fetchData(); setTimeout(() => setSuccess(""), 3000);
-    } catch(e){ setErr("Erro ao salvar sinistro.")}
+      setShowSinistroModal(false);
+      fetchData();
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (e) {
+      console.error("Erro ao salvar sinistro:", e);
+      setErr(e.response?.data?.error || "Erro ao salvar sinistro.");
+    }
   };
 
   const handleSaveLavagem = async () => {
     setErr("");
     try {
-      await axios.post("/api/frota/lavagens", lavagemData);
+      await apiClient.post("/api/frota/lavagens", lavagemData);
       setSuccess("Lavagem registrada.");
-      setShowLavagemModal(false); fetchData(); setTimeout(() => setSuccess(""), 3000);
-    } catch(e){ setErr("Erro ao salvar lavagem.")}
+      setShowLavagemModal(false);
+      fetchData();
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (e) {
+      setErr(e.response?.data?.error || "Erro ao salvar lavagem.");
+    }
   };
 
   // -----------------------------------------------------
@@ -352,8 +384,19 @@ export default function Frota() {
   const handleSaveInspecao = async () => {
     setErr("");
     try {
-      const payload = { ...inspecaoData, reserva_id: reservaSelecionadaId };
-      await axios.post("/api/frota/inspecoes", payload);
+      const formData = new FormData();
+      formData.append('reserva_id', reservaSelecionadaId);
+      formData.append('tipo', inspecaoData.tipo);
+      formData.append('quilometragem', inspecaoData.quilometragem);
+      formData.append('nivel_combustivel', inspecaoData.nivel_combustivel);
+      formData.append('avarias', inspecaoData.avarias);
+
+      // Append all files from the 'fotos' array
+      inspecaoData.fotos.forEach(file => {
+        formData.append('fotos_files', file);
+      });
+
+      await apiClient.post("/api/frota/inspecoes", formData, { headers: { 'Content-Type': 'multipart/form-data' } });
       setSuccess("Inspeção registrada. Odômetro atualizado.");
       setShowInspecaoModal(false);
       fetchData();
@@ -444,9 +487,9 @@ export default function Frota() {
             <Col>
               <Card.Title as="h4" className="mb-0"> <i className="bi bi-truck me-2"></i>Gestão de Frota Corporativa</Card.Title>
             </Col>
-            <Col className="text-end">
+            <Col className="d-flex align-items-center justify-content-end gap-2"> {/* Adicionado d-flex, align-items-center, justify-content-end e gap-2 */}
               {currentUser && (currentUser.privilegios?.includes('Admin') || currentUser.privilegios?.includes('Gestor')) && (
-                <Button variant="outline-danger" className="me-2" onClick={() => { setCustoData(emptyCusto); setShowCustoModal(true); }}>
+                <Button variant="outline-danger" onClick={() => { setCustoData(emptyCusto); setShowCustoModal(true); }}> {/* Removido me-2, pois gap-2 já cuida do espaçamento */}
                   <i className="bi bi-currency-dollar"></i> Lançar Despesa
                 </Button>
               )}

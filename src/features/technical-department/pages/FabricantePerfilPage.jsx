@@ -45,8 +45,8 @@ const FabricantePerfilPage = () => { // Renomeado
 
             <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: '12px' }}>
                 <Card.Body className="d-flex align-items-center gap-4 p-4">
-                    {fabricante.logo_base64 ? (
-                        <img src={fabricante.logo_base64} alt={`Logo ${fabricante.name}`} className="border rounded p-2 bg-white shadow-sm" style={{ width: '120px', height: '120px', objectFit: 'contain' }} />
+                    {fabricante.logo_url ? (
+                        <img src={fabricante.logo_url} alt={`Logo ${fabricante.name}`} className="border rounded p-2 bg-white shadow-sm" style={{ width: '120px', height: '120px', objectFit: 'contain' }} />
                     ) : (
                         <div className="bg-light rounded d-flex align-items-center justify-content-center shadow-sm" style={{ width: '120px', height: '120px' }}>
                             <FaIndustry size={40} className="text-muted" />

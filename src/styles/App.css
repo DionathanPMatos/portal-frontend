@@ -17,7 +17,7 @@
   --header-color: #ffffff;
   --page-padding-x: 1.5rem;  /* Padding lateral no mobile */
   --header-padding-y: 1rem;  /* Padding vertical do header no mobile */
-
+  --card-header-size: 18px; /* Altura fixa para os cabeçalhos dos cards, pode ser ajustada pelo admin */
   --header-height: 70px; /* Header mobile é maior porque os itens empilham (column) */
   --sidebar-width: 14rem; /* Largura do menu mobile quando aberto */
 }
@@ -86,6 +86,8 @@ h1, h2, h3, h6 {
 }
 h4, h5{
     color: '#ffffff';
+    font-size: 14px;
+
 }
 /* Define a cor de texto padrão para o conteúdo principal */
 .container-main p, .container-main li {
@@ -224,6 +226,18 @@ a {
 }
 
 
+.btn {
+  /* Flexbox para centralizar o conteúdo (ícone + texto) verticalmente e horizontalmente */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem; /* Espaçamento entre o ícone e o texto */
+  text-decoration: none;
+  font-family: "inter", sans-serif;
+}
+
+
+
 /* Contêiner do cabeçalho e do botão de hambúrguer no mobile */
 .header-mobile-wrapper {
     position: fixed;
@@ -309,6 +323,8 @@ a {
 .card-header *, .card-header .card-title {
   color: inherit !important;
   margin-bottom: 0;
+  height: var(--card-header-size, auto) !important;
+
 }
 
 .container-modal {
@@ -321,6 +337,15 @@ a {
   justify-content: center;
   align-items: center;
   background-color: rgba(0, 0, 0, 0.5);
+}
+
+.mt-4 {
+  margin-top: 0.1rem !important;
+}
+
+.px-4 {
+  padding-left: 0.1rem !important;
+  padding-right: 0.1rem !important;
 }
 /* Estilos para o modal com largura completa */
 .modal-full-width .modal-dialog {

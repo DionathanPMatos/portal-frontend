@@ -16,7 +16,7 @@ import CargosModal from './CargosModal';
 import SetoresModal from './SetoresModal';
 import UnidadesModal from './UnidadesModal.jsx';
 import apiClient from '../../../services/api';
-// import ImportModal from './ImportModal'; // 1. IMPORTA O NOVO MODAL
+import ImportModal from './../components/ImportModal';
 import '../../../App.jsx';
 
 const ManageEmployees = ({ isLoggedIn }) => {
@@ -31,7 +31,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
     const [isCargosModalOpen, setIsCargosModalOpen] = useState(false);
     const [isSetoresModalOpen, setIsSetoresModalOpen] = useState(false);
     const [isUnidadesModalOpen, setIsUnidadesModalOpen] = useState(false);
-    const [showImportModal, setShowImportModal] = useState(false); // 2. ESTADO PARA O MODAL DE IMPORTAÇÃO
+    const [showImportModal, setShowImportModal] = useState(false); 
     const [filtroCargo, setFiltroCargo] = useState(''); 
     const [filtroSetor, setFiltroSetor] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
@@ -46,8 +46,11 @@ const ManageEmployees = ({ isLoggedIn }) => {
     const [unidadeId, setUnidadeId] = useState('');
     const [permissions, setPermissions] = useState(['dashboard']);
     const [selectedFabricantes, setSelectedFabricantes] = useState([]);
+    
+    // Estados para a Imagem
     const [userpicFile, setUserpicFile] = useState(null);
-    const [existingUserpicBase64, setExistingUserpicBase64] = useState('');
+    const [existingUserpicUrl, setExistingUserpicUrl] = useState('');
+
     const [cnhNumero, setCnhNumero] = useState('');
     const [cnhValidade, setCnhValidade] = useState('');
 
@@ -77,15 +80,6 @@ const ManageEmployees = ({ isLoggedIn }) => {
         return nomeFormatado;
     };
 
-    const fileToBase64 = (file) => (
-        new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = (error) => reject(error);
-        })
-    );
-
     const fetchEmployees = async () => {
         try {
             setError(null);
@@ -97,6 +91,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
             });
             setEmployees(response.data);
         } catch (err) {
+            console.error('Erro ao buscar funcionários:', err);
             setError('Erro ao buscar funcionários.');
         } finally {
             setLoading(false);
@@ -149,32 +144,48 @@ const ManageEmployees = ({ isLoggedIn }) => {
         event.preventDefault();
         setSuccessMessage(null);
         setError(null);
+        
         if (!name || !email || !setorId) {
             setError("Nome, e-mail e setor são obrigatórios.");
             return;
         }
+
         try {
-            const userpicBase64 = userpicFile ? await fileToBase64(userpicFile) : existingUserpicBase64;
-            const employeeData = {
-                nome_completo: name,
-                email,
-                contato: contact,
-                setor_id: setorId ? Number(setorId) : null,
-                userpic_base64: userpicBase64 || null,
-                cargo_id: cargoId ? Number(cargoId) : null,
-                privilegios: permissions.join(',') || 'usuario',
-                fabricantes_ids: selectedFabricantes,
-                gestor_id: gestorId ? Number(gestorId) : null,
-                unidade_id: unidadeId ? Number(unidadeId) : null,
-                cnh_numero: cnhNumero || null,
-                cnh_validade: cnhValidade || null
+            // 1. Instanciar o FormData em vez de um objeto JSON
+            const formData = new FormData();
+            
+            // 2. Fazer o append dos campos de texto
+            formData.append('nome_completo', name);
+            formData.append('email', email);
+            if (contact) formData.append('contato', contact);
+            if (setorId) formData.append('setor_id', setorId);
+            if (cargoId) formData.append('cargo_id', cargoId);
+            formData.append('privilegios', permissions.join(',') || 'usuario');
+            if (gestorId) formData.append('gestor_id', gestorId);
+            if (unidadeId) formData.append('unidade_id', unidadeId);
+            if (cnhNumero) formData.append('cnh_numero', cnhNumero);
+            if (cnhValidade) formData.append('cnh_validade', cnhValidade);
+
+            // Arrays precisam ser enviados como String no FormData
+            if (selectedFabricantes && selectedFabricantes.length > 0) {
+                formData.append('fabricantes_ids', JSON.stringify(selectedFabricantes));
+            }
+
+            // 3. Fazer o append do ficheiro físico (Imagem)
+            if (userpicFile) {
+                formData.append('userpic_file', userpicFile);
+            }
+
+            // 4. Configurar os headers para multipart
+            const config = {
+                headers: { 'Content-Type': 'multipart/form-data' }
             };
 
             if (editingEmployee) {
-                await apiClient.put(`/api/funcionarios/${editingEmployee.id}`, employeeData);
+                await apiClient.put(`/api/funcionarios/${editingEmployee.id}`, formData, config);
                 setSuccessMessage("Funcionário editado com sucesso!");
             } else {
-                await apiClient.post('/api/funcionarios', employeeData);
+                await apiClient.post('/api/funcionarios', formData, config);
                 setSuccessMessage("Funcionário adicionado com sucesso!");
             }
 
@@ -183,6 +194,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
 
             setTimeout(() => { setSuccessMessage(null); }, 3000);
         } catch (err) {
+            console.error('Erro ao salvar funcionário:', err);
             if (err.response && err.response.status === 409) {
                 setError(err.response.data.error);
             } else {
@@ -204,10 +216,13 @@ const ManageEmployees = ({ isLoggedIn }) => {
         setUnidadeId(employee.unidade_id || '');
         setPermissions(employee.privilegios ? employee.privilegios.split(',') : ['dashboard']);
         setSelectedFabricantes(employee.fabricantes_ids || []);
-        setExistingUserpicBase64(employee.userpic_base64 || '');
-        setUserpicFile(null);
         setCnhNumero(employee.cnh_numero || '');
         setCnhValidade(employee.cnh_validade ? employee.cnh_validade.split('T')[0] : '');
+        
+        // Limpar ficheiro selecionado e definir a URL da imagem atual
+        setUserpicFile(null);
+        setExistingUserpicUrl(employee.userpic_url || ''); 
+        
         setShowAddEditModal(true);
     };
 
@@ -216,8 +231,11 @@ const ManageEmployees = ({ isLoggedIn }) => {
         setEditingEmployee(null);
         setName(''); setEmail(''); setContact('');
         setCargoId(''); setSetorId(''); setUnidadeId('');
-        setGestorId(''); setPermissions(['dashboard']); setSelectedFabricantes([]); setUserpicFile(null); setCnhNumero(''); setCnhValidade('');
-        setExistingUserpicBase64(''); setShowAddEditModal(true);
+        setGestorId(''); setPermissions(['dashboard']); setSelectedFabricantes([]); 
+        setCnhNumero(''); setCnhValidade('');
+        setUserpicFile(null); 
+        setExistingUserpicUrl('');
+        setShowAddEditModal(true);
     };
 
     const handleCloseAddEditModal = () => {
@@ -225,8 +243,10 @@ const ManageEmployees = ({ isLoggedIn }) => {
         setEditingEmployee(null);
         setName(''); setEmail(''); setContact('');
         setCargoId(''); setSetorId(''); setGestorId(''); setUnidadeId('');
-        setPermissions(['dashboard']); setSelectedFabricantes([]); setUserpicFile(null); setCnhNumero(''); setCnhValidade('');
-        setExistingUserpicBase64('');
+        setPermissions(['dashboard']); setSelectedFabricantes([]); 
+        setCnhNumero(''); setCnhValidade('');
+        setUserpicFile(null); 
+        setExistingUserpicUrl('');
     };
 
     const handleDeleteClick = (employee) => {
@@ -244,6 +264,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
             setSuccessMessage("Colaborador inativado com sucesso!");
             setTimeout(() => { setSuccessMessage(null); }, 3000);
         } catch (err) {
+            console.error('Erro ao inativar o colaborador:', err);
             setError('Erro ao inativar o colaborador.');
             setShowDeleteModal(false);
             setEmployeeToDelete(null);
@@ -265,7 +286,6 @@ const ManageEmployees = ({ isLoggedIn }) => {
         );
     }
 
-    // Filtragem por Busca de Texto
     const filteredEmployees = employees.filter(emp => {
         const searchLower = searchTerm.toLowerCase();
         return (
@@ -289,7 +309,6 @@ const ManageEmployees = ({ isLoggedIn }) => {
                     {successMessage && <Alert variant="success">{successMessage}</Alert>}
                     {error && <Alert variant="danger btn-sm">{error}</Alert>}
                     
-                    {/* Header da Página */}
                     <div className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
                         <div>
                             <h2 className="fw-bold mb-1 text-dark">Gestão de Colaboradores</h2>
@@ -297,7 +316,6 @@ const ManageEmployees = ({ isLoggedIn }) => {
                         </div>
                     </div>
 
-                    {/* Barra de Ferramentas e Filtros */}
                     <Card className="shadow-sm border-0 mb-4 bg-light">
                         <Card.Body className="p-3">
                             <Row className="align-items-end g-3 mb-3">
@@ -355,7 +373,6 @@ const ManageEmployees = ({ isLoggedIn }) => {
                         </Card.Body>
                     </Card>
 
-                    {/* Tabela de Colaboradores */}
                     <Card className="shadow-sm border-0">
                         <div className="table-responsive">
                             <Table hover className="align-middle mb-0">
@@ -374,7 +391,8 @@ const ManageEmployees = ({ isLoggedIn }) => {
                                             <tr key={employee.id}>
                                                 <td className="px-4 py-3">
                                                     <div className="d-flex align-items-center">
-                                                        <img src={employee.userpic_base64 || 'default-avatar.png'} alt="Foto" className="rounded-circle me-3 border" style={{ width: '45px', height: '45px', objectFit: 'cover' }} />
+                                                        {/* Lendo da nova URL pública em vez de Base64 */}
+                                                        <img src={employee.userpic_url || 'default-avatar.png'} alt="Foto" className="rounded-circle me-3 border bg-light" style={{ width: '45px', height: '45px', objectFit: 'cover' }} />
                                                         <div>
                                                             <div className="fw-bold text-dark">{formatarNome(employee.nome_completo)}</div>
                                                             <div className="text-muted small">{employee.email}</div>
@@ -413,7 +431,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
             <CargosModal show={isCargosModalOpen} onHide={() => setIsCargosModalOpen(false)} onCargosUpdate={fetchCargos} />
             <SetoresModal show={isSetoresModalOpen} onHide={() => setIsSetoresModalOpen(false)} onSetoresUpdate={fetchSetores} />
             <UnidadesModal show={isUnidadesModalOpen} onHide={() => setIsUnidadesModalOpen(false)} onUnidadesUpdate={fetchUnidades} />
-            {/* 4. RENDERIZAÇÃO DO NOVO MODAL DE IMPORTAÇÃO */}
+            
             <ImportModal 
                 show={showImportModal} 
                 onHide={() => setShowImportModal(false)}
@@ -430,7 +448,6 @@ const ManageEmployees = ({ isLoggedIn }) => {
                         <Form.Group className="mb-3"><Form.Label>E-mail</Form.Label><Form.Control type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></Form.Group>
                         <Form.Group className="mb-3"><Form.Label>Contato</Form.Label><Form.Control type="text" value={contact} onChange={(e) => setContact(e.target.value)} /></Form.Group>
                         <Form.Group className="mb-3">
-                            
                             <Form.Label>Setor</Form.Label>
                             <Form.Select value={setorId} onChange={(e) => setSetorId(e.target.value)} required>
                                 <option value="">Selecione o Setor</option>
@@ -456,7 +473,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
                             <Form.Select value={gestorId} onChange={(e) => setGestorId(e.target.value)}>
                                 <option value="">Nenhum (Responde à Diretoria)</option>
                                 {employees
-                                    .filter(emp => !editingEmployee || emp.id !== editingEmployee.id) // Evita que o funcionário seja chefe de si mesmo
+                                    .filter(emp => !editingEmployee || emp.id !== editingEmployee.id)
                                     .map(emp => (
                                         <option key={emp.id} value={emp.id}>{emp.nome_completo}</option>
                                 ))}
@@ -514,11 +531,14 @@ const ManageEmployees = ({ isLoggedIn }) => {
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Foto do colaborador</Form.Label>
+                            {/* O input agora captura e guarda o File bruto, sem conversões */}
                             <Form.Control type="file" onChange={(e) => setUserpicFile(e.target.files[0])}/>
-                            {editingEmployee && existingUserpicBase64 && (
+                            
+                            {/* Mostra a foto atual baseada na URL pública (se existir) */}
+                            {editingEmployee && existingUserpicUrl && (
                                 <div className="mt-2">
-                                    <small>Foto atual:</small><br />
-                                    <img src={existingUserpicBase64} alt="Foto atual" style={{ width: '50px', height: '50px', objectFit: 'contain' }}/>
+                                    <small className="text-muted mb-1 d-block">Foto atual:</small>
+                                    <img src={existingUserpicUrl} alt="Foto atual" className="border rounded bg-light" style={{ width: '60px', height: '60px', objectFit: 'contain' }}/>
                                 </div>
                             )}
                         </Form.Group>

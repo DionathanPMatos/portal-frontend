@@ -12,6 +12,8 @@ import ModalEtapaDetalhes from "../components/ModalEtapaDetalhes";
 import ModalOrcamentoDetalhes from "../components/ModalOrcamentoDetalhes";
 import ModalMaterialDetalhes from "../components/ModalMaterialDetalhes";
 import ChecklistManager from "../components/ChecklistManager";
+import { FaHistory } from "react-icons/fa"; // Ícone para o histórico
+import { useAuth } from "../../../contexts/AuthContext"; // Para permissões de usuário
 import apiClient from "../../../services/api";
 
 
@@ -24,10 +26,13 @@ const emptyProject = {
   data_prevista_conclusao: "",
   orcamento_total: 0,
   prioridade: "Normal",
-  observacoes: ""
+  observacoes: "",
+  equipe_ids: [] // Adiciona o campo para a equipe no objeto do projeto
 };
 
 export default function GestaoObras() {
+  const { user } = useAuth(); // Hook para obter o usuário logado
+
   const [loading, setLoading] = useState(true);
   const [projetos, setProjetos] = useState([]);
   const [etapas, setEtapas] = useState([]);
@@ -36,6 +41,8 @@ export default function GestaoObras() {
   const [checklists, setChecklists] = useState([]);
   const [comentarios, setComentarios] = useState([]);
   const [evolucao, setEvolucao] = useState([]);
+  const [historico, setHistorico] = useState([]); // 5. Estado para o histórico do projeto
+  const [funcionarios, setFuncionarios] = useState([]); // 1. Estado para a lista de funcionários
   const [unidades, setUnidades] = useState([]);
   
   const [projetoSelecionado, setProjetoSelecionado] = useState(null);
@@ -82,12 +89,15 @@ export default function GestaoObras() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [resProj, resUnidades] = await Promise.all([
+      // 1. Busca funcionários junto com os outros dados iniciais
+      const [resProj, resUnidades, resFunc] = await Promise.all([
         apiClient.get("/api/obras/projetos").catch(() => ({ data: [] })),
-        apiClient.get("/api/unidades").catch(() => ({ data: [] }))
+        apiClient.get("/api/unidades").catch(() => ({ data: [] })),
+        apiClient.get("/api/funcionarios").catch(() => ({ data: [] }))
       ]);
       setProjetos(resProj.data || []);
       setUnidades(resUnidades.data || []);
+      setFuncionarios(resFunc.data || []);
       if (resProj.data && resProj.data.length > 0) {
         await fetchProjectDetails(resProj.data[0].id);
       }
@@ -100,13 +110,15 @@ export default function GestaoObras() {
 
   const fetchProjectDetails = async (projectId) => {
     try {
-      const [resEtapas, resOrcamentos, resMateriais, resChecklists, resComentarios, resEvolucao] = await Promise.all([
+      // 5. Busca o histórico junto com os outros detalhes
+      const [resEtapas, resOrcamentos, resMateriais, resChecklists, resComentarios, resEvolucao, resHistorico] = await Promise.all([
         apiClient.get(`/api/obras/etapas/${projectId}`).catch(() => ({ data: [] })),
         apiClient.get(`/api/obras/orcamentos/${projectId}`).catch(() => ({ data: [] })),
         apiClient.get(`/api/obras/materiais/${projectId}`).catch(() => ({ data: [] })),
         apiClient.get(`/api/obras/checklists/${projectId}`).catch(() => ({ data: [] })),
         apiClient.get(`/api/obras/comentarios/${projectId}`).catch(() => ({ data: [] })),
-        apiClient.get(`/api/obras/evolucao/${projectId}`).catch(() => ({ data: [] }))
+        apiClient.get(`/api/obras/evolucao/${projectId}`).catch(() => ({ data: [] })),
+        apiClient.get(`/api/obras/projetos/${projectId}/historico`).catch(() => ({ data: [] }))
       ]);
       setEtapas(resEtapas.data || []);
       setOrcamentos(resOrcamentos.data || []);
@@ -114,6 +126,7 @@ export default function GestaoObras() {
       setChecklists(resChecklists.data || []);
       setComentarios(resComentarios.data || []);
       setEvolucao(resEvolucao.data || []);
+      setHistorico(resHistorico.data || []);
     } catch (error) {
       console.error("Erro ao carregar detalhes do projeto:", error);
     }
@@ -145,6 +158,10 @@ export default function GestaoObras() {
       setErr("Erro ao salvar projeto: " + error.message);
     }
   };
+
+  // 2. Lógica de permissão para visualização de projetos
+  // A lógica de permissão foi removida do frontend, pois o backend já filtra os projetos
+  // que o usuário pode ver, simplificando o código e centralizando a segurança.
 
   const filteredProjetos = projetos.filter(p => {
     const matchesSearch = p.nome_projeto.toLowerCase().includes(searchTerm.toLowerCase());
@@ -295,6 +312,40 @@ export default function GestaoObras() {
                         <p><strong>Descrição:</strong></p>
                         <p>{projetoSelecionado.descricao}</p>
                       </>
+                    )}
+                  </Card.Body>
+                </Card>
+              </Tab>
+
+              <Tab eventKey="equipe" title={`Equipe (${projetoSelecionado?.equipe_ids?.length || 0})`}>
+                <Card className="shadow-sm">
+                  <Card.Header>
+                    <h5>Colaboradores do Projeto</h5>
+                  </Card.Header>
+                  <Card.Body>
+                    {(!projetoSelecionado?.equipe_ids || projetoSelecionado.equipe_ids.length === 0) ? (
+                      <p className="text-muted">Nenhum colaborador vinculado a este projeto.</p>
+                    ) : (
+                      <Table hover responsive size="sm">
+                        <thead className="table-light">
+                          <tr>
+                            <th>Nome</th>
+                            <th>Cargo</th>
+                            <th>Setor</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {funcionarios
+                            .filter(f => projetoSelecionado.equipe_ids.includes(f.id))
+                            .map((membro) => (
+                              <tr key={membro.id}>
+                                <td>{membro.nome_completo}</td>
+                                <td>{membro.nome_cargo || '-'}</td>
+                                <td>{membro.nome_setor || '-'}</td>
+                              </tr>
+                            ))}
+                        </tbody>
+                      </Table>
                     )}
                   </Card.Body>
                 </Card>
@@ -477,6 +528,33 @@ export default function GestaoObras() {
                 </Card>
               </Tab>
 
+              <Tab eventKey="historico" title={<span><FaHistory /> Histórico</span>}>
+                <Card className="shadow-sm">
+                  <Card.Body>
+                    {historico.length === 0 ? (
+                      <p className="text-muted">Nenhum histórico de alterações encontrado.</p>
+                    ) : (
+                      <ul className="list-unstyled">
+                        {historico.map((h) => (
+                          <li key={h.id} className="mb-3 pb-3 border-bottom">
+                            <div className="d-flex justify-content-between">
+                              <div>
+                                <strong>{h.usuario_nome}</strong>
+                                <span className="text-muted"> {h.acao}</span>
+                              </div>
+                              <small className="text-muted">
+                                {format(new Date(h.data_modificacao), "d 'de' MMMM 'às' HH:mm", { locale: ptBR })}
+                              </small>
+                            </div>
+                            <p className="mb-0 mt-1 fst-italic text-secondary">"{h.detalhes}"</p>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </Card.Body>
+                </Card>
+              </Tab>
+
               <Tab eventKey="comentarios" title={`Comentários (${comentarios.length})`}>
                 <Card className="shadow-sm">
                   <Card.Header>
@@ -525,6 +603,7 @@ export default function GestaoObras() {
         setData={setProjectData}
         onSave={handleSaveProject}
         unidades={unidades}
+        funcionarios={funcionarios} // 1. Passa a lista de funcionários para o modal do projeto
       />
 
       <ModalEtapa
@@ -584,6 +663,7 @@ export default function GestaoObras() {
         etapa={etapaSelecionada}
         projetoId={projetoSelecionado?.id}
         onUpdate={() => fetchProjectDetails(projetoSelecionado.id)}
+        funcionarios={funcionarios} // 4. Passa a lista de funcionários para o modal de detalhes da etapa
       />
 
       <ModalOrcamentoDetalhes

@@ -70,8 +70,8 @@ const FabricantesListPage = () => { // Renomeado
                                                 <Col key={fab.id}>
                                                     <Card as={Link} to={`/dtc/fabricantes/${fab.id}`} className="h-100 text-center shadow-sm border text-decoration-none" style={{ transition: 'transform 0.2s', borderRadius: '12px' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}>
                                                         <Card.Body className="d-flex flex-column align-items-center justify-content-center p-4">
-                                                            {fab.logo_base64 ? (
-                                                                <img src={fab.logo_base64} alt={`Logo ${fab.name}`} style={{ height: '80px', width: '100%', objectFit: 'contain', marginBottom: '15px' }} />
+                                                            {fab.logo_url ? (
+                                                                <img src={fab.logo_url} alt={`Logo ${fab.name}`} style={{ height: '80px', width: '100%', objectFit: 'contain', marginBottom: '15px' }} />
                                                             ) : (
                                                                 <div className="bg-light rounded-circle d-flex align-items-center justify-content-center mb-3" style={{ width: '80px', height: '80px' }}><FaIndustry size={30} className="text-muted" /></div>
                                                             )}

@@ -324,7 +324,7 @@ export default function Facilities() {
         <Card.Header className="bg-white">
           <Row className="align-items-center">
             <Col>
-              <Card.Title as="h4" className="mb-0"> <i className="bi bi-building me-2"></i>Gestão de Facilities & Ativos</Card.Title>
+              <Card.Title as="h5" className="mb-0"> <i className="bi bi-building me-2"></i>Gestão de Facilities & Ativos</Card.Title>
             </Col>
           </Row>
         </Card.Header>
@@ -393,7 +393,7 @@ export default function Facilities() {
               <Row className="g-3 mb-4">
                 <Col md={6}>
                   <Card className="shadow-sm border-0 h-100">
-                    <Card.Header className="bg-white fw-bold text-secondary">Últimas Manutenções Solicitadas</Card.Header>
+                    <Card.Header as="h5" className="mb-0">Últimas Manutenções Solicitadas</Card.Header>
                     <Table responsive hover size="sm" className="mb-0">
                       <thead>
                         <tr><th>Data</th><th>Equipamento</th><th>Filial</th><th>Status</th></tr>
@@ -414,7 +414,7 @@ export default function Facilities() {
                 </Col>
                 <Col md={6}>
                   <Card className="shadow-sm border-0 h-100">
-                    <Card.Header className="bg-white fw-bold text-secondary">Próximas Manutenções Programadas</Card.Header>
+                    <Card.Header as="h5" className="mb-0">Próximas Manutenções Programadas</Card.Header>
                     <Table responsive hover size="sm" className="mb-0">
                       <thead>
                         <tr><th>Data Prog.</th><th>Equipamento</th><th>Filial</th></tr>
@@ -437,7 +437,7 @@ export default function Facilities() {
               <Row className="g-3">
                 <Col md={6}>
                   <Card className="shadow-sm border-0 h-100">
-                    <Card.Header className="bg-white fw-bold text-secondary">Valor de Bens por Filial (Ativos)</Card.Header>
+                    <Card.Header as="h5" className="mb-0">Valor de Bens por Filial (Ativos)</Card.Header>
                     <Table responsive hover size="sm" className="mb-0">
                       <thead>
                         <tr><th>Filial</th><th className="text-end">Valor Total (R$)</th></tr>
@@ -455,7 +455,7 @@ export default function Facilities() {
                 </Col>
                 <Col md={6}>
                   <Card className="shadow-sm border-0 h-100">
-                    <Card.Header className="bg-white fw-bold text-secondary">Custo de Manutenção por Filial (Concluídas)</Card.Header>
+                    <Card.Header as="h5" className="mb-0">Custo de Manutenção por Filial (Concluídas)</Card.Header>
                     <Table responsive hover size="sm" className="mb-0">
                       <thead>
                         <tr><th>Filial</th><th className="text-end">Custo Total (R$)</th></tr>
