@@ -64,7 +64,7 @@ export default function DashboardVisitasPage() { // Renomeado
                     <Card className="text-center shadow-sm border-0 border-start border-4 border-primary">
                         <Card.Body>
                             <h6 className="text-muted">Total Solicitadas</h6>
-                            <h3 className="mb-0 fw-bold">{metrics.kpis.total_visitas || 0}</h3>
+                            <h3 className="mb-0 fw-bold">{metrics.kpis?.total_visitas || 0}</h3>
                         </Card.Body>
                     </Card>
                 </Col>
@@ -72,7 +72,7 @@ export default function DashboardVisitasPage() { // Renomeado
                     <Card className="text-center shadow-sm border-0 border-start border-4 border-warning">
                         <Card.Body>
                             <h6 className="text-muted">Pendentes</h6>
-                            <h3 className="mb-0 fw-bold">{metrics.kpis.pendentes || 0}</h3>
+                            <h3 className="mb-0 fw-bold">{metrics.kpis?.pendentes || 0}</h3>
                         </Card.Body>
                     </Card>
                 </Col>
@@ -80,7 +80,7 @@ export default function DashboardVisitasPage() { // Renomeado
                     <Card className="text-center shadow-sm border-0 border-start border-4 border-success">
                         <Card.Body>
                             <h6 className="text-muted">Autorizadas</h6>
-                            <h3 className="mb-0 fw-bold">{metrics.kpis.autorizadas || 0}</h3>
+                            <h3 className="mb-0 fw-bold">{metrics.kpis?.autorizadas || 0}</h3>
                         </Card.Body>
                     </Card>
                 </Col>
@@ -88,7 +88,7 @@ export default function DashboardVisitasPage() { // Renomeado
                     <Card className="text-center shadow-sm border-0 border-start border-4 border-danger">
                         <Card.Body>
                             <h6 className="text-muted">Recusadas</h6>
-                            <h3 className="mb-0 fw-bold">{metrics.kpis.recusadas || 0}</h3>
+                            <h3 className="mb-0 fw-bold">{metrics.kpis?.recusadas || 0}</h3>
                         </Card.Body>
                     </Card>
                 </Col>

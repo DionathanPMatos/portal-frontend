@@ -24,6 +24,7 @@ import CommercialRegistrationPage from "./features/commercial/pages/Registro.jsx
 import ClientListPage from "./features/commercial/pages/Clients/Clientes.jsx"; // Renomeado e movido
 import ClientDetailPage from "./features/commercial/pages/Clients/ClienteDetalhe.jsx"; // Renomeado e movido
 import PurchaseDashboardPage from "./features/commercial/pages/DashboardCompras.jsx"; // Renomeado e movido
+import KpiComercialPage from "./features/commercial/pages/KpiComercialPage.jsx"; 
 
 // ==========================================
 // MÓDULO DEPARTAMENTO TÉCNICO (DTC)
@@ -35,6 +36,7 @@ import FabricantesListPage from "./features/technical-department/pages/Fabricant
 import FabricantePerfilPage from "./features/technical-department/pages/FabricantePerfilPage.jsx"; // Renomeado
 import GerenciarFabricantesPage from "./features/technical-department/pages/GerenciarFabricantesPage.jsx"; // Renomeado
 import FerramentasUteisPage from "./features/technical-department/pages/FerramentasUteisPage.jsx"; // Renomeado
+import PerguntasDtcPage from "./features/technical-department/pages/PerguntasDtcPage.jsx";
 
 // ==========================================
 // MÓDULO VISITANTES
@@ -126,6 +128,7 @@ function App() {
             {/* ROTAS DO CRM */}
             <Route path="/crm/projetos" element={<CommercialDashboardPage />} />
             <Route path="/modulo_crm/projetos-perdidos" element={<LostProjectsPage />} />
+            <Route path="/crm/kpi" element={<KpiComercialPage />} />
             {/* --- ALTERAÇÃO AQUI: Passando o 'user' como prop --- */}
             <Route path="/crm/projetos/:id" element={<ProjectDetailsPage user={user} />} />
             
@@ -135,6 +138,7 @@ function App() {
             <Route path="/dtc/fabricantes/:id" element={<FabricantePerfilPage />} />
             <Route path="/admin/fabricantes" element={<GerenciarFabricantesPage />} />
             <Route path="/dtc/ferramentas" element={<FerramentasUteisPage />} />
+            <Route path="/dtc/perguntas" element={<PerguntasDtcPage user={user} />} />
 
             {/* OUTRAS ROTAS (Ajuste a rota de registro se necessário) */}
             <Route path="/registro" element={<CommercialRegistrationPage />} />

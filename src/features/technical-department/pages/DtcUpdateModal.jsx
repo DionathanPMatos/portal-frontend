@@ -70,7 +70,7 @@ const DtcUpdateModal = ({ show, onHide, onSuccess, projeto, tecnicos }) => {
     const handleDeleteDocument = async (docId) => {
         if (!window.confirm('Tem certeza?')) return;
         try {
-            await apiClient.delete(`/api/documentos/${docId}`);
+            await apiClient.delete(`/api/projetos/documentos/${docId}`);
             setSuccess('Documento excluído com sucesso!');
             fetchDocuments(); // Apenas recarrega a lista de documentos
         } catch (err) {
@@ -119,7 +119,7 @@ const DtcUpdateModal = ({ show, onHide, onSuccess, projeto, tecnicos }) => {
                 <ListGroup variant="flush" className="mb-3">
                     {documentos.map(doc => (
                         <ListGroup.Item key={doc.id} className="d-flex justify-content-between align-items-center">
-                            <a href={`http://localhost:3000/${doc.caminho_arquivo}`} target="_blank" rel="noopener noreferrer">{doc.nome_original}</a>
+                            <a href={doc.caminho_arquivo} target="_blank" rel="noopener noreferrer">{doc.nome_original}</a>
                             <Button variant="outline-danger" size="sm" onClick={() => handleDeleteDocument(doc.id)}><i className="bi bi-trash"></i></Button>
                         </ListGroup.Item>
                     ))}

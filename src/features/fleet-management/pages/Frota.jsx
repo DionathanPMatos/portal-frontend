@@ -513,16 +513,16 @@ export default function Frota() {
               {dashboard ? (
                 <div className="mt-3">
                   <Row className="g-3 mb-3">
-                    <Col md={3}><Card className="text-center shadow-sm"><Card.Body><h6 className="text-muted text-uppercase mb-1" style={{fontSize:'0.75rem'}}>Disponíveis</h6><h3 className="text-success m-0 fw-bold">{dashboard.kpis.frota_disponivel}</h3></Card.Body></Card></Col>
-                    <Col md={3}><Card className="text-center shadow-sm"><Card.Body><h6 className="text-muted text-uppercase mb-1" style={{fontSize:'0.75rem'}}>Em Uso</h6><h3 className="text-primary m-0 fw-bold">{dashboard.kpis.frota_em_uso}</h3></Card.Body></Card></Col>
-                    <Col md={3}><Card className="text-center shadow-sm"><Card.Body><h6 className="text-muted text-uppercase mb-1" style={{fontSize:'0.75rem'}}>Ocupação Atual</h6><h3 className="text-info m-0 fw-bold">{dashboard.kpis.taxa_ocupacao}%</h3></Card.Body></Card></Col>
-                    <Col md={3}><Card className="text-center shadow-sm bg-light"><Card.Body><h6 className="text-muted text-uppercase mb-1" style={{fontSize:'0.75rem'}}>Odômetro Frota</h6><h3 className="text-dark m-0 fw-bold">{dashboard.kpis.total_km.toLocaleString('pt-BR')} km</h3></Card.Body></Card></Col>
+                    <Col md={3}><Card className="text-center shadow-sm"><Card.Body><h6 className="text-muted text-uppercase mb-1" style={{fontSize:'0.75rem'}}>Disponíveis</h6><h3 className="text-success m-0 fw-bold">{dashboard.kpis?.frota_disponivel || 0}</h3></Card.Body></Card></Col>
+                    <Col md={3}><Card className="text-center shadow-sm"><Card.Body><h6 className="text-muted text-uppercase mb-1" style={{fontSize:'0.75rem'}}>Em Uso</h6><h3 className="text-primary m-0 fw-bold">{dashboard.kpis?.frota_em_uso || 0}</h3></Card.Body></Card></Col>
+                    <Col md={3}><Card className="text-center shadow-sm"><Card.Body><h6 className="text-muted text-uppercase mb-1" style={{fontSize:'0.75rem'}}>Ocupação Atual</h6><h3 className="text-info m-0 fw-bold">{dashboard.kpis?.taxa_ocupacao || 0}%</h3></Card.Body></Card></Col>
+                    <Col md={3}><Card className="text-center shadow-sm bg-light"><Card.Body><h6 className="text-muted text-uppercase mb-1" style={{fontSize:'0.75rem'}}>Odômetro Frota</h6><h3 className="text-dark m-0 fw-bold">{(dashboard.kpis?.total_km || 0).toLocaleString('pt-BR')} km</h3></Card.Body></Card></Col>
                   </Row>
                   <Row className="g-3 mb-4">
-                    <Col md={3}><Card className="text-center shadow-sm bg-danger text-white"><Card.Body><h6 className="text-white text-uppercase mb-1" style={{fontSize:'0.75rem'}}>Gastos (Mês)</h6><h3 className="text-white m-0 fw-bold">{formatCurrency(dashboard.kpis.gastos_mes)}</h3></Card.Body></Card></Col>
-                    <Col md={3}><Card className="text-center shadow-sm border border-warning"><Card.Body><h6 className="text-warning text-uppercase mb-1" style={{fontSize:'0.75rem'}}>Em Manutenção</h6><h3 className="text-warning m-0 fw-bold">{dashboard.kpis.frota_manutencao}</h3></Card.Body></Card></Col>
-                    <Col md={3}><Card className="text-center shadow-sm border border-danger"><Card.Body><h6 className="text-danger text-uppercase mb-1" style={{fontSize:'0.75rem'}}>Multas Pendentes</h6><h3 className="text-danger m-0 fw-bold">{dashboard.kpis.multas_pendentes}</h3></Card.Body></Card></Col>
-                    <Col md={3}><Card className="text-center shadow-sm border border-warning"><Card.Body><h6 className="text-warning text-uppercase mb-1" style={{fontSize:'0.75rem'}}>Sinistros Abertos</h6><h3 className="text-warning m-0 fw-bold">{dashboard.kpis.sinistros_abertos}</h3></Card.Body></Card></Col>
+                    <Col md={3}><Card className="text-center shadow-sm bg-danger text-white"><Card.Body><h6 className="text-white text-uppercase mb-1" style={{fontSize:'0.75rem'}}>Gastos (Mês)</h6><h3 className="text-white m-0 fw-bold">{formatCurrency(dashboard.kpis?.gastos_mes || 0)}</h3></Card.Body></Card></Col>
+                    <Col md={3}><Card className="text-center shadow-sm border border-warning"><Card.Body><h6 className="text-warning text-uppercase mb-1" style={{fontSize:'0.75rem'}}>Em Manutenção</h6><h3 className="text-warning m-0 fw-bold">{dashboard.kpis?.frota_manutencao || 0}</h3></Card.Body></Card></Col>
+                    <Col md={3}><Card className="text-center shadow-sm border border-danger"><Card.Body><h6 className="text-danger text-uppercase mb-1" style={{fontSize:'0.75rem'}}>Multas Pendentes</h6><h3 className="text-danger m-0 fw-bold">{dashboard.kpis?.multas_pendentes || 0}</h3></Card.Body></Card></Col>
+                    <Col md={3}><Card className="text-center shadow-sm border border-warning"><Card.Body><h6 className="text-warning text-uppercase mb-1" style={{fontSize:'0.75rem'}}>Sinistros Abertos</h6><h3 className="text-warning m-0 fw-bold">{dashboard.kpis?.sinistros_abertos || 0}</h3></Card.Body></Card></Col>
                   </Row>
                   <Row className="g-3">
                     <Col md={6}>
@@ -813,7 +813,8 @@ export default function Frota() {
                 <tbody>
                   {reservas.map(r => (
                     <tr key={r.id}>
-                      <td>{format(new Date(r.data_inicio), "dd/MM/yy HH:mm")} a {format(new Date(r.data_fim), "dd/MM/yy HH:mm")}</td>                      <td>{r.modelo} ({r.placa})</td>
+                      <td>{format(new Date(r.data_inicio), "dd/MM/yy HH:mm")} a {format(new Date(r.data_fim), "dd/MM/yy HH:mm")}</td>
+                      <td>{r.modelo} ({r.placa})</td>
                       <td>{r.origem} → {r.destino}</td>
                       <td><Badge bg={getStatusBadge(r.status)}>{r.status}</Badge></td>
                       <td>

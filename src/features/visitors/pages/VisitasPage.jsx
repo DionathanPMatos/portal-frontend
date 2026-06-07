@@ -7,7 +7,8 @@ import { FaMapMarkedAlt } from 'react-icons/fa';
 import '../../../styles/App.css'; // Caminho ajustado para o CSS global
 
 export default function VisitasPage({ user }) { // Renomeado
-    const isManager = user?.privilegios?.includes('Admin') || user?.privilegios?.includes('Gestor');
+    const privilegios = user?.privilegios?.toLowerCase() || '';
+    const isManager = privilegios.includes('admin') || privilegios.includes('gestor');
 
     return (
         <Container fluid className="px-4">

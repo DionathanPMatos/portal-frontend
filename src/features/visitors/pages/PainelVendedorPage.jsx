@@ -26,8 +26,9 @@ export default function PainelVendedorPage() { // Renomeado
 
     const carregarClientes = async () => {
         try {
-            const { data } = await apiClient.get('/api/clientes');
-            setClientes(data);
+            const response = await apiClient.get('/api/clientes');
+            // A API de clientes retorna um objeto paginado { data: [...], total: ... }
+            setClientes(response.data.data || []);
         } catch (error) {
             console.error(error);
         }
@@ -41,6 +42,7 @@ export default function PainelVendedorPage() { // Renomeado
             setNovaVisita({ cliente_id: '', data_visita: '', justificativa_objetivo: '' });
             carregarVisitas();
         } catch (error) {
+            console.error(error);
             alert('Erro ao solicitar visita.');
         }
     };
@@ -57,6 +59,7 @@ export default function PainelVendedorPage() { // Renomeado
             setFeedbackVisita({ id: null, feedback: '', requerRetorno: false, dataRetorno: '' });
             carregarVisitas();
         } catch (error) {
+            console.error(error);
             alert('Erro ao salvar feedback.');
         }
     };

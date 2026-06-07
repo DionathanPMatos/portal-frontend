@@ -43,6 +43,7 @@ const menuItems = [
       { name: "CRM - Mannesoft", link: "/crm/projetos" },
       { name: "Clientes", link: "/crm/clientes" },
       { name: "Visitas Comerciais", link: "/crm/visitas" },
+      { name: "KPIs Comerciais", link: "/crm/kpi" },
       {
         name: "Email Corporativo",
         link: "https://outlook.office.com/mail/",
@@ -85,6 +86,7 @@ const menuItems = [
       { name: "Ferramentas Úteis", link: "/dtc/ferramentas" },
       { name: "Solicitação de Propostas", link: "/crm/dashboard-dtc" },
       { name: "Repositório Técnico", link: "/dtc/repositorio" },
+      { name: "Fórum e Dúvidas", link: "/dtc/perguntas" },
       {
         name: "RMA",
         link: "https://rma-dev.dca.com.br/support/home",

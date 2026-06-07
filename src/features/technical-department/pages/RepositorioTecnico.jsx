@@ -45,8 +45,18 @@ const RepositorioTecnico = () => {
     const fetchDocumentos = async () => {
         setLoading(true);
         try {
-            const response = await apiClient.get('/api/repositorio');
+            const [response, verticaisRes] = await Promise.all([
+                apiClient.get('/api/repositorio'),
+                apiClient.get('/api/verticais')
+            ]);
             setDocumentos(response.data);
+            
+            // Junta as categorias existentes no DB com as do MOCK e as Verticais Oficiais (Remove duplicatas e ordena)
+            const dbCategorias = response.data.map(doc => doc.categoria);
+            const verticaisNomes = verticaisRes.data.map(v => v.nome);
+            const allCategorias = Array.from(new Set([...CATEGORIAS_MOCK, ...dbCategorias, ...verticaisNomes])).sort();
+            setCategorias(allCategorias);
+            
             setError(null);
         } catch (err) {
             console.error('Erro ao carregar os documentos do repositório:', err);

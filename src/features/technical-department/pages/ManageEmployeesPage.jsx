@@ -14,8 +14,8 @@ import Modal from 'react-bootstrap/Modal';
 import apiClient from '../../../services/api'; // Importa a instância configurada do Axios
 import { FaEdit, FaTrash, FaUserPlus, FaFileImport, FaBriefcase, FaSitemap, FaSearch, FaUserTimes } from 'react-icons/fa';
 import CargosModal from './CargosModal';
-import SetoresModal from './SetoresModal';
-import UnidadesModal from '../UnidadesModal';
+import SetoresModal from '../../../components/layout/SetoresModal';
+import UnidadesModal from './UnidadesModal';
 import ImportModal from '../components/ImportModal'; // 1. IMPORTA O NOVO MODAL do local correto
 // import '../../App.css'; // Removido: estilos globais devem ser importados apenas em main.jsx ou App.jsx
 
@@ -97,6 +97,7 @@ const ManageEmployeesPage = ({ isLoggedIn }) => { // Renomeado
             });
             setEmployees(response.data);
         } catch (err) {
+                console.error('Erro ao buscar funcionários:', err);
             setError('Erro ao buscar funcionários.');
         } finally {
             setLoading(false);
@@ -183,6 +184,7 @@ const ManageEmployeesPage = ({ isLoggedIn }) => { // Renomeado
 
             setTimeout(() => { setSuccessMessage(null); }, 3000);
         } catch (err) {
+            console.error('Erro ao salvar funcionário:', err);
             if (err.response && err.response.status === 409) {
                 setError(err.response.data.error);
             } else {
@@ -204,7 +206,7 @@ const ManageEmployeesPage = ({ isLoggedIn }) => { // Renomeado
         setUnidadeId(employee.unidade_id || '');
         setPermissions(employee.privilegios ? employee.privilegios.split(',') : ['dashboard']);
         setSelectedFabricantes(employee.fabricantes_ids || []);
-        setExistingUserpicBase64(employee.userpic_base64 || '');
+        setExistingUserpicBase64(employee.userpic_url || '');
         setUserpicFile(null);
         setCnhNumero(employee.cnh_numero || '');
         setCnhValidade(employee.cnh_validade ? employee.cnh_validade.split('T')[0] : '');
@@ -237,7 +239,6 @@ const ManageEmployeesPage = ({ isLoggedIn }) => { // Renomeado
 
     const confirmDelete = async () => {
         try {
-            await axios.delete(`/api/funcionarios/${employeeToDelete.id}`);
             await apiClient.delete(`/api/funcionarios/${employeeToDelete.id}`);
             await fetchEmployees();
             setShowDeleteModal(false);
@@ -245,6 +246,7 @@ const ManageEmployeesPage = ({ isLoggedIn }) => { // Renomeado
             setSuccessMessage("Colaborador inativado com sucesso!");
             setTimeout(() => { setSuccessMessage(null); }, 3000);
         } catch (err) {
+            console.error('Erro ao inativar colaborador:', err);
             setError('Erro ao inativar o colaborador.');
             setShowDeleteModal(false);
             setEmployeeToDelete(null);
@@ -375,7 +377,7 @@ const ManageEmployeesPage = ({ isLoggedIn }) => { // Renomeado
                                             <tr key={employee.id}>
                                                 <td className="px-4 py-3">
                                                     <div className="d-flex align-items-center">
-                                                        <img src={employee.userpic_base64 || 'default-avatar.png'} alt="Foto" className="rounded-circle me-3 border" style={{ width: '45px', height: '45px', objectFit: 'cover' }} />
+                                                        <img src={employee.userpic_url || 'default-avatar.png'} alt="Foto" className="rounded-circle me-3 border" style={{ width: '45px', height: '45px', objectFit: 'cover' }} />
                                                         <div>
                                                             <div className="fw-bold text-dark">{formatarNome(employee.nome_completo)}</div>
                                                             <div className="text-muted small">{employee.email}</div>

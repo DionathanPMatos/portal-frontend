@@ -81,13 +81,8 @@ body {
 
 
 /* Garanta que os títulos e textos também usem as variáveis */
-h1, h2, h3, h6 {
+h1, h2, h3, h4, h5, h6 {
     color: var(--text-primary-color);
-}
-h4, h5{
-    color: '#ffffff';
-    font-size: 14px;
-
 }
 /* Define a cor de texto padrão para o conteúdo principal */
 .container-main p, .container-main li {
@@ -312,7 +307,6 @@ a {
 .card{
   width: 100%;
 }
-/* Padronização global dos Cabeçalhos de Card usando as variáveis do banco */
 .card-header {
   background-color: var(--card-header-bg, #153049) !important;
   color: var(--card-header-text, #ffffff) !important;
@@ -320,11 +314,19 @@ a {
 }
 
 /* Garante que o texto (ex: Card.Title) herde a cor de texto definida pelo admin */
-.card-header *, .card-header .card-title {
+.card-header * {
   color: inherit !important;
+}
+
+/* Padronização de tamanho de ERP para os títulos de todos os cards */
+.card-title, .card-header .card-title {
+  color: inherit !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
   margin-bottom: 0;
   height: var(--card-header-size, auto) !important;
-
+  display: flex;
+  align-items: center;
 }
 
 .container-modal {
@@ -367,6 +369,7 @@ a {
 
 .btn-primary {
   background-color: #1b4b6d;
+  
 }
 
 .btn-primary:hover {

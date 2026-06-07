@@ -1,20 +1,25 @@
 import React, { useState, useEffect, useRef} from "react";
-import axios from 'axios';
 import { FaDollarSign, FaCalendarAlt, FaBullseye, FaTrophy, FaUpload, FaTrash, FaEdit } from "react-icons/fa";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import "../styles/Dashboard.css";
 import NewsWidget from "./../features/news/pages/NewsWidget";
+import apiClient from "../services/api";
 
-function Dashboard({ isLoggedIn }) {
+function Dashboard() {
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const [activeMarca, setActiveMarca] = useState(null); // 🚀 Estado para controlar a marca isolada
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
     const fetchMetrics = async () => {
+      setLoading(true);
       try {
-        const response = await axios.get('/api/dashboard-metrics');
+        const response = await apiClient.get('/api/dashboard-metrics', {
+          params: { month: selectedMonth, year: selectedYear }
+        });
         setMetrics(response.data);
       } catch (error) {
         console.error("Erro ao buscar métricas do dashboard:", error);
@@ -23,7 +28,7 @@ function Dashboard({ isLoggedIn }) {
       }
     };
     fetchMetrics();
-  }, []);
+  }, [selectedMonth, selectedYear]);
 
   // Referência invisível para abrir o explorador de arquivos do Windows
   const fileInputRef = useRef(null);
@@ -38,14 +43,16 @@ function Dashboard({ isLoggedIn }) {
 
     setIsUploading(true); // 🚀 Trava a tela e mostra a mensagem de carregamento
     try {
-      await axios.post('/api/upload-csv', formData, {
+      await apiClient.post('/api/upload-csv', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       
       alert('Resultados do dia importados com sucesso!');
       
       // 🚀 Recarrega as métricas da tela automaticamente com os dados novos!
-      const response = await axios.get('/api/dashboard-metrics');
+      const response = await apiClient.get('/api/dashboard-metrics', {
+        params: { month: selectedMonth, year: selectedYear }
+      });
       setMetrics(response.data);
       
     } catch (error) {
@@ -63,11 +70,13 @@ function Dashboard({ isLoggedIn }) {
     if (window.confirm('Tem certeza que deseja APAGAR TODOS os dados de vendas importados? Essa ação não pode ser desfeita.')) {
       try {
         setLoading(true);
-        await axios.delete('/api/dashboard-metrics/clear');
+        await apiClient.delete('/api/dashboard-metrics/clear');
         alert('Dados apagados com sucesso!');
         
         // Recarrega as métricas da tela automaticamente zeradas
-        const response = await axios.get('/api/dashboard-metrics');
+        const response = await apiClient.get('/api/dashboard-metrics', {
+          params: { month: selectedMonth, year: selectedYear }
+        });
         setMetrics(response.data);
       } catch (error) {
         console.error("Erro ao limpar dados:", error);
@@ -94,10 +103,12 @@ function Dashboard({ isLoggedIn }) {
 
     try {
       setLoading(true);
-      await axios.post('/api/dashboard-metrics/meta-ano', { meta: novaMeta });
+      await apiClient.post('/api/dashboard-metrics/meta-ano', { meta: novaMeta });
       
       // Recarrega as métricas
-      const response = await axios.get('/api/dashboard-metrics');
+      const response = await apiClient.get('/api/dashboard-metrics', {
+        params: { month: selectedMonth, year: selectedYear }
+      });
       setMetrics(response.data);
     } catch (error) {
       console.error("Erro ao atualizar meta anual:", error);
@@ -123,10 +134,12 @@ function Dashboard({ isLoggedIn }) {
 
     try {
       setLoading(true);
-      await axios.post('/api/dashboard-metrics/meta', { meta: novaMeta });
+      await apiClient.post('/api/dashboard-metrics/meta', { meta: novaMeta });
       
       // Recarrega as métricas
-      const response = await axios.get('/api/dashboard-metrics');
+      const response = await apiClient.get('/api/dashboard-metrics', {
+        params: { month: selectedMonth, year: selectedYear }
+      });
       setMetrics(response.data);
     } catch (error) {
       console.error("Erro ao atualizar meta:", error);
@@ -151,10 +164,12 @@ function Dashboard({ isLoggedIn }) {
 
     try {
       setLoading(true);
-      await axios.post('/api/dashboard-metrics/meta-vendedor', { vendedor: vendedorNome, meta: novaMeta });
+      await apiClient.post('/api/dashboard-metrics/meta-vendedor', { vendedor: vendedorNome, meta: novaMeta });
       
       // Recarrega as métricas da tela para atualizar a barra de progresso imediatamente
-      const response = await axios.get('/api/dashboard-metrics');
+      const response = await apiClient.get('/api/dashboard-metrics', {
+        params: { month: selectedMonth, year: selectedYear }
+      });
       setMetrics(response.data);
     } catch (error) {
       console.error("Erro ao atualizar meta do vendedor:", error);
@@ -220,7 +235,37 @@ function Dashboard({ isLoggedIn }) {
           <p className="text-muted text-sm">Visão consolidada de performance comercial e metas</p>
         </div>
         {/* 🚀 NOVA ÁREA DE AÇÕES NO TOPO DIREITO */}
-        <div className="page-actions d-flex gap-2">
+        <div className="page-actions d-flex gap-2 align-items-center">
+          <select 
+            className="form-select shadow-sm" 
+            style={{ width: '140px', cursor: 'pointer' }}
+            value={selectedMonth} 
+            onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+          >
+            <option value={1}>Janeiro</option>
+            <option value={2}>Fevereiro</option>
+            <option value={3}>Março</option>
+            <option value={4}>Abril</option>
+            <option value={5}>Maio</option>
+            <option value={6}>Junho</option>
+            <option value={7}>Julho</option>
+            <option value={8}>Agosto</option>
+            <option value={9}>Setembro</option>
+            <option value={10}>Outubro</option>
+            <option value={11}>Novembro</option>
+            <option value={12}>Dezembro</option>
+          </select>
+          <select 
+            className="form-select shadow-sm" 
+            style={{ width: '100px', cursor: 'pointer' }}
+            value={selectedYear} 
+            onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+          >
+            {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 2 + i).map(ano => (
+              <option key={ano} value={ano}>{ano}</option>
+            ))}
+          </select>
+
           <button 
             className="btn btn-outline-danger d-flex align-items-center gap-2 shadow-sm"
             onClick={handleClearData}

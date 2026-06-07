@@ -32,6 +32,7 @@ const formatarNome = (nome) => {
             const response = await apiClient.get('/api/funcionarios-tecnicos');
             setEmployees(Array.isArray(response.data) ? response.data : []);
         } catch (err) {
+            console.error('Erro ao buscar o organograma:', err);
             setError('Erro ao buscar o organograma.');
         } finally {
             setLoading(false);
@@ -99,7 +100,7 @@ const formatarNome = (nome) => {
             
             <div className={`pt-${isCompact ? '3' : '4'} pb-${isCompact ? '2' : '3'}`} style={{ background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)', borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}>
                 <img 
-                    src={employee.userpic_base64 || 'default-avatar.png'} 
+                    src={employee.userpic_url || 'default-avatar.png'} 
                     alt={formatarNome(employee.nome_completo)}
                     className="border border-4 border-white shadow-sm"
                     style={{ width: isCompact ? '70px' : '110px', height: isCompact ? '70px' : '110px', borderRadius: '50%', objectFit: 'cover' }}

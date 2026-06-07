@@ -10,11 +10,16 @@ function DashboardPage({ isLoggedIn }) { // Renomeado para seguir convenção de
   const [loading, setLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const [activeMarca, setActiveMarca] = useState(null); // 🚀 Estado para controlar a marca isolada
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
     const fetchMetrics = async () => {
+      setLoading(true);
       try {
-        const response = await apiClient.get('/api/dashboard-metrics'); // Usa apiClient
+        const response = await apiClient.get('/api/dashboard-metrics', {
+          params: { month: selectedMonth, year: selectedYear }
+        });
         setMetrics(response.data);
       } catch (error) {
         console.error("Erro ao buscar métricas do dashboard:", error);
@@ -23,7 +28,7 @@ function DashboardPage({ isLoggedIn }) { // Renomeado para seguir convenção de
       }
     };
     fetchMetrics();
-  }, []);
+  }, [selectedMonth, selectedYear]);
 
   // Referência invisível para abrir o explorador de arquivos do Windows
   const fileInputRef = useRef(null);
@@ -45,7 +50,9 @@ function DashboardPage({ isLoggedIn }) { // Renomeado para seguir convenção de
       alert('Resultados do dia importados com sucesso!');
       
       // 🚀 Recarrega as métricas da tela automaticamente com os dados novos!
-      const response = await apiClient.get('/api/dashboard-metrics'); // Usa apiClient
+      const response = await apiClient.get('/api/dashboard-metrics', {
+        params: { month: selectedMonth, year: selectedYear }
+      });
       setMetrics(response.data);
       
     } catch (error) {
@@ -67,7 +74,9 @@ function DashboardPage({ isLoggedIn }) { // Renomeado para seguir convenção de
         alert('Dados apagados com sucesso!');
         
         // Recarrega as métricas da tela automaticamente zeradas
-        const response = await apiClient.get('/api/dashboard-metrics'); // Usa apiClient
+        const response = await apiClient.get('/api/dashboard-metrics', {
+          params: { month: selectedMonth, year: selectedYear }
+        });
         setMetrics(response.data);
       } catch (error) {
         console.error("Erro ao limpar dados:", error);
@@ -97,7 +106,9 @@ function DashboardPage({ isLoggedIn }) { // Renomeado para seguir convenção de
       await apiClient.post('/api/dashboard-metrics/meta-ano', { meta: novaMeta }); // Usa apiClient
       
       // Recarrega as métricas
-      const response = await apiClient.get('/api/dashboard-metrics'); // Usa apiClient
+      const response = await apiClient.get('/api/dashboard-metrics', {
+        params: { month: selectedMonth, year: selectedYear }
+      });
       setMetrics(response.data);
     } catch (error) {
       console.error("Erro ao atualizar meta anual:", error);
@@ -126,7 +137,9 @@ function DashboardPage({ isLoggedIn }) { // Renomeado para seguir convenção de
       await apiClient.post('/api/dashboard-metrics/meta', { meta: novaMeta }); // Usa apiClient
       
       // Recarrega as métricas
-      const response = await apiClient.get('/api/dashboard-metrics'); // Usa apiClient
+      const response = await apiClient.get('/api/dashboard-metrics', {
+        params: { month: selectedMonth, year: selectedYear }
+      });
       setMetrics(response.data);
     } catch (error) {
       console.error("Erro ao atualizar meta:", error);
@@ -154,7 +167,9 @@ function DashboardPage({ isLoggedIn }) { // Renomeado para seguir convenção de
       await apiClient.post('/api/dashboard-metrics/meta-vendedor', { vendedor: vendedorNome, meta: novaMeta }); // Usa apiClient
       
       // Recarrega as métricas da tela para atualizar a barra de progresso imediatamente
-      const response = await apiClient.get('/api/dashboard-metrics'); // Usa apiClient
+      const response = await apiClient.get('/api/dashboard-metrics', {
+        params: { month: selectedMonth, year: selectedYear }
+      });
       setMetrics(response.data);
     } catch (error) {
       console.error("Erro ao atualizar meta do vendedor:", error);
@@ -220,7 +235,37 @@ function DashboardPage({ isLoggedIn }) { // Renomeado para seguir convenção de
           <p className="text-muted text-sm">Visão consolidada de performance comercial e metas</p>
         </div>
         {/* 🚀 NOVA ÁREA DE AÇÕES NO TOPO DIREITO */}
-        <div className="page-actions d-flex gap-2">
+      <div className="page-actions d-flex gap-2 align-items-center">
+        <select 
+          className="form-select shadow-sm" 
+          style={{ width: '140px', cursor: 'pointer' }}
+          value={selectedMonth} 
+          onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+        >
+          <option value={1}>Janeiro</option>
+          <option value={2}>Fevereiro</option>
+          <option value={3}>Março</option>
+          <option value={4}>Abril</option>
+          <option value={5}>Maio</option>
+          <option value={6}>Junho</option>
+          <option value={7}>Julho</option>
+          <option value={8}>Agosto</option>
+          <option value={9}>Setembro</option>
+          <option value={10}>Outubro</option>
+          <option value={11}>Novembro</option>
+          <option value={12}>Dezembro</option>
+        </select>
+        <select 
+          className="form-select shadow-sm" 
+          style={{ width: '100px', cursor: 'pointer' }}
+          value={selectedYear} 
+          onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+        >
+          {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 2 + i).map(ano => (
+            <option key={ano} value={ano}>{ano}</option>
+          ))}
+        </select>
+
           <button 
             className="btn btn-outline-danger d-flex align-items-center gap-2 shadow-sm"
             onClick={handleClearData}

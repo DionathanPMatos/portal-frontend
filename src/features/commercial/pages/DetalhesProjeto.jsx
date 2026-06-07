@@ -1,4 +1,3 @@
-import { useAuth } from '../../../contexts/AuthContext'; // Ajuste o caminho se necessário
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Container, Spinner, Alert, Card, Row, Col, Breadcrumb, Button, Modal, Form, ListGroup, InputGroup, Badge, Tabs, Tab, FormCheck, Accordion, Table } from 'react-bootstrap';
@@ -95,7 +94,8 @@ const carregarDetalhesPedido = async () => {
 return (
         <Accordion.Item eventKey={pedidoVinculado.numero_pedido}>
             <Accordion.Header onClick={carregarDetalhesPedido}>
-                Pedido ERP: {pedidoVinculado.numero_pedido} (Valor: {parseFloat(pedidoVinculado.valor_total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })})
+                Pedido ERP: {pedidoVinculado.numero_pedido} {detalhes.pedido ? `(Valor: ${parseFloat(detalhes.pedido.valor_total_pedido || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })})` : ''}
+                <Badge bg={badgeStatus.bg} text={badgeStatus.text} className="ms-3">{badgeStatus.label}</Badge>
             </Accordion.Header>
             <Accordion.Body>
                 {isLoading && <Spinner animation="border" size="sm" />}
@@ -117,7 +117,12 @@ return (
                                ))}
                            </tbody>
                         </Table>
-                        <Button variant="outline-danger" size="sm" onClick={() => onDesvincular(pedidoVinculado.numero_pedido)}>
+                        {hasInsufficientStock && !detalhes.solicitacao && (
+                            <Button variant="warning" size="sm" className="me-2" onClick={handleSolicitarCompra}>
+                                Solicitar Compra de Faltantes
+                            </Button>
+                        )}
+                        <Button variant="outline-danger" size="sm" onClick={() => onDesvincular(pedidoVinculado.id)}>
                             Desvincular Pedido
                         </Button>
                     </div>
@@ -157,7 +162,7 @@ const DetalhesProjeto = ({ user }) => {    const { id } = useParams();
     const [textoAtividade, setTextoAtividade] = useState('');
     const [dataTarefa, setDataTarefa] = useState('');
 
-    const USUARIO_LOGADO_ID = 1;
+    const USUARIO_LOGADO_ID = user?.id || 1;
 
     const fetchData = async () => {
         try {
@@ -231,8 +236,7 @@ const handleMarkAsLost = async () => {
         return;
     }
     try {
-        await apiClient.patch(`/api/projetos/${id}/status`, {
-            etapa_funil: '0% - Projeto Perdido', // <-- LINHA ATUALIZADA
+        await apiClient.patch(`/api/projetos/${id}/perder`, {
             motivo_perda: motivoPerda
         });
         setShowLostModal(false);
@@ -628,7 +632,7 @@ const handleMarkAsLost = async () => {
                                 {documentos.length > 0 ? (
                                     documentos.map(doc => (
                                         <ListGroup.Item key={doc.id} className="d-flex justify-content-between align-items-center">
-                                            <a href={`http://localhost:3000/${doc.caminho_arquivo}`} target="_blank" rel="noopener noreferrer">
+                                            <a href={doc.caminho_arquivo} target="_blank" rel="noopener noreferrer">
                                                 {doc.nome_original}
                                             </a>
                                             <Button variant="outline-danger" size="sm" onClick={() => handleDeleteDocument(doc.id)}>
