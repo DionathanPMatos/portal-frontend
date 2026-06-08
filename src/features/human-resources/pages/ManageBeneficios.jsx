@@ -30,6 +30,7 @@ const ManageBeneficios = () => {
             setBeneficios(response.data);
             setError(null);
         } catch (err) {
+            console.error('Erro ao carregar benefícios:', err);
             setError('Erro ao carregar os benefícios.');
         } finally {
             setLoading(false);
@@ -50,12 +51,12 @@ const ManageBeneficios = () => {
             setEditingId(beneficio.id);
             setNome(beneficio.nome);
             setDescricao(beneficio.descricao || '');
-            setExistingLogoBase64(beneficio.logo_base64 || '');
+            setExistingLogoUrl(beneficio.logo_url || '');
         } else {
             setEditingId(null);
             setNome('');
             setDescricao('');
-            setExistingLogoBase64('');
+            setExistingLogoUrl('');
         }
         setLogoFile(null);
         setShowModal(true);
@@ -110,6 +111,7 @@ const ManageBeneficios = () => {
                 fetchBeneficios();
                 setTimeout(() => setSuccessMessage(null), 3000);
             } catch (err) {
+                console.error("Erro ao remover benefício:", err);
                 setError('Erro ao remover benefício.');
             }
         }

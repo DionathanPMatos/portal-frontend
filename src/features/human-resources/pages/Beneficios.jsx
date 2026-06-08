@@ -16,6 +16,7 @@ const Beneficios = () => {
                 const response = await apiClient.get('/api/beneficios');
                 setBeneficios(response.data);
             } catch (err) {
+                console.error('Erro ao carregar benefícios:', err);
                 setError('Não foi possível carregar os benefícios.');
             } finally {
                 setLoading(false);
