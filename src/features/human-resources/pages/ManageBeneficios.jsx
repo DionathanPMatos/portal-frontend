@@ -17,7 +17,7 @@ const ManageBeneficios = () => {
     const [nome, setNome] = useState('');
     const [descricao, setDescricao] = useState('');
     const [logoFile, setLogoFile] = useState(null);
-    const [existingLogoBase64, setExistingLogoBase64] = useState('');
+    const [existingLogoUrl, setExistingLogoUrl] = useState('');
 
     useEffect(() => {
         fetchBeneficios();
@@ -66,14 +66,27 @@ const ManageBeneficios = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const logo_base64 = logoFile ? await fileToBase64(logoFile) : existingLogoBase64;
-            const payload = { nome, descricao, logo_base64 };
+            const formData = new FormData();
+            formData.append('nome', nome);
+            formData.append('descricao', descricao);
+
+            if (logoFile) {
+                formData.append('logo_file', logoFile);
+            } else if (editingId) {
+                // Envia a URL existente para que o backend saiba se deve mantê-la ou limpá-la
+                formData.append('logo_url', existingLogoUrl);
+            }
+
+            const config = {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            };
 
             if (editingId) {
-                await apiClient.put(`/api/beneficios/${editingId}`, payload);
+                // O método PUT com FormData pode ser problemático em alguns servidores, mas axios lida bem.
+                await apiClient.put(`/api/beneficios/${editingId}`, formData, config);
                 setSuccessMessage('Benefício atualizado com sucesso!');
             } else {
-                await apiClient.post('/api/beneficios', payload);
+                await apiClient.post('/api/beneficios', formData, config);
                 setSuccessMessage('Benefício criado com sucesso!');
             }
 
@@ -81,7 +94,11 @@ const ManageBeneficios = () => {
             fetchBeneficios();
             setTimeout(() => setSuccessMessage(null), 3000);
         } catch (err) {
-            setError('Erro ao salvar o benefício.');
+            console.error("Erro ao salvar benefício:", err);
+            const errorMsg = err.response?.data?.error || 'Erro ao salvar o benefício.';
+            setError(errorMsg);
+            // Limpa o erro após alguns segundos
+            setTimeout(() => setError(null), 5000);
         }
     };
 
@@ -131,9 +148,9 @@ const ManageBeneficios = () => {
                                     {beneficios.length > 0 ? (
                                         beneficios.map(b => (
                                             <tr key={b.id}>
-                                                <td className="px-4 py-3">
-                                                    {b.logo_base64 ? (
-                                                        <img src={b.logo_base64} alt={b.nome} className="rounded" style={{ height: '40px', objectFit: 'contain' }} />
+                                                <td className="px-4 py-3" style={{ width: '100px' }}>
+                                                    {b.logo_url ? (
+                                                        <img src={b.logo_url} alt={b.nome} className="rounded border bg-light" style={{ height: '40px', width: '60px', objectFit: 'contain' }} />
                                                     ) : (
                                                         <span className="text-muted small">Sem logo</span>
                                                     )}
@@ -171,9 +188,9 @@ const ManageBeneficios = () => {
                                     <Form.Group className="mb-3">
                                         <Form.Label>Subir Logo</Form.Label>
                                         <Form.Control type="file" accept="image/*" onChange={(e) => setLogoFile(e.target.files[0])} />
-                                        {existingLogoBase64 && !logoFile && (
+                                        {existingLogoUrl && !logoFile && (
                                             <div className="mt-2 text-center border p-2 bg-light rounded">
-                                                <img src={existingLogoBase64} alt="Logo atual" style={{ height: '40px', objectFit: 'contain' }} />
+                                                <img src={existingLogoUrl} alt="Logo atual" style={{ height: '40px', objectFit: 'contain' }} />
                                             </div>
                                         )}
                                     </Form.Group>

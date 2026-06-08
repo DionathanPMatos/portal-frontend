@@ -35,7 +35,7 @@ const Beneficios = () => {
                 <Col>
                     <Card className="shadow-sm border-0">
                         <Card.Header>
-                            <Card.Title as="h4"> <FaGifts />&nbsp;Benefícios Corporativos</Card.Title>
+                            <Card.Title as="h4"> <FaGifts />&nbsp;Benefícios Corporativos </Card.Title>
                         </Card.Header>
                         <Card.Body>
                             <div className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
@@ -63,8 +63,8 @@ const Beneficios = () => {
                                                     onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)'; }}
                                                 >
                                                     <Card.Body className="d-flex flex-column align-items-center justify-content-center p-4">
-                                                        {b.logo_base64 ? (
-                                                            <img src={b.logo_base64} alt={b.nome} style={{ height: '110px', maxWidth: '100%', objectFit: 'contain', marginBottom: '15px' }} />
+                                                        {b.logo_url ? (
+                                                            <img src={b.logo_url} alt={b.nome} style={{ height: '110px', maxWidth: '100%', objectFit: 'contain', marginBottom: '15px' }} />
                                                         ) : (
                                                             <div className="bg-light rounded-circle d-flex align-items-center justify-content-center mb-3" style={{ width: '110px', height: '110px' }}>
                                                                 <FaGifts size={48} className="text-secondary" />
@@ -95,9 +95,9 @@ const Beneficios = () => {
                             <Modal.Title className="fw-bold fs-5">{selectedBeneficio.nome}</Modal.Title>
                         </Modal.Header>
                         <Modal.Body className="p-4">
-                            {selectedBeneficio.logo_base64 && (
+                            {selectedBeneficio.logo_url && (
                                 <div className="text-center mb-4 pb-3 border-bottom">
-                                    <img src={selectedBeneficio.logo_base64} alt={selectedBeneficio.nome} style={{ height: '120px', objectFit: 'contain' }} />
+                                    <img src={selectedBeneficio.logo_url} alt={selectedBeneficio.nome} style={{ height: '120px', objectFit: 'contain' }} />
                                 </div>
                             )}
                             {/* Exibe o HTML rico vindo do CKEditor */}

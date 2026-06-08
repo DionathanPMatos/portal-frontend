@@ -16,8 +16,9 @@ import CargosModal from './CargosModal';
 import SetoresModal from './SetoresModal';
 import UnidadesModal from './UnidadesModal.jsx';
 import apiClient from '../../../services/api';
-import ImportModal from './../components/ImportModal';
-import '../../../App.jsx';
+import ImportModal from '../components/ImportModal';
+// A importação de '../../../App.jsx' foi removida.
+// Estilos globais devem ser importados no arquivo de entrada principal da sua aplicação (ex: main.jsx ou index.js).
 
 const ManageEmployees = ({ isLoggedIn }) => {
     const [employees, setEmployees] = useState([]);
@@ -189,7 +190,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
                 setSuccessMessage("Funcionário adicionado com sucesso!");
             }
 
-            handleCloseAddEditModal();
+            handleCloseAndResetModal();
             await fetchEmployees();
 
             setTimeout(() => { setSuccessMessage(null); }, 3000);
@@ -226,8 +227,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
         setShowAddEditModal(true);
     };
 
-    const handleAddClick = () => {
-        setError(null);
+    const resetForm = () => {
         setEditingEmployee(null);
         setName(''); setEmail(''); setContact('');
         setCargoId(''); setSetorId(''); setUnidadeId('');
@@ -235,18 +235,17 @@ const ManageEmployees = ({ isLoggedIn }) => {
         setCnhNumero(''); setCnhValidade('');
         setUserpicFile(null); 
         setExistingUserpicUrl('');
+        setError(null);
+    };
+
+    const handleAddClick = () => {
+        resetForm();
         setShowAddEditModal(true);
     };
 
-    const handleCloseAddEditModal = () => {
+    const handleCloseAndResetModal = () => {
         setShowAddEditModal(false);
-        setEditingEmployee(null);
-        setName(''); setEmail(''); setContact('');
-        setCargoId(''); setSetorId(''); setGestorId(''); setUnidadeId('');
-        setPermissions(['dashboard']); setSelectedFabricantes([]); 
-        setCnhNumero(''); setCnhValidade('');
-        setUserpicFile(null); 
-        setExistingUserpicUrl('');
+        resetForm();
     };
 
     const handleDeleteClick = (employee) => {
@@ -438,7 +437,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
                 onComplete={fetchEmployees}
             />
             
-            <Modal show={showAddEditModal} onHide={handleCloseAddEditModal} size="lg">
+            <Modal show={showAddEditModal} onHide={handleCloseAndResetModal} size="lg">
                 <Modal.Header closeButton>
                     <Modal.Title>{editingEmployee ? 'Editar Colaborador' : 'Adicionar Novo Colaborador'}</Modal.Title>
                 </Modal.Header>
@@ -544,8 +543,8 @@ const ManageEmployees = ({ isLoggedIn }) => {
                         </Form.Group>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button variant="secondary btn-sm" onClick={handleCloseAddEditModal}>Cancelar</Button>
-                        <Button variant="success btn-sm" type="submit">{editingEmployee ? 'Salvar Edição' : 'Adicionar Colaborador'}</Button>
+                        <Button variant="secondary btn-sm" onClick={handleCloseAndResetModal}>Cancelar</Button>
+                        <Button variant="success btn-sm" type="submit">{editingEmployee ? 'Salvar Alterações' : 'Adicionar Colaborador'}</Button>
                     </Modal.Footer>
                 </Form>
             </Modal>

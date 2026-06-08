@@ -17,6 +17,7 @@ const CargosModal = ({ show, onHide, onCargosUpdate }) => { // Mantido
             const response = await apiClient.get('/api/cargos');
             setCargos(response.data);
         } catch (err) {
+            console.error('Erro ao buscar cargos:', err);
             setError('Falha ao buscar cargos.');
         } finally {
             setLoading(false);
@@ -44,6 +45,7 @@ const CargosModal = ({ show, onHide, onCargosUpdate }) => { // Mantido
             await fetchCargos();
             onCargosUpdate(); // Informa o componente pai que a lista de cargos mudou
         } catch (err) {
+            console.error('Erro ao salvar cargo:', err);
             setError('Falha ao salvar cargo.');
         }
     };
@@ -55,6 +57,7 @@ const CargosModal = ({ show, onHide, onCargosUpdate }) => { // Mantido
                 await fetchCargos();
                 onCargosUpdate(); // Informa o componente pai
             } catch (err) {
+                console.error('Erro ao excluir cargo:', err);
                 setError('Falha ao excluir cargo. Verifique se não há funcionários vinculados a ele.');
             }
         }

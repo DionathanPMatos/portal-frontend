@@ -12,9 +12,9 @@ import Spinner from 'react-bootstrap/Spinner';
 import Alert from 'react-bootstrap/Alert';
 import Modal from 'react-bootstrap/Modal';
 import apiClient from '../../../services/api'; // Importa a instância configurada do Axios
-import { FaEdit, FaTrash, FaUserPlus, FaFileImport, FaBriefcase, FaSitemap, FaSearch, FaUserTimes } from 'react-icons/fa';
+import { FaEdit, FaUserPlus, FaFileImport, FaBriefcase, FaSitemap, FaSearch, FaUserTimes } from 'react-icons/fa';
 import CargosModal from './CargosModal';
-import SetoresModal from '../../../components/layout/SetoresModal';
+import SetoresModal from '../../human-resources/pages/SetoresModal';
 import UnidadesModal from './UnidadesModal';
 import ImportModal from '../components/ImportModal'; // 1. IMPORTA O NOVO MODAL do local correto
 // import '../../App.css'; // Removido: estilos globais devem ser importados apenas em main.jsx ou App.jsx
@@ -47,7 +47,7 @@ const ManageEmployeesPage = ({ isLoggedIn }) => { // Renomeado
     const [permissions, setPermissions] = useState(['dashboard']);
     const [selectedFabricantes, setSelectedFabricantes] = useState([]);
     const [userpicFile, setUserpicFile] = useState(null);
-    const [existingUserpicBase64, setExistingUserpicBase64] = useState('');
+    const [existingUserpicUrl, setExistingUserpicUrl] = useState('');
     const [cnhNumero, setCnhNumero] = useState('');
     const [cnhValidade, setCnhValidade] = useState('');
 
@@ -76,15 +76,6 @@ const ManageEmployeesPage = ({ isLoggedIn }) => { // Renomeado
         }).join(' ');
         return nomeFormatado;
     };
-
-    const fileToBase64 = (file) => (
-        new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = (error) => reject(error);
-        })
-    );
 
     const fetchEmployees = async () => {
         try {
@@ -155,27 +146,35 @@ const ManageEmployeesPage = ({ isLoggedIn }) => { // Renomeado
             return;
         }
         try {
-            const userpicBase64 = userpicFile ? await fileToBase64(userpicFile) : existingUserpicBase64;
-            const employeeData = {
-                nome_completo: name,
-                email,
-                contato: contact,
-                setor_id: setorId ? Number(setorId) : null,
-                userpic_base64: userpicBase64 || null,
-                cargo_id: cargoId ? Number(cargoId) : null,
-                privilegios: permissions.join(',') || 'usuario',
-                fabricantes_ids: selectedFabricantes,
-                gestor_id: gestorId ? Number(gestorId) : null,
-                unidade_id: unidadeId ? Number(unidadeId) : null,
-                cnh_numero: cnhNumero || null,
-                cnh_validade: cnhValidade || null
+            const formData = new FormData();
+            formData.append('nome_completo', name);
+            formData.append('email', email);
+            if (contact) formData.append('contato', contact);
+            if (setorId) formData.append('setor_id', setorId);
+            if (cargoId) formData.append('cargo_id', cargoId);
+            formData.append('privilegios', permissions.join(',') || 'usuario');
+            if (gestorId) formData.append('gestor_id', gestorId);
+            if (unidadeId) formData.append('unidade_id', unidadeId);
+            if (cnhNumero) formData.append('cnh_numero', cnhNumero);
+            if (cnhValidade) formData.append('cnh_validade', cnhValidade);
+
+            if (selectedFabricantes && selectedFabricantes.length > 0) {
+                formData.append('fabricantes_ids', JSON.stringify(selectedFabricantes));
+            }
+
+            if (userpicFile) {
+                formData.append('userpic_file', userpicFile);
+            }
+
+            const config = {
+                headers: { 'Content-Type': 'multipart/form-data' }
             };
 
             if (editingEmployee) {
-                await apiClient.put(`/api/funcionarios/${editingEmployee.id}`, employeeData);
+                await apiClient.put(`/api/funcionarios/${editingEmployee.id}`, formData, config);
                 setSuccessMessage("Funcionário editado com sucesso!");
             } else {
-                await apiClient.post('/api/funcionarios', employeeData);
+                await apiClient.post('/api/funcionarios', formData, config);
                 setSuccessMessage("Funcionário adicionado com sucesso!");
             }
 
@@ -206,8 +205,8 @@ const ManageEmployeesPage = ({ isLoggedIn }) => { // Renomeado
         setUnidadeId(employee.unidade_id || '');
         setPermissions(employee.privilegios ? employee.privilegios.split(',') : ['dashboard']);
         setSelectedFabricantes(employee.fabricantes_ids || []);
-        setExistingUserpicBase64(employee.userpic_url || '');
         setUserpicFile(null);
+        setExistingUserpicUrl(employee.userpic_url || '');
         setCnhNumero(employee.cnh_numero || '');
         setCnhValidade(employee.cnh_validade ? employee.cnh_validade.split('T')[0] : '');
         setShowAddEditModal(true);
@@ -218,8 +217,9 @@ const ManageEmployeesPage = ({ isLoggedIn }) => { // Renomeado
         setEditingEmployee(null);
         setName(''); setEmail(''); setContact('');
         setCargoId(''); setSetorId(''); setUnidadeId('');
-        setGestorId(''); setPermissions(['dashboard']); setSelectedFabricantes([]); setUserpicFile(null); setCnhNumero(''); setCnhValidade('');
-        setExistingUserpicBase64(''); setShowAddEditModal(true);
+        setGestorId(''); setPermissions(['dashboard']); setSelectedFabricantes([]); 
+        setCnhNumero(''); setCnhValidade('');
+        setUserpicFile(null); setExistingUserpicUrl(''); setShowAddEditModal(true);
     };
 
     const handleCloseAddEditModal = () => {
@@ -227,8 +227,9 @@ const ManageEmployeesPage = ({ isLoggedIn }) => { // Renomeado
         setEditingEmployee(null);
         setName(''); setEmail(''); setContact('');
         setCargoId(''); setSetorId(''); setGestorId(''); setUnidadeId('');
-        setPermissions(['dashboard']); setSelectedFabricantes([]); setUserpicFile(null); setCnhNumero(''); setCnhValidade('');
-        setExistingUserpicBase64('');
+        setPermissions(['dashboard']); setSelectedFabricantes([]); 
+        setCnhNumero(''); setCnhValidade('');
+        setUserpicFile(null); setExistingUserpicUrl('');
     };
 
     const handleDeleteClick = (employee) => {
@@ -517,11 +518,14 @@ const ManageEmployeesPage = ({ isLoggedIn }) => { // Renomeado
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Foto do colaborador</Form.Label>
-                            <Form.Control type="file" onChange={(e) => setUserpicFile(e.target.files[0])}/>
-                            {editingEmployee && existingUserpicBase64 && (
+                            <Form.Control type="file" accept="image/*" onChange={(e) => setUserpicFile(e.target.files[0])}/>
+                            {editingEmployee && existingUserpicUrl && !userpicFile && (
                                 <div className="mt-2">
-                                    <small>Foto atual:</small><br />
-                                    <img src={existingUserpicBase64} alt="Foto atual" style={{ width: '50px', height: '50px', objectFit: 'contain' }}/>
+                                    <small className="text-muted d-block mb-1">Foto atual:</small>
+                                    <img 
+                                        src={existingUserpicUrl} alt="Foto atual" 
+                                        className="border rounded bg-light" 
+                                        style={{ width: '60px', height: '60px', objectFit: 'contain' }}/>
                                 </div>
                             )}
                         </Form.Group>

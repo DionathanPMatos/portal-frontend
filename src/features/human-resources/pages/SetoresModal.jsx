@@ -1,7 +1,7 @@
 // Novo arquivo: src/components/SetoresModal.jsx
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, ListGroup, InputGroup, Alert, Spinner } from 'react-bootstrap';
-import axios from 'axios';
+import apiClient from '../../../services/api';
 
 const SetoresModal = ({ show, onHide, onSetoresUpdate }) => {
     const [setores, setSetores] = useState([]);
@@ -14,9 +14,10 @@ const SetoresModal = ({ show, onHide, onSetoresUpdate }) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await axios.get('/api/setores');
+            const response = await apiClient.get('/api/setores');
             setSetores(response.data);
         } catch (err) {
+            console.error('Erro ao buscar setores:', err);
             setError('Falha ao buscar setores.');
         } finally {
             setLoading(false);
@@ -34,22 +35,24 @@ const SetoresModal = ({ show, onHide, onSetoresUpdate }) => {
         const url = editingSetor ? `/api/setores/${editingSetor.id}` : '/api/setores';
         const method = editingSetor ? 'put' : 'post';
         try {
-            await axios[method](url, { nome_setor: nomeSetor });
+            await apiClient[method](url, { nome_setor: nomeSetor });
             resetForm();
             await fetchSetores();
             onSetoresUpdate();
         } catch (err) {
-            setError('Falha ao salvar setor.');
+            console.error('Erro ao salvar setor:', err);
+            setError(editingSetor ? 'Falha ao atualizar setor.' : 'Falha ao adicionar setor.');
         }
     };
     
     const handleDelete = async (id) => {
         if (window.confirm('Tem certeza que deseja excluir este setor?')) {
             try {
-                await axios.delete(`/api/setores/${id}`);
+                await apiClient.delete(`/api/setores/${id}`);
                 await fetchSetores();
                 onSetoresUpdate();
             } catch (err) {
+                console.error('Erro ao excluir setor:', err);
                 setError('Falha ao excluir setor. Verifique se não há funcionários vinculados a ele.');
             }
         }
@@ -98,6 +101,7 @@ const SetoresModal = ({ show, onHide, onSetoresUpdate }) => {
                                 {setor.nome_setor}
                                 <div>
                                     <Button variant="outline-info" size="sm" onClick={() => handleEdit(setor)}>Editar</Button>
+                                    <Button variant="outline-danger" size="sm" className="ms-2" onClick={() => handleDelete(setor.id)}>Excluir</Button>
                                 </div>
                             </ListGroup.Item>
                         ))}

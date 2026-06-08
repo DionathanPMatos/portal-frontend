@@ -16,7 +16,7 @@ const UnidadesModal = ({ show, onHide, onUnidadesUpdate }) => {
             const response = await apiClient.get('/api/unidades');
             setUnidades(response.data);
         } catch (err) {
-            setError('Falha ao buscar unidades.');
+            console.error('Erro ao buscar unidades:', err);
         } finally {
             setLoading(false);
         }
@@ -26,22 +26,21 @@ const UnidadesModal = ({ show, onHide, onUnidadesUpdate }) => {
         if (show) fetchUnidades();
     }, [show]);
 
-const handleSave = async () => {
-        if (!nomeUnidade.trim()) return;
-        const url = editingUnidade ? `/api/unidades/${editingUnidade.id}` : '/api/unidades';
-        const method = editingUnidade ? 'put' : 'post';
-        
-        try {
-            // Correção: Chamada dinâmica do método com URL e Payload
-            await apiClientmethod;
-            
-            resetForm();
-            await fetchUnidades();
-            if(onUnidadesUpdate) onUnidadesUpdate();
-        } catch (err) {
-            setError('Falha ao salvar unidade.');
-        }
-    };
+    const handleSave = async () => {
+        if (!nomeUnidade.trim()) return;
+        const url = editingUnidade ? `/api/unidades/${editingUnidade.id}` : '/api/unidades';
+        const method = editingUnidade ? 'put' : 'post';
+
+        try {
+            await apiClient[method](url, { nome_unidade: nomeUnidade });
+            resetForm();
+            await fetchUnidades();
+            if (onUnidadesUpdate) onUnidadesUpdate();
+        } catch (err) {
+            console.error('Erro ao salvar:', err);
+            setError(editingUnidade ? 'Falha ao atualizar unidade.' : 'Falha ao adicionar unidade.');
+        }
+    };
     
     const handleDelete = async (id) => {
         if (window.confirm('Tem certeza que deseja excluir esta unidade?')) {
@@ -50,6 +49,7 @@ const handleSave = async () => {
                 await fetchUnidades();
                 if(onUnidadesUpdate) onUnidadesUpdate();
             } catch (err) {
+                console.error('Erro ao excluir:', err);
                 setError('Falha ao excluir. Verifique se não há funcionários vinculados.');
             }
         }
