@@ -107,8 +107,8 @@ const formatarNome = (nome) => {
                 />
             </div>
             <Card.Body className={`d-flex flex-column p-${isCompact ? '3' : '4'}`}>
-                <Card.Title className={`fw-bold text-dark mb-1 ${isCompact ? 'fs-6' : 'fs-5'}`}>{formatarNome(employee.nome_completo)}</Card.Title>
-                <Card.Subtitle className={`mb-${isCompact ? '2' : '3'} text-muted small text-uppercase fw-semibold`} style={{ fontSize: isCompact ? '0.7rem' : '' }}>{employee.setor}</Card.Subtitle>
+                <Card.Title className={`fw-bold text-dark mb-2 text-center justify-content-center ${isCompact ? 'fs-6' : 'fs-5'}`}>{formatarNome(employee.nome_completo)}</Card.Title>
+                <Card.Subtitle className={`mb-${isCompact ? '2' : '3'} text-muted small text-uppercase fw-semibold text-center`} style={{ fontSize: isCompact ? '0.7rem' : '' }}>{employee.setor}</Card.Subtitle>
                 
                 <div className="mt-2 text-start">
                     <p className="mb-1 text-muted" style={{ fontSize: isCompact ? '0.75rem' : '0.85rem' }}><strong>Cargo:</strong> {employee.cargo || 'Não informado'}</p>
