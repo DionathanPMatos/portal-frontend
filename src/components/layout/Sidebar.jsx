@@ -120,14 +120,9 @@ const menuItems = [
     name: "Marketing",
     icon: <FaPencilAlt size={iconSize} />,
     subItems: [
+      { name: "Solicitar Material", link: "/marketing/solicitar-material" },
+      { name: "Reservar Sala/Showroom", link: "/marketing/reservar-sala" },
       { name: "Cases de Sucesso", link: "#" },
-      { name: "Solicitação de Cartão de Visita", link: "#" },
-      { name: "Solicitação de Material", link: "#" },
-      {
-        name: "Reserva Showroom",
-        link: "https://deltacable-my.sharepoint.com/personal/juliana_prestupa_dca_com_br/Lists/Showroom?env=WebViewList",
-        target: "_blank",
-      },
       { name: "Politica de Marketing", link: "#" },
     ],
   },

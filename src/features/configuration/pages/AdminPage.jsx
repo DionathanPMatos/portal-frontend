@@ -2,13 +2,13 @@ import React from 'react';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { FaUserPlus, FaIndustry, FaUsers, FaChevronRight, FaSitemap } from 'react-icons/fa';
-import { MdOutlineAttachMoney } from "react-icons/md";
+import { MdOutlineAttachMoney, MdCardGiftcard } from "react-icons/md";
 import { AiFillSafetyCertificate, AiFillAlert } from "react-icons/ai";
 import { SiHomeassistantcommunitystore } from "react-icons/si";
 import { GiFloorHatch } from "react-icons/gi";
 import { RiTeamFill, RiProjectorFill } from "react-icons/ri";
 import { IoColorPalette } from "react-icons/io5"; // Novo ícone
-import { FaChartPie, FaRegNewspaper } from "react-icons/fa"; 
+import { FaChartPie, FaRegNewspaper, FaBoxOpen } from "react-icons/fa"; 
 import { FaSearchDollar } from "react-icons/fa";
 
 // Estrutura de dados organizada por seções
@@ -109,6 +109,23 @@ const dashboardSections = [
                 link: '/admin/relatorios',
             },
         ],
+    },
+    {
+        title: 'Marketing',
+        cards: [
+            {
+                title: 'Gerenciar Produtos',
+                text: 'Cadastre e edite materiais de marketing (brindes, etc).',
+                icon: <FaBoxOpen size={24} />,
+                link: '/admin/marketing/produtos',
+            },
+            {
+                title: 'Gestão de Solicitações',
+                text: 'Aprove ou recuse solicitações de materiais e reservas de sala.',
+                icon: <MdCardGiftcard size={24} />,
+                link: '/admin/marketing/gestao',
+            },
+        ]
     },
     {
         title: 'Sistema',
