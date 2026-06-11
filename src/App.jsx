@@ -77,6 +77,11 @@ import BeneficiosPage from "./features/human-resources/pages/Beneficios.jsx"; //
 import ManageBeneficiosPage from "./features/human-resources/pages/ManageBeneficios.jsx"; // Renomeado
 
 // ==========================================
+// MÓDULO FINANCEIRO
+// ==========================================
+import FinanceiroPage from "./features/financial/pages/FinanceiroPage.jsx";
+
+// ==========================================
 // MÓDULO FERRAMENTAS
 // ==========================================
 import CalculadoraSolarPage from "./features/tools/pages/CalculadoraSolar.jsx"; // Renomeado
@@ -163,6 +168,9 @@ function App() {
             <Route path="/admin/gerenciar-leads" element={<GerenciamentoLeadsPage />} />
             <Route path="/crm/clientes" element={<ClientListPage />} />
             <Route path="/crm/clientes/:id" element={<ClientDetailPage user={user} />} />
+
+            {/* MÓDULO FINANCEIRO */}
+            <Route path="/financeiro" element={<FinanceiroPage user={user} />} />
 
             {/* NOVA ROTA PARA O MÓDULO DE CONTROLE DE FROTA */}
             <Route path="/frota" element={<Frota />} />
