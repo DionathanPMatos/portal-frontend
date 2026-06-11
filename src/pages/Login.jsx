@@ -26,16 +26,20 @@ function Login() {
     try {
       // Fazendo a requisição para a rota correta do nosso backend
       const response = await apiClient.post('/api/auth/login', { email: e.target.formBasicEmail.value, password: e.target.formBasicPassword.value }); // Usa apiClient
-      if (response.status === 200) {
-          // Redireciona para o root após autenticação com sucesso
-          window.location.href = '/'; 
-      }
-    } catch (err) {
-      setError(err.response?.data?.message || err.response?.data?.error || 'Erro ao realizar login. Verifique suas credenciais.');
+ if (response.status === 200) {
+    // SALVA O CRACHÁ!
+    localStorage.setItem('@portal_token', response.data.token);
+    localStorage.setItem('@portal_user', JSON.stringify(response.data.user));
+    
+    window.location.href = '/'; 
+}
+    } catch (error) {
+      console.error('Erro no login:', error);
+      setError(error.response?.data?.error || 'Erro ao fazer login. Verifique suas credenciais e tente novamente.');
     } finally {
       setLoading(false);
     }
-  };
+}
 
   // Função de Login via Microsoft (Mesmo fluxo usado no Header)
   const handleMicrosoftLogin = () => {

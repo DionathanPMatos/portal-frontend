@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Row, Col, Card, Alert, Spinner } from 'react-bootstrap';
-import axios from 'axios';
 import { useTheme } from '../../../contexts/ThemeContext';
+import apiClient from '../../../services/api';
 
 function AdminTheme() {
   const { refreshTheme } = useTheme();
@@ -30,7 +30,7 @@ function AdminTheme() {
   const [logoUrl, setLogoUrl] = useState('');
   
   useEffect(() => {
-    axios.get('/api/settings')
+    apiClient.get('/api/settings')
       .then(response => {
         const data = response.data;
         setPageTitle(data.page_title || 'Portal DCA');
@@ -84,7 +84,7 @@ function AdminTheme() {
     }
 
     try {
-      await axios.post('/api/settings', formData, {
+      await apiClient.post('/api/settings', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setMessage({ type: 'success', text: 'Tema atualizado com sucesso! A página será recarregada.' });

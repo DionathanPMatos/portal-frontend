@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Modal, Button, Form, Alert, Spinner } from "react-bootstrap";
-import axios from "axios";
+import apiClient from "../../../services/api";
 
 export default function ModalImportarPrestador({ show, onHide, onSave }) {
   const [file, setFile] = useState(null);
@@ -26,7 +26,7 @@ export default function ModalImportarPrestador({ show, onHide, onSave }) {
     formData.append("file", file);
 
     try {
-      const res = await axios.post("/api/facilities/prestadores/import", formData, {
+      const res = await apiClient.post("/api/facilities/prestadores/import", formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
       

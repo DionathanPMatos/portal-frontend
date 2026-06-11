@@ -76,7 +76,7 @@ const DashboardDTCPage = () => { // Renomeado
     if (error) return <Container className="mt-5"><Alert variant="danger">{error}</Alert></Container>;
 
     return (
-        
+        <>
                 <Container fluid className="px-4">
                     <Row>
                         <Col>
@@ -144,7 +144,6 @@ const DashboardDTCPage = () => { // Renomeado
                         </Col>
                     </Row>
                 </Container>
-   );
             {selectedProject && (
                 <DtcUpdateModal
                     show={showModal}
@@ -154,7 +153,7 @@ const DashboardDTCPage = () => { // Renomeado
                     tecnicos={tecnicos}
                 />
             )}
-      
- 
+        </>
+    );
 };
 export default DashboardDTCPage; // Exporta o nome atualizado

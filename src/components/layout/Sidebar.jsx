@@ -255,7 +255,7 @@ function Sidebar({ isLoggedIn, user, onLogout }) {
     setActiveAccordion(activeAccordion === itemName ? null : itemName);
   };
 
-  const logoUrl = theme?.logo_url || logo; // <-- Adicionando optional chaining (?) por segurança
+  const logoUrl = theme?.logo_url || "/logo.png"; // <-- Alterado para string para evitar ReferenceError
   return (
     <>
       {!isOpen && (

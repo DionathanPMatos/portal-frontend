@@ -1,12 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { Spinner, Container } from 'react-bootstrap';
-import apiClient from '../services/api'; // Importa a instância configurada do Axios
-
-// ==========================================
-// 🚀 CONFIGURAÇÃO GLOBAL DO AXIOS (MOVIDA PARA src/services/api.js)
-// Agora, todas as requisições usarão 'apiClient'
-// O SEGREDO DO LOGIN: 'withCredentials' já está configurado em apiClient
-// ==========================================
+import apiClient from '../services/api'; 
 
 // 1. Cria o Contexto
 const AuthContext = createContext(null);
@@ -17,35 +11,62 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchUserData = async () => {
+        const initializeAuth = async () => {
             try {
-                // Como configuramos o baseURL acima, agora basta chamar a rota limpa!
-                const response = await apiClient.get('/user-data'); // Usa apiClient
+                // PASSO A: O usuário acabou de voltar da Microsoft? A URL tem ?token=... ?
+                const urlParams = new URLSearchParams(window.location.search);
+                const tokenFromUrl = urlParams.get('token');
+
+                if (tokenFromUrl) {
+                    // Guarda o token da Microsoft no cofre do navegador
+                    localStorage.setItem('@portal_token', tokenFromUrl);
+                    
+                    // Limpa a barra de endereços (URL) para esconder o token do usuário (Clean Code visual)
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+
+                // PASSO B: Pega o token atual (seja o recém-salvo da Microsoft, ou um login antigo)
+                const storedToken = localStorage.getItem('@portal_token');
+
+                if (!storedToken) {
+                    // Se não tem token de forma alguma, o usuário não está logado.
+                    setLoading(false);
+                    return;
+                }
+
+                // PASSO C: Valida o Token no Backend e traz os dados do usuário + tenant_id
+                // Nosso interceptor no api.js já vai colocar o cabeçalho Authorization automaticamente!
+                const response = await apiClient.get('/api/auth/me'); 
+                
                 setUser(response.data);
             } catch (error) {
-                console.error("Usuário não autenticado:", error.response?.data?.error);
+                console.error("Sessão expirada ou token inválido:", error.response?.data?.error);
+                // Se o backend rejeitar o token (expirou ou fraudado), limpamos tudo.
+                localStorage.removeItem('@portal_token');
                 setUser(null);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchUserData();
+        initializeAuth();
     }, []);
 
-    // Mostra um spinner enquanto carrega os dados do usuário
+    // Mostra um spinner enquanto carrega a validação
     if (loading) {
         return (
             <Container className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
-                <Spinner animation="border" />
+                <Spinner animation="border" variant="primary" />
             </Container>
         );
     }
 
-    // Disponibiliza o 'user' para todos os componentes filhos
+    // PASSO D: O novo fluxo de Logout do SaaS
     const handleLogout = () => {
-        // Usa apiClient para garantir que a URL base e credenciais sejam enviadas
-        window.location.href = `${apiClient.defaults.baseURL}/auth/microsoft/logout`;
+        // Agora, deslogar significa apenas destruir o "crachá" do navegador
+        localStorage.removeItem('@portal_token');
+        setUser(null);
+        window.location.href = '/login'; 
     };
 
     return (
@@ -55,7 +76,7 @@ export const AuthProvider = ({ children }) => {
     );
 };
 
-// 3. Cria um hook customizado para facilitar o uso do contexto
+// 3. Cria um hook customizado
 export const useAuth = () => {
     return useContext(AuthContext);
 };

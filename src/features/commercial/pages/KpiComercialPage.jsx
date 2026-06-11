@@ -52,6 +52,7 @@ const KpiComercialPage = () => {
                 setVendedores(vendedoresRes.data);
                 setMetas(metasRes.data);
             } catch (err) {
+                console.error('Erro ao carregar dados de configuração:', err);
                 setError('Erro ao carregar dados de configuração.');
             }
         };
@@ -72,6 +73,7 @@ const KpiComercialPage = () => {
                 const { data } = await apiClient.get('/api/kpi/comercial', { params });
                 setKpiData(data);
             } catch (err) {
+                console.error(err);
                 setError('Erro ao carregar os KPIs.');
                 setKpiData(null);
             } finally {
@@ -103,6 +105,7 @@ const KpiComercialPage = () => {
             setMetas(metasRes.data);
             alert('Meta atualizada com sucesso!');
         } catch (err) {
+            console.error('Erro ao atualizar meta:', err);
             alert('Erro ao atualizar a meta.');
         }
     };

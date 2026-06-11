@@ -45,7 +45,6 @@ const AdminDashboardPage = () => { // Renomeado
     } catch (error) {
         console.error('Erro no upload:', error);
         
-        // Tratamento de erro robusto padrão Axios
         // Ele busca a mensagem enviada pelo backend, ou cai para a mensagem genérica
         const errorMessage = error.response?.data?.error || error.message || 'Falha no upload.';
         setUploadStatus(`Erro: ${errorMessage}`);
@@ -75,7 +74,7 @@ const AdminDashboardPage = () => { // Renomeado
                             
                             <hr />
 
-                            <Form onSubmit={handleUploadSubmit}>
+                            <Form onSubmit={handleUpload}>
                                 <Form.Group controlId="csvFileInput" className="mb-3">
                                     <Form.Label>Selecione a planilha (.csv):</Form.Label>
                                     <Form.Control 
