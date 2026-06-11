@@ -88,6 +88,15 @@ import NewsManagerPage from "./features/news/pages/NewsManager.jsx"; // Renomead
 import NewsPage from "./features/news/pages/NewsPage.jsx"; // Mantido
 
 // ==========================================
+// MÓDULO MARKETING
+// ==========================================
+import ManageMarketingProductsPage from "./features/marketing/pages/ManageMarketingProducts.jsx";
+import RequestMaterialPage from "./features/marketing/pages/RequestMaterialPage.jsx";
+import ReserveRoomPage from "./features/marketing/pages/ReserveRoomPage.jsx";
+import ManageMarketingRequestsPage from "./features/marketing/pages/ManageMarketingRequests.jsx";
+
+
+// ==========================================
 // ARQUIVOS DE ESTILOS CSS
 // ==========================================
 import "./styles/Header.css"; // Movido para styles
@@ -170,6 +179,12 @@ function App() {
             {/* ROTAS FACILITIES */}
             <Route path="/facilities" element={<FacilitiesPage />} />
             <Route path="/facilities/gestao-obras" element={<GestaoObrasPage />} />
+
+            {/* ROTAS MARKETING */}
+            <Route path="/admin/marketing/produtos" element={<ManageMarketingProductsPage />} />
+            <Route path="/marketing/solicitar-material" element={<RequestMaterialPage />} />
+            <Route path="/marketing/reservar-sala" element={<ReserveRoomPage />} />
+            <Route path="/admin/marketing/gestao" element={<ManageMarketingRequestsPage />} />
 
           </Routes>
         </div>
