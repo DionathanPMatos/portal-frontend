@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import apiClient from "../../../services/api";
 import { Modal, Form, Button, Row, Col, Alert } from "react-bootstrap";
 
 export default function ModalOrcamento({ show, onHide, projetoId, onSave }) {
@@ -24,7 +24,7 @@ export default function ModalOrcamento({ show, onHide, projetoId, onSave }) {
 
   const fetchPrestadores = async () => {
     try {
-      const res = await axios.get("/api/facilities/prestadores");
+      const res = await apiClient.get("/api/facilities/prestadores");
       setPrestadores(res.data || []);
     } catch (error) {
       console.error("Erro ao buscar prestadores:", error);
@@ -33,7 +33,7 @@ export default function ModalOrcamento({ show, onHide, projetoId, onSave }) {
 
   const fetchEtapas = async () => {
     try {
-      const res = await axios.get(`/api/obras/etapas/${projetoId}`);
+      const res = await apiClient.get(`/api/obras/etapas/${projetoId}`);
       setEtapas(res.data || []);
     } catch (error) {
       console.error("Erro ao buscar etapas:", error);
@@ -52,7 +52,7 @@ export default function ModalOrcamento({ show, onHide, projetoId, onSave }) {
       return;
     }
     try {
-      await axios.post("/api/obras/orcamentos", {
+      await apiClient.post("/api/obras/orcamentos", {
         projeto_id: projetoId,
         ...data,
         valor_estimado: parseFloat(data.valor_estimado)

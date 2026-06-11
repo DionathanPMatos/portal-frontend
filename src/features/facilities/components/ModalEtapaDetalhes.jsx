@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import apiClient from "../../../services/api";
 import { Modal, Form, Button, Row, Col, Alert, Table, Badge, ProgressBar } from "react-bootstrap";
 
 export default function ModalEtapaDetalhes({ show, onHide, etapa, projetoId, onUpdate }) {
@@ -21,7 +21,7 @@ export default function ModalEtapaDetalhes({ show, onHide, etapa, projetoId, onU
   const handleSave = async () => {
     setLoading(true);
     try {
-      await axios.put(`/api/obras/etapas/${data.id}`, data);
+      await apiClient.put(`/api/obras/etapas/${data.id}`, data);
       setErro("");
       onUpdate();
       onHide();

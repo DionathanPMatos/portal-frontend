@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../../../services/api';
 import { Container, Spinner, Alert, Card, Row, Col, Button, Modal, Form, Tabs, Tab, Table, Breadcrumb } from 'react-bootstrap';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
@@ -60,15 +60,16 @@ const Registro = () => {
     const showSuccess = (message) => { setSuccessMessage(message); setTimeout(() => setSuccessMessage(null), 4000); };
     const handleError = (message) => { setError(message); setTimeout(() => setError(null), 4000); };
     const fetchManufacturers = async () => {
-        try { setLoading(true); const res = await axios.get('/api/fabricantes'); setManufacturers(res.data); } 
-        catch (err) { handleError('Erro ao carregar fabricantes.'); } 
+        try { setLoading(true); const res = await apiClient.get('/api/fabricantes'); setManufacturers(res.data); } 
+        catch (err)
+         { handleError('Erro ao carregar fabricantes.'); } 
         finally { setLoading(false); }
     };
     useEffect(() => { fetchManufacturers(); }, []);
 
     // --- MODAL DE DETALHES ---
     const handleShowDetails = async (id) => {
-        try { const res = await axios.get(`/api/fabricantes/${id}`); setSelectedManufacturer(res.data); setShowDetailsModal(true); } 
+        try { const res = await apiClient.get(`/api/fabricantes/${id}`); setSelectedManufacturer(res.data); setShowDetailsModal(true); } 
         catch (err) { handleError('Não foi possível carregar os detalhes do fabricante.'); }
     };
     const handleCloseDetailsModal = () => setShowDetailsModal(false);
@@ -84,7 +85,7 @@ const Registro = () => {
         try {
             const url = isEditing ? `/api/fabricantes/${editingManufacturer.id}` : '/api/fabricantes';
             const method = isEditing ? 'put' : 'post';
-            await axios[method](url, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+            await apiClient[method](url, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
             showSuccess(`Fabricante ${isEditing ? 'atualizado' : 'adicionado'} com sucesso!`);
             fetchManufacturers();
             handleCloseAddEditModal();
@@ -94,7 +95,7 @@ const Registro = () => {
     // --- CRUD: FABRICANTE (EXCLUIR) ---
     const handleDeleteClick = (manufacturer) => { setManufacturerToDelete(manufacturer); setShowDetailsModal(false); setShowDeleteModal(true); };
     const confirmDelete = async () => {
-        try { await axios.delete(`/api/fabricantes/${manufacturerToDelete.id}`); showSuccess('Fabricante excluído com sucesso!'); fetchManufacturers(); setShowDeleteModal(false); } 
+        try { await apiClient.delete(`/api/fabricantes/${manufacturerToDelete.id}`); showSuccess('Fabricante excluído com sucesso!'); fetchManufacturers(); setShowDeleteModal(false); } 
         catch (err) { handleError('Erro ao excluir fabricante.'); }
     };
 
@@ -109,7 +110,7 @@ const Registro = () => {
         try {
             const url = isEditing ? `/api/keyaccounts/${editingKeyAccount.id}` : `/api/fabricantes/${selectedManufacturer.id}/keyaccounts`;
             const method = isEditing ? 'put' : 'post';
-            await axios[method](url, keyAccountData);
+            await apiClient[method](url, keyAccountData);
             showSuccess(`Key Account ${isEditing ? 'atualizado' : 'adicionado'} com sucesso!`);
             handleShowDetails(selectedManufacturer.id);
             handleCloseKeyAccountModal();
@@ -117,7 +118,7 @@ const Registro = () => {
     };
     const handleDeleteKeyAccount = async (kaId) => {
         if (window.confirm("Tem certeza que deseja excluir este Key Account?")) {
-            try { await axios.delete(`/api/keyaccounts/${kaId}`); showSuccess('Key Account excluído com sucesso!'); handleShowDetails(selectedManufacturer.id); } 
+            try { await apiClient.delete(`/api/keyaccounts/${kaId}`); showSuccess('Key Account excluído com sucesso!'); handleShowDetails(selectedManufacturer.id); } 
             catch (err) { handleError('Erro ao excluir Key Account.'); }
         }
     };
@@ -129,7 +130,7 @@ const Registro = () => {
         formData.append('documento', documentoUpload.file);
         formData.append('descricao', documentoUpload.descricao);
         try {
-            const res = await axios.post(`/api/fabricantes/${selectedManufacturer.id}/documentos`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+            const res = await apiClient.post(`/api/fabricantes/${selectedManufacturer.id}/documentos`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
             showSuccess("Documento enviado com sucesso!");
             setSelectedManufacturer(prev => ({ ...prev, documentos: [...prev.documentos, res.data.newDocument] }));
             setDocumentoUpload({ file: null, descricao: '' });
@@ -138,7 +139,7 @@ const Registro = () => {
     const handleDeleteDocumento = async (docId) => {
         if (window.confirm("Tem certeza que deseja excluir este documento?")) {
             try {
-                await axios.delete(`/api/fabricantes/documentos/${docId}`);
+                await apiClient.delete(`/api/fabricantes/documentos/${docId}`);
                 showSuccess('Documento excluído com sucesso!');
                 setSelectedManufacturer(prev => ({ ...prev, documentos: prev.documentos.filter(d => d.id !== docId) }));
             } catch (err) { handleError('Erro ao excluir o documento.'); }
@@ -150,7 +151,7 @@ const Registro = () => {
         const formData = new FormData();
         formData.append(fieldName, value);
         try {
-            await axios.put(`/api/fabricantes/${selectedManufacturer.id}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+            await apiClient.put(`/api/fabricantes/${selectedManufacturer.id}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
             setSelectedManufacturer(prev => ({ ...prev, [fieldName]: value }));
             showSuccess('Informação atualizada com sucesso!');
         } catch (err) { handleError('Erro ao salvar a informação.'); }

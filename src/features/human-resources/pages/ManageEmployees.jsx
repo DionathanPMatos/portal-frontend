@@ -26,6 +26,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
     const [setores, setSetores] = useState([]);
     const [unidades, setUnidades] = useState([]);
     const [fabricantes, setFabricantes] = useState([]);
+    const [verticais, setVerticais] = useState([]); // 🚀 Lista de Verticais
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
@@ -47,6 +48,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
     const [unidadeId, setUnidadeId] = useState('');
     const [permissions, setPermissions] = useState(['dashboard']);
     const [selectedFabricantes, setSelectedFabricantes] = useState([]);
+    const [selectedVerticais, setSelectedVerticais] = useState([]); // 🚀 Selecionados
     
     // Estados para a Imagem
     const [userpicFile, setUserpicFile] = useState(null);
@@ -127,6 +129,13 @@ const ManageEmployees = ({ isLoggedIn }) => {
         } catch (err) { console.error('Erro ao buscar fabricantes:', err); }
     };
 
+    const fetchVerticais = async () => {
+        try {
+            const response = await apiClient.get('/api/verticais');
+            setVerticais(response.data);
+        } catch (err) { console.error('Erro ao buscar verticais:', err); }
+    };
+
     useEffect(() => {
         if (isLoggedIn) {
             setLoading(true);
@@ -135,6 +144,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
             if (setores.length === 0) fetchSetores();
             if (unidades.length === 0) fetchUnidades();
             if (fabricantes.length === 0) fetchFabricantes();
+            if (verticais.length === 0) fetchVerticais(); // 🚀 Busca Verticais
         } else {
             setEmployees([]);
             setLoading(false);
@@ -170,6 +180,10 @@ const ManageEmployees = ({ isLoggedIn }) => {
             // Arrays precisam ser enviados como String no FormData
             if (selectedFabricantes && selectedFabricantes.length > 0) {
                 formData.append('fabricantes_ids', JSON.stringify(selectedFabricantes));
+            }
+            
+            if (selectedVerticais && selectedVerticais.length > 0) {
+                formData.append('verticais_ids', JSON.stringify(selectedVerticais)); // 🚀 Anexa Verticais
             }
 
             // 3. Fazer o append do ficheiro físico (Imagem)
@@ -217,6 +231,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
         setUnidadeId(employee.unidade_id || '');
         setPermissions(employee.privilegios ? employee.privilegios.split(',') : ['dashboard']);
         setSelectedFabricantes(employee.fabricantes_ids || []);
+        setSelectedVerticais(employee.verticais_ids || []); // 🚀 Restaura seleções
         setCnhNumero(employee.cnh_numero || '');
         setCnhValidade(employee.cnh_validade ? employee.cnh_validade.split('T')[0] : '');
         
@@ -231,7 +246,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
         setEditingEmployee(null);
         setName(''); setEmail(''); setContact('');
         setCargoId(''); setSetorId(''); setUnidadeId('');
-        setGestorId(''); setPermissions(['dashboard']); setSelectedFabricantes([]); 
+        setGestorId(''); setPermissions(['dashboard']); setSelectedFabricantes([]); setSelectedVerticais([]);
         setCnhNumero(''); setCnhValidade('');
         setUserpicFile(null); 
         setExistingUserpicUrl('');
@@ -526,6 +541,27 @@ const ManageEmployees = ({ isLoggedIn }) => {
                                         }}
                                     />
                                 )) : <span className="text-muted small">Nenhuma marca cadastrada. Vá até Admin {'>'} Gerenciar Fabricantes para cadastrá-las.</span>}
+                            </div>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label className="fw-bold text-muted small text-uppercase">Verticais DTC Representadas</Form.Label>
+                            <div className="d-flex flex-wrap gap-3 p-3 bg-light rounded border">
+                                {verticais.length > 0 ? verticais.map(vert => (
+                                    <Form.Check 
+                                        key={vert.id}
+                                        type="checkbox"
+                                        id={`vert-${vert.id}`}
+                                        label={vert.nome}
+                                        checked={selectedVerticais.includes(vert.id)}
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                setSelectedVerticais([...selectedVerticais, vert.id]);
+                                            } else {
+                                                setSelectedVerticais(selectedVerticais.filter(id => id !== vert.id));
+                                            }
+                                        }}
+                                    />
+                                )) : <span className="text-muted small">Nenhuma vertical cadastrada.</span>}
                             </div>
                         </Form.Group>
                         <Form.Group className="mb-3">

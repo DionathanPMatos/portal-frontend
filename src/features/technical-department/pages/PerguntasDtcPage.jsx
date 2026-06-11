@@ -122,7 +122,7 @@ export default function PerguntasDtcPage({ user }) {
             carregarPerguntas();
         } catch (error) {
             console.error("Erro ao enviar pergunta:", error);
-            alert(error.response?.data?.error || 'Erro ao enviar pergunta. Verifique o terminal do backend para detalhes.');
+            alert(error.response?.data?.error || 'Erro ao enviar pergunta. Verifique o servidor.');
         }
     };
 

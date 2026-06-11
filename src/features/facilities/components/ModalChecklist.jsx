@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { Modal, Form, Button, Row, Col, Alert } from "react-bootstrap";
+import apiClient from "../../../services/api";
 
 export default function ModalChecklist({ show, onHide, projetoId, onSave }) {
   const [data, setData] = useState({
@@ -20,7 +20,7 @@ export default function ModalChecklist({ show, onHide, projetoId, onSave }) {
 
   const fetchEtapas = async () => {
     try {
-      const res = await axios.get(`/api/obras/etapas/${projetoId}`);
+      const res = await apiClient.get(`/api/obras/etapas/${projetoId}`);
       setEtapas(res.data || []);
     } catch (error) {
       console.error("Erro ao buscar etapas:", error);
@@ -39,7 +39,7 @@ export default function ModalChecklist({ show, onHide, projetoId, onSave }) {
       return;
     }
     try {
-      await axios.post("/api/obras/checklists", {
+      await apiClient.post("/api/obras/checklists", {
         projeto_id: projetoId,
         ...data
       });

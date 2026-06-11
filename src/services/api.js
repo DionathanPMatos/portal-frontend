@@ -6,15 +6,17 @@ const apiClient = axios.create({
     baseURL: API_URL,
 });
 
-// 🚀 A MÁGICA DO JWT ACONTECE AQUI
-// Antes de qualquer requisição sair para o backend, o Axios executa isso:
 apiClient.interceptors.request.use((config) => {
-    // Busca o crachá que salvamos no cofre do navegador (localStorage)
     const token = localStorage.getItem('@portal_token');
+    const tenantId = localStorage.getItem('@portal_tenant_id'); // 👈 Captura o tenantId salvo no login
     
     if (token) {
-        // Se tem token, anexa no formato padrão de segurança (Bearer)
         config.headers.Authorization = `Bearer ${token}`;
+    }
+    
+    // 🚀 Envia o tenant_id no cabeçalho para o backend
+    if (tenantId) {
+        config.headers['x-tenant-id'] = tenantId;
     }
     
     return config;

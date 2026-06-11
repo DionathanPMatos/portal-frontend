@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import apiClient from '../../../services/api';
 import { Modal, Form, Button, Row, Col, Alert } from "react-bootstrap";
 
 export default function ModalOrcamentoDetalhes({ show, onHide, orcamento, onUpdate }) {
@@ -21,7 +21,7 @@ export default function ModalOrcamentoDetalhes({ show, onHide, orcamento, onUpda
   const handleSave = async () => {
     setLoading(true);
     try {
-      await axios.put(`/api/obras/orcamentos/${data.id}`, data);
+      await apiClient.put(`/api/obras/orcamentos/${data.id}`, data);
       setErro("");
       onUpdate();
       onHide();
@@ -34,7 +34,7 @@ export default function ModalOrcamentoDetalhes({ show, onHide, orcamento, onUpda
   const handleAprovar = async () => {
     setLoading(true);
     try {
-      await axios.put(`/api/obras/orcamentos/${data.id}`, { ...data, status: "Aprovado" });
+      await apiClient.put(`/api/obras/orcamentos/${data.id}`, { ...data, status: "Aprovado" });
       setErro("");
       onUpdate();
       onHide();
@@ -47,7 +47,7 @@ export default function ModalOrcamentoDetalhes({ show, onHide, orcamento, onUpda
   const handleReprovar = async () => {
     setLoading(true);
     try {
-      await axios.put(`/api/obras/orcamentos/${data.id}`, { ...data, status: "Rejeitado" });
+      await apiClient.put(`/api/obras/orcamentos/${data.id}`, { ...data, status: "Rejeitado" });
       setErro("");
       onUpdate();
       onHide();
