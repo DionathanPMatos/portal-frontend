@@ -98,32 +98,8 @@ const menuItems = [
     name: "Financeiro",
     icon: <FaMoneyBill size={iconSize} />,
     subItems: [
-      {
-        name: "Adiantamento de Viagem",
-        link: "https://deltacable-my.sharepoint.com/personal/andressa_karvat_dca_com_br/Lists/ADTO%20%20SOLICITAO%20DE%20VIAGEM?env=WebViewList",
-        target: "_blank",
-      },
-      {
-        name: "Analise de Operações",
-        link: "https://deltacable-my.sharepoint.com/personal/miria_machado_dca_com_br/Lists/Anlise%20Operaes%20%20DCA?env=WebViewList",
-        target: "_blank",
-      },
-      {
-        name: "Atendimento de Clientes",
-        link: "https://deltacable-my.sharepoint.com/personal/juliana_borges_dca_com_br/Lists/CADASTROSANALISES?env=WebViewList",
-        target: "_blank",
-      },
-      {
-        name: "Despesas Locais",
-        link: "https://deltacable-my.sharepoint.com/personal/andressa_karvat_dca_com_br/Lists/RELATRIO%20DE%20DESPESAS%20LOCAIS?env=WebViewList",
-        target: "_blank",
-      },
-      {
-        name: "Despesas de Viagens",
-        link: "https://deltacable-my.sharepoint.com/personal/andressa_karvat_dca_com_br/Lists/Prestao%20de%20contas%20viagem?env=WebViewList",
-        target: "_blank",
-      },
-      { name: "Politicas Financeiras", link: "#" },
+      { name: "Central Financeira", link: "/financeiro" },
+      { name: "Políticas Financeiras", link: "#" },
     ],
   },
   {

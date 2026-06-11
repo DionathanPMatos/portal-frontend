@@ -88,6 +88,11 @@ import NewsManagerPage from "./features/news/pages/NewsManager.jsx"; // Renomead
 import NewsPage from "./features/news/pages/NewsPage.jsx"; // Mantido
 
 // ==========================================
+// MÓDULO FINANCEIRO
+// ==========================================
+import FinanceiroPage from "./features/financial/pages/FinanceiroPage.jsx";
+
+// ==========================================
 // ARQUIVOS DE ESTILOS CSS
 // ==========================================
 import "./styles/Header.css"; // Movido para styles
@@ -170,6 +175,9 @@ function App() {
             {/* ROTAS FACILITIES */}
             <Route path="/facilities" element={<FacilitiesPage />} />
             <Route path="/facilities/gestao-obras" element={<GestaoObrasPage />} />
+
+            {/* ROTAS FINANCEIRAS */}
+            <Route path="/financeiro" element={<FinanceiroPage user={user} />} />
 
           </Routes>
         </div>
