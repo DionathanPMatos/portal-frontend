@@ -12,6 +12,7 @@ import Spinner from 'react-bootstrap/Spinner';
 import Alert from 'react-bootstrap/Alert';
 import Modal from 'react-bootstrap/Modal';
 import { FaEdit, FaTrash, FaUserPlus, FaFileImport, FaBriefcase, FaSitemap, FaSearch, FaUserTimes } from 'react-icons/fa';
+import { Tabs, Tab } from 'react-bootstrap';
 import CargosModal from './CargosModal';
 import SetoresModal from './SetoresModal';
 import UnidadesModal from './UnidadesModal.jsx';
@@ -27,6 +28,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
     const [unidades, setUnidades] = useState([]);
     const [fabricantes, setFabricantes] = useState([]);
     const [verticais, setVerticais] = useState([]); // 🚀 Lista de Verticais
+    const [subgrupos, setSubgrupos] = useState([]); // 🚀 Lista de Subgrupos FAQ
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
@@ -49,6 +51,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
     const [permissions, setPermissions] = useState(['dashboard']);
     const [selectedFabricantes, setSelectedFabricantes] = useState([]);
     const [selectedVerticais, setSelectedVerticais] = useState([]); // 🚀 Selecionados
+    const [selectedSubgrupos, setSelectedSubgrupos] = useState([]); // 🚀 Subgrupos selecionados
     
     // Estados para a Imagem
     const [userpicFile, setUserpicFile] = useState(null);
@@ -136,6 +139,13 @@ const ManageEmployees = ({ isLoggedIn }) => {
         } catch (err) { console.error('Erro ao buscar verticais:', err); }
     };
 
+    const fetchSubgrupos = async () => {
+        try {
+            const response = await apiClient.get('/api/faq/subgrupos');
+            setSubgrupos(response.data);
+        } catch (err) { console.error('Erro ao buscar subgrupos:', err); }
+    };
+
     useEffect(() => {
         if (isLoggedIn) {
             setLoading(true);
@@ -145,6 +155,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
             if (unidades.length === 0) fetchUnidades();
             if (fabricantes.length === 0) fetchFabricantes();
             if (verticais.length === 0) fetchVerticais(); // 🚀 Busca Verticais
+            if (subgrupos.length === 0) fetchSubgrupos(); // 🚀 Busca Subgrupos
         } else {
             setEmployees([]);
             setLoading(false);
@@ -186,9 +197,16 @@ const ManageEmployees = ({ isLoggedIn }) => {
                 formData.append('verticais_ids', JSON.stringify(selectedVerticais)); // 🚀 Anexa Verticais
             }
 
+            if (selectedSubgrupos && selectedSubgrupos.length > 0) {
+                formData.append('subgrupos_ids', JSON.stringify(selectedSubgrupos)); // 🚀 Anexa Subgrupos
+            }
+
             // 3. Fazer o append do ficheiro físico (Imagem)
             if (userpicFile) {
                 formData.append('userpic_file', userpicFile);
+            } else if (editingEmployee && existingUserpicUrl) {
+                // 🚀 Mantém a imagem atual no FormData se nenhuma nova for enviada
+                formData.append('userpic_url', existingUserpicUrl);
             }
 
             // 4. Configurar os headers para multipart
@@ -232,6 +250,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
         setPermissions(employee.privilegios ? employee.privilegios.split(',') : ['dashboard']);
         setSelectedFabricantes(employee.fabricantes_ids || []);
         setSelectedVerticais(employee.verticais_ids || []); // 🚀 Restaura seleções
+        setSelectedSubgrupos(employee.subgrupos_ids || []); // 🚀 Restaura subgrupos
         setCnhNumero(employee.cnh_numero || '');
         setCnhValidade(employee.cnh_validade ? employee.cnh_validade.split('T')[0] : '');
         
@@ -246,7 +265,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
         setEditingEmployee(null);
         setName(''); setEmail(''); setContact('');
         setCargoId(''); setSetorId(''); setUnidadeId('');
-        setGestorId(''); setPermissions(['dashboard']); setSelectedFabricantes([]); setSelectedVerticais([]);
+        setGestorId(''); setPermissions(['dashboard']); setSelectedFabricantes([]); setSelectedVerticais([]); setSelectedSubgrupos([]);
         setCnhNumero(''); setCnhValidade('');
         setUserpicFile(null); 
         setExistingUserpicUrl('');
@@ -316,6 +335,18 @@ const ManageEmployees = ({ isLoggedIn }) => {
         return privArray.map(p => <Badge bg="secondary" className="me-1 text-uppercase" key={p}>{p}</Badge>);
     };
 
+    // 🚀 Lógica Inteligente: Filtra os Subgrupos com base no Setor selecionado E Fabricantes marcados
+    const availableSubgrupos = subgrupos.filter(sub => {
+        const matchSetor = setorId ? String(sub.setor_id) === String(setorId) : true;
+        
+        // 🚀 Conversão Segura: Transforma tudo em String para evitar bugs de tipagem (1 vs "1")
+        const matchFabricante = sub.fabricantes && sub.fabricantes.some(f => 
+            selectedFabricantes.some(selecionado => String(selecionado) === String(f.fabricante_id))
+        );
+        
+        return matchSetor && matchFabricante;
+    });
+
     return (
         <div className="dash-grid">
             <div className='container-main p-4' >
@@ -383,7 +414,9 @@ const ManageEmployees = ({ isLoggedIn }) => {
                                         <FaSitemap /> Filiais / Unidades
                                     </Button>
                                 </Col>
+                                
                             </Row>
+                            
                         </Card.Body>
                     </Card>
 
@@ -458,125 +491,175 @@ const ManageEmployees = ({ isLoggedIn }) => {
                 </Modal.Header>
                 <Form onSubmit={handleFormSubmit}>
                     <Modal.Body>
-                        <Form.Group className="mb-3"><Form.Label>Nome Completo</Form.Label><Form.Control type="text" value={name} onChange={(e) => setName(e.target.value)} required /></Form.Group>
-                        <Form.Group className="mb-3"><Form.Label>E-mail</Form.Label><Form.Control type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></Form.Group>
-                        <Form.Group className="mb-3"><Form.Label>Contato</Form.Label><Form.Control type="text" value={contact} onChange={(e) => setContact(e.target.value)} /></Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Setor</Form.Label>
-                            <Form.Select value={setorId} onChange={(e) => setSetorId(e.target.value)} required>
-                                <option value="">Selecione o Setor</option>
-                                {setores.map(s => (<option key={s.id} value={s.id}>{s.nome_setor}</option>))}
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Cargo</Form.Label>
-                            <Form.Select value={cargoId} onChange={(e) => setCargoId(e.target.value)}>
-                                <option value="">Selecione o Cargo</option>
-                                {cargos.map(cargo => (<option key={cargo.id} value={cargo.id}>{cargo.nome_cargo}</option>))}
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Unidade / Filial</Form.Label>
-                            <Form.Select value={unidadeId} onChange={(e) => setUnidadeId(e.target.value)}>
-                                <option value="">Não Vinculado</option>
-                                {unidades.map(u => (<option key={u.id} value={u.id}>{u.nome_unidade}</option>))}
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Reporta a (Gestor/Supervisor)</Form.Label>
-                            <Form.Select value={gestorId} onChange={(e) => setGestorId(e.target.value)}>
-                                <option value="">Nenhum (Responde à Diretoria)</option>
-                                {employees
-                                    .filter(emp => !editingEmployee || emp.id !== editingEmployee.id)
-                                    .map(emp => (
-                                        <option key={emp.id} value={emp.id}>{emp.nome_completo}</option>
-                                ))}
-                            </Form.Select>
-                        </Form.Group>
-                        <Row>
-                            <Col md={6}>
-                                <Form.Group className="mb-3"><Form.Label>Nº CNH (Frota)</Form.Label><Form.Control type="text" value={cnhNumero} onChange={(e) => setCnhNumero(e.target.value)} placeholder="Opcional" /></Form.Group>
-                            </Col>
-                            <Col md={6}>
-                                <Form.Group className="mb-3"><Form.Label>Validade CNH</Form.Label><Form.Control type="date" value={cnhValidade} onChange={(e) => setCnhValidade(e.target.value)} /></Form.Group>
-                            </Col>
-                        </Row>
-                        <Form.Group className="mb-3">
-                            <Form.Label className="fw-bold text-muted small text-uppercase">Permissões de Acesso</Form.Label>
-                            <div className="d-flex flex-wrap gap-3 p-3 bg-light rounded border">
-                                {AVAILABLE_PERMISSIONS.map(perm => (
-                                    <Form.Check 
-                                        key={perm.id}
-                                        type="checkbox"
-                                        id={`perm-${perm.id}`}
-                                        label={perm.label}
-                                        checked={permissions.includes(perm.id)}
-                                        onChange={(e) => {
-                                            if (e.target.checked) {
-                                                setPermissions([...permissions, perm.id]);
-                                            } else {
-                                                setPermissions(permissions.filter(p => p !== perm.id));
-                                            }
-                                        }}
-                                    />
-                                ))}
-                            </div>
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label className="fw-bold text-muted small text-uppercase">Marcas Representadas (Organograma)</Form.Label>
-                            <div className="d-flex flex-wrap gap-3 p-3 bg-light rounded border">
-                                {fabricantes.length > 0 ? fabricantes.map(fab => (
-                                    <Form.Check 
-                                        key={fab.id}
-                                        type="checkbox"
-                                        id={`fab-${fab.id}`}
-                                        label={fab.name}
-                                        checked={selectedFabricantes.includes(fab.id)}
-                                        onChange={(e) => {
-                                            if (e.target.checked) {
-                                                setSelectedFabricantes([...selectedFabricantes, fab.id]);
-                                            } else {
-                                                setSelectedFabricantes(selectedFabricantes.filter(id => id !== fab.id));
-                                            }
-                                        }}
-                                    />
-                                )) : <span className="text-muted small">Nenhuma marca cadastrada. Vá até Admin {'>'} Gerenciar Fabricantes para cadastrá-las.</span>}
-                            </div>
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label className="fw-bold text-muted small text-uppercase">Verticais DTC Representadas</Form.Label>
-                            <div className="d-flex flex-wrap gap-3 p-3 bg-light rounded border">
-                                {verticais.length > 0 ? verticais.map(vert => (
-                                    <Form.Check 
-                                        key={vert.id}
-                                        type="checkbox"
-                                        id={`vert-${vert.id}`}
-                                        label={vert.nome}
-                                        checked={selectedVerticais.includes(vert.id)}
-                                        onChange={(e) => {
-                                            if (e.target.checked) {
-                                                setSelectedVerticais([...selectedVerticais, vert.id]);
-                                            } else {
-                                                setSelectedVerticais(selectedVerticais.filter(id => id !== vert.id));
-                                            }
-                                        }}
-                                    />
-                                )) : <span className="text-muted small">Nenhuma vertical cadastrada.</span>}
-                            </div>
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Foto do colaborador</Form.Label>
-                            {/* O input agora captura e guarda o File bruto, sem conversões */}
-                            <Form.Control type="file" onChange={(e) => setUserpicFile(e.target.files[0])}/>
-                            
-                            {/* Mostra a foto atual baseada na URL pública (se existir) */}
-                            {editingEmployee && existingUserpicUrl && (
-                                <div className="mt-2">
-                                    <small className="text-muted mb-1 d-block">Foto atual:</small>
-                                    <img src={existingUserpicUrl} alt="Foto atual" className="border rounded bg-light" style={{ width: '60px', height: '60px', objectFit: 'contain' }}/>
+                        <Tabs defaultActiveKey="dados" className="mb-4 custom-tabs">
+                            {/* ABA 1: DADOS PESSOAIS E RH */}
+                            <Tab eventKey="dados" title="Dados Pessoais e RH">
+                                <div className="pt-3">
+                                    <Form.Group className="mb-3"><Form.Label>Nome Completo</Form.Label><Form.Control type="text" value={name} onChange={(e) => setName(e.target.value)} required /></Form.Group>
+                                    <Row>
+                                        <Col md={6}>
+                                            <Form.Group className="mb-3"><Form.Label>E-mail Corporativo</Form.Label><Form.Control type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></Form.Group>
+                                        </Col>
+                                        <Col md={6}>
+                                            <Form.Group className="mb-3"><Form.Label>Contato</Form.Label><Form.Control type="text" value={contact} onChange={(e) => setContact(e.target.value)} /></Form.Group>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col md={6}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Setor</Form.Label>
+                                                <Form.Select value={setorId} onChange={(e) => setSetorId(e.target.value)} required>
+                                                    <option value="">Selecione o Setor</option>
+                                                    {setores.map(s => (<option key={s.id} value={s.id}>{s.nome_setor}</option>))}
+                                                </Form.Select>
+                                            </Form.Group>
+                                        </Col>
+                                        <Col md={6}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Cargo</Form.Label>
+                                                <Form.Select value={cargoId} onChange={(e) => setCargoId(e.target.value)}>
+                                                    <option value="">Selecione o Cargo</option>
+                                                    {cargos.map(cargo => (<option key={cargo.id} value={cargo.id}>{cargo.nome_cargo}</option>))}
+                                                </Form.Select>
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col md={6}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Unidade / Filial Base</Form.Label>
+                                                <Form.Select value={unidadeId} onChange={(e) => setUnidadeId(e.target.value)}>
+                                                    <option value="">Não Vinculado</option>
+                                                    {unidades.map(u => (<option key={u.id} value={u.id}>{u.nome_unidade}</option>))}
+                                                </Form.Select>
+                                            </Form.Group>
+                                        </Col>
+                                        <Col md={6}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Reporta a (Gestor/Supervisor)</Form.Label>
+                                                <Form.Select value={gestorId} onChange={(e) => setGestorId(e.target.value)}>
+                                                    <option value="">Nenhum (Responde à Diretoria)</option>
+                                                    {employees
+                                                        .filter(emp => !editingEmployee || emp.id !== editingEmployee.id)
+                                                        .map(emp => (
+                                                            <option key={emp.id} value={emp.id}>{emp.nome_completo}</option>
+                                                    ))}
+                                                </Form.Select>
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col md={6}>
+                                            <Form.Group className="mb-3"><Form.Label>Nº CNH (Frota)</Form.Label><Form.Control type="text" value={cnhNumero} onChange={(e) => setCnhNumero(e.target.value)} placeholder="Opcional" /></Form.Group>
+                                        </Col>
+                                        <Col md={6}>
+                                            <Form.Group className="mb-3"><Form.Label>Validade CNH</Form.Label><Form.Control type="date" value={cnhValidade} onChange={(e) => setCnhValidade(e.target.value)} /></Form.Group>
+                                        </Col>
+                                    </Row>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Foto do Colaborador (Perfil)</Form.Label>
+                                        <Form.Control type="file" accept="image/*" onChange={(e) => setUserpicFile(e.target.files[0])}/>
+                                        {editingEmployee && existingUserpicUrl && (
+                                            <div className="mt-3 p-2 border rounded bg-light d-inline-block text-center">
+                                                <small className="text-muted mb-2 d-block">Foto atual:</small>
+                                                <img src={existingUserpicUrl} alt="Foto atual" className="rounded-circle shadow-sm" style={{ width: '80px', height: '80px', objectFit: 'cover' }}/>
+                                            </div>
+                                        )}
+                                    </Form.Group>
                                 </div>
-                            )}
-                        </Form.Group>
+                            </Tab>
+                            
+                            {/* ABA 2: ACESSOS E RESPONSABILIDADES */}
+                            <Tab eventKey="acessos" title="Acessos e Responsabilidades">
+                                <div className="pt-3">
+                                    <Form.Group className="mb-4">
+                                        <Form.Label className="fw-bold text-muted small text-uppercase">Permissões de Acesso ao Sistema</Form.Label>
+                                        <div className="d-flex flex-wrap gap-3 p-3 bg-light rounded border">
+                                            {AVAILABLE_PERMISSIONS.map(perm => (
+                                                <Form.Check 
+                                                    key={perm.id}
+                                                    type="checkbox"
+                                                    id={`perm-${perm.id}`}
+                                                    label={perm.label}
+                                                    checked={permissions.includes(perm.id)}
+                                                    onChange={(e) => {
+                                                        if (e.target.checked) {
+                                                            setPermissions([...permissions, perm.id]);
+                                                        } else {
+                                                            setPermissions(permissions.filter(p => p !== perm.id));
+                                                        }
+                                                    }}
+                                                />
+                                            ))}
+                                        </div>
+                                        <Form.Text className="text-muted">Atenção: Permissões de administrador dão acesso total às configurações do portal.</Form.Text>
+                                    </Form.Group>
+                                    
+                                    <Form.Group className="mb-4">
+                                        <Form.Label className="fw-bold text-muted small text-uppercase">Marcas Representadas (Organograma Técnico)</Form.Label>
+                                        <div className="d-flex flex-wrap gap-3 p-3 bg-light rounded border">
+                                            {fabricantes.length > 0 ? fabricantes.map(fab => (
+                                                <Form.Check 
+                                                    key={fab.id}
+                                                    type="checkbox"
+                                                    id={`fab-${fab.id}`}
+                                                    label={fab.name}
+                                                    checked={selectedFabricantes.includes(fab.id)}
+                                                    onChange={(e) => {
+                                                        if (e.target.checked) {
+                                                            setSelectedFabricantes([...selectedFabricantes, fab.id]);
+                                                        } else {
+                                                            setSelectedFabricantes(selectedFabricantes.filter(id => id !== fab.id));
+                                                        }
+                                                    }}
+                                                />
+                                            )) : <span className="text-muted small">Nenhuma marca cadastrada. Vá até Admin {'>'} Gerenciar Fabricantes.</span>}
+                                        </div>
+                                    </Form.Group>
+                                    
+                                    <Form.Group className="mb-3">
+                                        <Form.Label className="fw-bold text-muted small text-uppercase">Verticais DTC Representadas</Form.Label>
+                                        <div className="d-flex flex-wrap gap-3 p-3 bg-light rounded border">
+                                            {verticais.length > 0 ? verticais.map(vert => (
+                                                <Form.Check 
+                                                    key={vert.id}
+                                                    type="checkbox"
+                                                    id={`vert-${vert.id}`}
+                                                    label={vert.nome}
+                                                    checked={selectedVerticais.includes(vert.id)}
+                                                    onChange={(e) => {
+                                                        if (e.target.checked) {
+                                                            setSelectedVerticais([...selectedVerticais, vert.id]);
+                                                        } else {
+                                                            setSelectedVerticais(selectedVerticais.filter(id => id !== vert.id));
+                                                        }
+                                                    }}
+                                                />
+                                            )) : <span className="text-muted small">Nenhuma vertical cadastrada.</span>}
+                                        </div>
+                                    </Form.Group>
+                                    
+                                    <Form.Group className="mb-3">
+                                        <Form.Label className="fw-bold text-muted small text-uppercase">Responsabilidade FAQ (Subgrupos)</Form.Label>
+                                        <div className="d-flex flex-wrap gap-3 p-3 bg-light rounded border">
+                                            {availableSubgrupos.length > 0 ? availableSubgrupos.map(sub => (
+                                                <Form.Check 
+                                                    key={`sub-${sub.id}`}
+                                                    type="checkbox"
+                                                    id={`sub-${sub.id}`}
+                                                    label={sub.nome}
+                                                    checked={selectedSubgrupos.includes(sub.id)}
+                                                    onChange={(e) => {
+                                                        if (e.target.checked) setSelectedSubgrupos([...selectedSubgrupos, sub.id]);
+                                                        else setSelectedSubgrupos(selectedSubgrupos.filter(id => id !== sub.id));
+                                                    }}
+                                                />
+                                            )) : <span className="text-muted small">Nenhum subgrupo disponível para os fabricantes e setor selecionados.</span>}
+                                        </div>
+                                    </Form.Group>
+                                </div>
+                            </Tab>
+                        </Tabs>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary btn-sm" onClick={handleCloseAndResetModal}>Cancelar</Button>

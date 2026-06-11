@@ -120,6 +120,12 @@ const dashboardSections = [
                 link: '/admin/theme',
             },
             {
+                title: 'Gerenciar FAQ',
+                text: 'Gerencie as categorias e vínculos de FAQ.',
+                icon: <FaRegNewspaper size={24} />,
+                link: '/admin/faq-categorias',
+            },
+            {
                 title: 'Mural de Avisos (News)',
                 text: 'Gerencie notícias e comunicados para a equipe.',
                 icon: <FaRegNewspaper size={24} />,

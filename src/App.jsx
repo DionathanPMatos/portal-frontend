@@ -66,6 +66,7 @@ import GerenciamentoLeadsPage from './features/prospect-agent/pages/Gerenciament
 // ==========================================
 import AdminPage from "./features/configuration/pages/AdminPage.jsx"; // Renomeado
 import AdminTheme from "./features/configuration/pages/AdminThemePage.jsx"; // Renomeado
+import FaqAdmin from './features/configuration/pages/FaqAdmin.jsx'; // Ajuste a pasta se guardou noutro lado
 
 // ==========================================
 // MÓDULO RH
@@ -145,6 +146,7 @@ function App() {
             <Route path="/adminpage" element={<AdminPage />} />
             <Route path="/admin/theme" element={<AdminTheme />} />
             <Route path="/RegisterUser" element={<RegisterUserPage />} />
+            <Route path="/admin/faq-categorias" element={<FaqAdmin />} />
             <Route path="/admin/noticias" element={<NewsManagerPage />} /> {/* Mantido */}
             <Route path="/noticias" element={<NewsPage />} />
             <Route path="/OrganogramaTecnico" element={<OrganogramaTecnicoPage />} />
@@ -161,6 +163,7 @@ function App() {
             <Route path="/admin/gerenciar-leads" element={<GerenciamentoLeadsPage />} />
             <Route path="/crm/clientes" element={<ClientListPage />} />
             <Route path="/crm/clientes/:id" element={<ClientDetailPage user={user} />} />
+            <Route path="/admin/faq-categorias" element={<FaqAdmin /> /* NOVA ROTA PARA O MÓDULO DE FAQ */} /> 
 
             {/* NOVA ROTA PARA O MÓDULO DE CONTROLE DE FROTA */}
             <Route path="/frota" element={<Frota />} />
