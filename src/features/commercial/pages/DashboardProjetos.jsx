@@ -3,12 +3,12 @@ import { Container, Button, Spinner, Alert, Form, Table, ButtonGroup, Row, Col }
 import { DndContext, closestCorners, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useDroppable } from '@dnd-kit/core';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
 import ProjetoFormModal from './CRM/ProjetoFormModal';
 import SortableItem from './CRM/SortableItem';
 import '../styles/Crm.css';
 import '../../../styles/App.css';
+import apiClient from '../../../services/api';
 
 // Lista de etapas para as colunas do Kanban
 // (Excluímos "Perdido" e os status de entrega, que não são colunas ativas do funil)
@@ -116,8 +116,8 @@ const DashboardProjetos = () => {
         try {
             setLoading(true);
             const [projetosRes, vendedoresRes] = await Promise.all([
-                axios.get('/api/projetos'),
-                axios.get('/api/vendedores')
+                apiClient.get('/api/projetos'),
+                apiClient.get('/api/vendedores')
             ]);
 
             // =======================================================
@@ -127,6 +127,7 @@ const DashboardProjetos = () => {
             setVendedores(vendedoresRes.data);
 
         } catch (err) {
+            console.error('Erro ao buscar dados:', err);
             setError('Falha ao buscar dados.');
         } finally {
             setLoading(false);
@@ -180,7 +181,7 @@ const DashboardProjetos = () => {
         formData.append('file', file);
 
         try {
-            const response = await axios.post('/api/crm/projetos/importar', formData, {
+            const response = await apiClient.post('/api/crm/projetos/importar', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -208,8 +209,9 @@ const DashboardProjetos = () => {
         if (!activeContainer || !overContainer || activeContainer === overContainer) { return; }
         setProjetos(prev => prev.map(p => p.id === active.id ? { ...p, etapa_funil: overContainer } : p));
         try {
-            await axios.patch(`/api/projetos/${active.id}/mover`, { novaEtapa: overContainer });
+            await apiClient.patch(`/api/projetos/${active.id}/mover`, { novaEtapa: overContainer });
         } catch (err) {
+            console.error('Erro ao mover projeto:', err);
             setError('Não foi possível salvar a alteração. Sincronizando novamente.');
             fetchProjetosEVendedores();
         }

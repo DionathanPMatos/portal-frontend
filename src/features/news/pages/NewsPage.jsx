@@ -30,12 +30,26 @@ export default function NewsPage() {
         }
     };
 
-    const handleOpenNews = async (news) => {
+const handleOpenNews = async (news) => {
         setSelectedNews(news);
-        if (!news.lida) {
+        
+        // Só fazemos o POST se a notícia ainda não estiver marcada como lida
+        if (news.lida === false || news.lida === 0) {
             try {
                 await apiClient.post(`/api/noticias/${news.id}/lida`);
-                setNewsList(prev => prev.map(n => n.id === news.id ? { ...n, lida: true } : n));
+                
+                // 🚀 FORÇA A ATUALIZAÇÃO: Em vez de confiar apenas no setNewsList,
+                // vamos atualizar o estado de forma imutável e correta.
+                setNewsList(prevNews => 
+                    prevNews.map(item => 
+                        item.id === news.id ? { ...item, lida: true } : item
+                    )
+                );
+                
+                // Opcional: Se o seu componente for o "Sino" de notificações,
+                // dispare um evento para ele saber que precisa atualizar também
+                window.dispatchEvent(new Event('notificacao-atualizada'));
+                
             } catch (err) {
                 console.error("Erro ao marcar como lida:", err);
             }

@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Card, Badge, Modal, Button } from 'react-bootstrap';
 import { FaCalendarAlt, FaExclamationTriangle, FaInfoCircle, FaExclamationCircle, FaThumbtack } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import '../styles/News.css';
+import apiClient from '../../../services/api';
+
 
 export default function NewsWidget() {
     const [newsList, setNewsList] = useState([]);
@@ -15,7 +16,7 @@ export default function NewsWidget() {
 
     const fetchNews = async () => {
         try {
-            const { data } = await axios.get('/api/noticias');
+            const { data } = await apiClient.get('/api/noticias');
             setNewsList(data);
         } catch (error) {
             console.error('Erro ao buscar notícias:', error);
@@ -30,14 +31,26 @@ export default function NewsWidget() {
             default: return <FaInfoCircle className="news-icon text-primary" />;
         }
     };
-
-    const handleOpenNews = async (news) => {
+const handleOpenNews = async (news) => {
         setSelectedNews(news);
-        if (!news.lida) {
+        
+        // Só fazemos o POST se a notícia ainda não estiver marcada como lida
+        if (news.lida === false || news.lida === 0) {
             try {
-                await axios.post(`/api/noticias/${news.id}/lida`);
-                // Atualiza localmente para "lida" sem precisar recarregar tudo
-                setNewsList(prev => prev.map(n => n.id === news.id ? { ...n, lida: true } : n));
+                await apiClient.post(`/api/noticias/${news.id}/lida`);
+                
+                // 🚀 FORÇA A ATUALIZAÇÃO: Em vez de confiar apenas no setNewsList,
+                // vamos atualizar o estado de forma imutável e correta.
+                setNewsList(prevNews => 
+                    prevNews.map(item => 
+                        item.id === news.id ? { ...item, lida: true } : item
+                    )
+                );
+                
+                // Opcional: Se o seu componente for o "Sino" de notificações,
+                // dispare um evento para ele saber que precisa atualizar também
+                window.dispatchEvent(new Event('notificacao-atualizada'));
+                
             } catch (err) {
                 console.error("Erro ao marcar como lida:", err);
             }

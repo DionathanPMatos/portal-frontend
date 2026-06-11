@@ -11,12 +11,14 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import Spinner from 'react-bootstrap/Spinner';
 import Alert from 'react-bootstrap/Alert';
 import Modal from 'react-bootstrap/Modal';
-import { FaEdit, FaTrash, FaUserPlus, FaFileImport, FaBriefcase, FaSitemap, FaSearch, FaUserTimes } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaUserPlus, FaFileImport, FaBriefcase, FaSitemap, FaSearch, FaUserTimes, } from 'react-icons/fa';
+import { Tabs, Tab } from 'react-bootstrap';
 import CargosModal from './CargosModal';
 import SetoresModal from './SetoresModal';
 import UnidadesModal from './UnidadesModal.jsx';
 import apiClient from '../../../services/api';
 import ImportModal from '../components/ImportModal';
+
 // A importação de '../../../App.jsx' foi removida.
 // Estilos globais devem ser importados no arquivo de entrada principal da sua aplicação (ex: main.jsx ou index.js).
 
@@ -26,6 +28,8 @@ const ManageEmployees = ({ isLoggedIn }) => {
     const [setores, setSetores] = useState([]);
     const [unidades, setUnidades] = useState([]);
     const [fabricantes, setFabricantes] = useState([]);
+    const [verticais, setVerticais] = useState([]); // 🚀 Lista de Verticais
+    const [subgrupos, setSubgrupos] = useState([]); // 🚀 Lista de Subgrupos FAQ
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
@@ -47,6 +51,8 @@ const ManageEmployees = ({ isLoggedIn }) => {
     const [unidadeId, setUnidadeId] = useState('');
     const [permissions, setPermissions] = useState(['dashboard']);
     const [selectedFabricantes, setSelectedFabricantes] = useState([]);
+    const [selectedVerticais, setSelectedVerticais] = useState([]); // 🚀 Selecionados
+    const [selectedSubgrupos, setSelectedSubgrupos] = useState([]); // 🚀 Subgrupos selecionados
     
     // Estados para a Imagem
     const [userpicFile, setUserpicFile] = useState(null);
@@ -59,6 +65,10 @@ const ManageEmployees = ({ isLoggedIn }) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [employeeToDelete, setEmployeeToDelete] = useState(null);
     const [showAddEditModal, setShowAddEditModal] = useState(false);
+
+    // Estados para a barra de pesquisa de subgrupos
+    const [searchSubgrupo, setSearchSubgrupo] = useState('');
+    const [showSubgrupoDropdown, setShowSubgrupoDropdown] = useState(false);
     
     const AVAILABLE_PERMISSIONS = [
         { id: 'admin', label: 'Administrador (Acesso Total)' },
@@ -127,6 +137,20 @@ const ManageEmployees = ({ isLoggedIn }) => {
         } catch (err) { console.error('Erro ao buscar fabricantes:', err); }
     };
 
+    const fetchVerticais = async () => {
+        try {
+            const response = await apiClient.get('/api/verticais');
+            setVerticais(response.data);
+        } catch (err) { console.error('Erro ao buscar verticais:', err); }
+    };
+
+    const fetchSubgrupos = async () => {
+        try {
+            const response = await apiClient.get('/api/faq/subgrupos');
+            setSubgrupos(response.data);
+        } catch (err) { console.error('Erro ao buscar subgrupos:', err); }
+    };
+
     useEffect(() => {
         if (isLoggedIn) {
             setLoading(true);
@@ -135,6 +159,8 @@ const ManageEmployees = ({ isLoggedIn }) => {
             if (setores.length === 0) fetchSetores();
             if (unidades.length === 0) fetchUnidades();
             if (fabricantes.length === 0) fetchFabricantes();
+            if (verticais.length === 0) fetchVerticais(); // 🚀 Busca Verticais
+            if (subgrupos.length === 0) fetchSubgrupos(); // 🚀 Busca Subgrupos
         } else {
             setEmployees([]);
             setLoading(false);
@@ -171,10 +197,21 @@ const ManageEmployees = ({ isLoggedIn }) => {
             if (selectedFabricantes && selectedFabricantes.length > 0) {
                 formData.append('fabricantes_ids', JSON.stringify(selectedFabricantes));
             }
+            
+            if (selectedVerticais && selectedVerticais.length > 0) {
+                formData.append('verticais_ids', JSON.stringify(selectedVerticais)); // 🚀 Anexa Verticais
+            }
+
+            if (selectedSubgrupos && selectedSubgrupos.length > 0) {
+                formData.append('subgrupos_ids', JSON.stringify(selectedSubgrupos)); // 🚀 Anexa Subgrupos
+            }
 
             // 3. Fazer o append do ficheiro físico (Imagem)
             if (userpicFile) {
                 formData.append('userpic_file', userpicFile);
+            } else if (editingEmployee && existingUserpicUrl) {
+                // 🚀 Mantém a imagem atual no FormData se nenhuma nova for enviada
+                formData.append('userpic_url', existingUserpicUrl);
             }
 
             // 4. Configurar os headers para multipart
@@ -217,6 +254,8 @@ const ManageEmployees = ({ isLoggedIn }) => {
         setUnidadeId(employee.unidade_id || '');
         setPermissions(employee.privilegios ? employee.privilegios.split(',') : ['dashboard']);
         setSelectedFabricantes(employee.fabricantes_ids || []);
+        setSelectedVerticais(employee.verticais_ids || []); // 🚀 Restaura seleções
+        setSelectedSubgrupos(employee.subgrupos_ids || []); // 🚀 Restaura subgrupos
         setCnhNumero(employee.cnh_numero || '');
         setCnhValidade(employee.cnh_validade ? employee.cnh_validade.split('T')[0] : '');
         
@@ -231,11 +270,13 @@ const ManageEmployees = ({ isLoggedIn }) => {
         setEditingEmployee(null);
         setName(''); setEmail(''); setContact('');
         setCargoId(''); setSetorId(''); setUnidadeId('');
-        setGestorId(''); setPermissions(['dashboard']); setSelectedFabricantes([]); 
+        setGestorId(''); setPermissions(['dashboard']); setSelectedFabricantes([]); setSelectedVerticais([]); setSelectedSubgrupos([]);
         setCnhNumero(''); setCnhValidade('');
         setUserpicFile(null); 
         setExistingUserpicUrl('');
         setError(null);
+        setSearchSubgrupo('');
+        setShowSubgrupoDropdown(false);
     };
 
     const handleAddClick = () => {
@@ -300,6 +341,16 @@ const ManageEmployees = ({ isLoggedIn }) => {
         if (privArray.length > 2) return <Badge bg="primary">PERSONALIZADO ({privArray.length})</Badge>;
         return privArray.map(p => <Badge bg="secondary" className="me-1 text-uppercase" key={p}>{p}</Badge>);
     };
+
+// 🚀 Lógica Simplificada (Achatamento): 
+    // Filtra os Subgrupos APENAS com base no Setor do colaborador.
+    const availableSubgrupos = subgrupos.filter(sub => {
+        // Se o RH ainda não selecionou um setor para o colaborador, mostra todos.
+        if (!setorId) return true; 
+        
+        // Se já selecionou, mostra apenas os subgrupos (ex: DAHUA-CAMERAS) que pertencem àquele setor.
+        return String(sub.setor_id) === String(setorId);
+    });
 
     return (
         <div className="dash-grid">
@@ -368,7 +419,9 @@ const ManageEmployees = ({ isLoggedIn }) => {
                                         <FaSitemap /> Filiais / Unidades
                                     </Button>
                                 </Col>
+                                
                             </Row>
+                            
                         </Card.Body>
                     </Card>
 
@@ -443,104 +496,242 @@ const ManageEmployees = ({ isLoggedIn }) => {
                 </Modal.Header>
                 <Form onSubmit={handleFormSubmit}>
                     <Modal.Body>
-                        <Form.Group className="mb-3"><Form.Label>Nome Completo</Form.Label><Form.Control type="text" value={name} onChange={(e) => setName(e.target.value)} required /></Form.Group>
-                        <Form.Group className="mb-3"><Form.Label>E-mail</Form.Label><Form.Control type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></Form.Group>
-                        <Form.Group className="mb-3"><Form.Label>Contato</Form.Label><Form.Control type="text" value={contact} onChange={(e) => setContact(e.target.value)} /></Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Setor</Form.Label>
-                            <Form.Select value={setorId} onChange={(e) => setSetorId(e.target.value)} required>
-                                <option value="">Selecione o Setor</option>
-                                {setores.map(s => (<option key={s.id} value={s.id}>{s.nome_setor}</option>))}
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Cargo</Form.Label>
-                            <Form.Select value={cargoId} onChange={(e) => setCargoId(e.target.value)}>
-                                <option value="">Selecione o Cargo</option>
-                                {cargos.map(cargo => (<option key={cargo.id} value={cargo.id}>{cargo.nome_cargo}</option>))}
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Unidade / Filial</Form.Label>
-                            <Form.Select value={unidadeId} onChange={(e) => setUnidadeId(e.target.value)}>
-                                <option value="">Não Vinculado</option>
-                                {unidades.map(u => (<option key={u.id} value={u.id}>{u.nome_unidade}</option>))}
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Reporta a (Gestor/Supervisor)</Form.Label>
-                            <Form.Select value={gestorId} onChange={(e) => setGestorId(e.target.value)}>
-                                <option value="">Nenhum (Responde à Diretoria)</option>
-                                {employees
-                                    .filter(emp => !editingEmployee || emp.id !== editingEmployee.id)
-                                    .map(emp => (
-                                        <option key={emp.id} value={emp.id}>{emp.nome_completo}</option>
-                                ))}
-                            </Form.Select>
-                        </Form.Group>
-                        <Row>
-                            <Col md={6}>
-                                <Form.Group className="mb-3"><Form.Label>Nº CNH (Frota)</Form.Label><Form.Control type="text" value={cnhNumero} onChange={(e) => setCnhNumero(e.target.value)} placeholder="Opcional" /></Form.Group>
-                            </Col>
-                            <Col md={6}>
-                                <Form.Group className="mb-3"><Form.Label>Validade CNH</Form.Label><Form.Control type="date" value={cnhValidade} onChange={(e) => setCnhValidade(e.target.value)} /></Form.Group>
-                            </Col>
-                        </Row>
-                        <Form.Group className="mb-3">
-                            <Form.Label className="fw-bold text-muted small text-uppercase">Permissões de Acesso</Form.Label>
-                            <div className="d-flex flex-wrap gap-3 p-3 bg-light rounded border">
-                                {AVAILABLE_PERMISSIONS.map(perm => (
-                                    <Form.Check 
-                                        key={perm.id}
-                                        type="checkbox"
-                                        id={`perm-${perm.id}`}
-                                        label={perm.label}
-                                        checked={permissions.includes(perm.id)}
-                                        onChange={(e) => {
-                                            if (e.target.checked) {
-                                                setPermissions([...permissions, perm.id]);
-                                            } else {
-                                                setPermissions(permissions.filter(p => p !== perm.id));
-                                            }
-                                        }}
-                                    />
-                                ))}
-                            </div>
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label className="fw-bold text-muted small text-uppercase">Marcas Representadas (Organograma)</Form.Label>
-                            <div className="d-flex flex-wrap gap-3 p-3 bg-light rounded border">
-                                {fabricantes.length > 0 ? fabricantes.map(fab => (
-                                    <Form.Check 
-                                        key={fab.id}
-                                        type="checkbox"
-                                        id={`fab-${fab.id}`}
-                                        label={fab.name}
-                                        checked={selectedFabricantes.includes(fab.id)}
-                                        onChange={(e) => {
-                                            if (e.target.checked) {
-                                                setSelectedFabricantes([...selectedFabricantes, fab.id]);
-                                            } else {
-                                                setSelectedFabricantes(selectedFabricantes.filter(id => id !== fab.id));
-                                            }
-                                        }}
-                                    />
-                                )) : <span className="text-muted small">Nenhuma marca cadastrada. Vá até Admin {'>'} Gerenciar Fabricantes para cadastrá-las.</span>}
-                            </div>
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Foto do colaborador</Form.Label>
-                            {/* O input agora captura e guarda o File bruto, sem conversões */}
-                            <Form.Control type="file" onChange={(e) => setUserpicFile(e.target.files[0])}/>
-                            
-                            {/* Mostra a foto atual baseada na URL pública (se existir) */}
-                            {editingEmployee && existingUserpicUrl && (
-                                <div className="mt-2">
-                                    <small className="text-muted mb-1 d-block">Foto atual:</small>
-                                    <img src={existingUserpicUrl} alt="Foto atual" className="border rounded bg-light" style={{ width: '60px', height: '60px', objectFit: 'contain' }}/>
+                        <Tabs defaultActiveKey="dados" className="mb-4 custom-tabs">
+                            {/* ABA 1: DADOS PESSOAIS E RH */}
+                            <Tab eventKey="dados" title="Dados Pessoais e RH">
+                                <div className="pt-3">
+                                    <Form.Group className="mb-3"><Form.Label>Nome Completo</Form.Label><Form.Control type="text" value={name} onChange={(e) => setName(e.target.value)} required /></Form.Group>
+                                    <Row>
+                                        <Col md={6}>
+                                            <Form.Group className="mb-3"><Form.Label>E-mail Corporativo</Form.Label><Form.Control type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></Form.Group>
+                                        </Col>
+                                        <Col md={6}>
+                                            <Form.Group className="mb-3"><Form.Label>Contato</Form.Label><Form.Control type="text" value={contact} onChange={(e) => setContact(e.target.value)} /></Form.Group>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col md={6}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Setor</Form.Label>
+                                                <Form.Select value={setorId} onChange={(e) => setSetorId(e.target.value)} required>
+                                                    <option value="">Selecione o Setor</option>
+                                                    {setores.map(s => (<option key={s.id} value={s.id}>{s.nome_setor}</option>))}
+                                                </Form.Select>
+                                            </Form.Group>
+                                        </Col>
+                                        <Col md={6}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Cargo</Form.Label>
+                                                <Form.Select value={cargoId} onChange={(e) => setCargoId(e.target.value)}>
+                                                    <option value="">Selecione o Cargo</option>
+                                                    {cargos.map(cargo => (<option key={cargo.id} value={cargo.id}>{cargo.nome_cargo}</option>))}
+                                                </Form.Select>
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col md={6}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Unidade / Filial Base</Form.Label>
+                                                <Form.Select value={unidadeId} onChange={(e) => setUnidadeId(e.target.value)}>
+                                                    <option value="">Não Vinculado</option>
+                                                    {unidades.map(u => (<option key={u.id} value={u.id}>{u.nome_unidade}</option>))}
+                                                </Form.Select>
+                                            </Form.Group>
+                                        </Col>
+                                        <Col md={6}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Reporta a (Gestor/Supervisor)</Form.Label>
+                                                <Form.Select value={gestorId} onChange={(e) => setGestorId(e.target.value)}>
+                                                    <option value="">Nenhum (Responde à Diretoria)</option>
+                                                    {employees
+                                                        .filter(emp => !editingEmployee || emp.id !== editingEmployee.id)
+                                                        .map(emp => (
+                                                            <option key={emp.id} value={emp.id}>{emp.nome_completo}</option>
+                                                    ))}
+                                                </Form.Select>
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col md={6}>
+                                            <Form.Group className="mb-3"><Form.Label>Nº CNH (Frota)</Form.Label><Form.Control type="text" value={cnhNumero} onChange={(e) => setCnhNumero(e.target.value)} placeholder="Opcional" /></Form.Group>
+                                        </Col>
+                                        <Col md={6}>
+                                            <Form.Group className="mb-3"><Form.Label>Validade CNH</Form.Label><Form.Control type="date" value={cnhValidade} onChange={(e) => setCnhValidade(e.target.value)} /></Form.Group>
+                                        </Col>
+                                    </Row>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Foto do Colaborador (Perfil)</Form.Label>
+                                        <Form.Control type="file" accept="image/*" onChange={(e) => setUserpicFile(e.target.files[0])}/>
+                                        {editingEmployee && existingUserpicUrl && (
+                                            <div className="mt-3 p-2 border rounded bg-light d-inline-block text-center">
+                                                <small className="text-muted mb-2 d-block">Foto atual:</small>
+                                                <img src={existingUserpicUrl} alt="Foto atual" className="rounded-circle shadow-sm" style={{ width: '80px', height: '80px', objectFit: 'cover' }}/>
+                                            </div>
+                                        )}
+                                    </Form.Group>
                                 </div>
-                            )}
-                        </Form.Group>
+                            </Tab>
+                            
+                            {/* ABA 2: ACESSOS E RESPONSABILIDADES */}
+                            <Tab eventKey="acessos" title="Acessos e Responsabilidades">
+                                <div className="pt-3">
+                                    <Form.Group className="mb-4">
+                                        <Form.Label className="fw-bold text-muted small text-uppercase">Permissões de Acesso ao Sistema</Form.Label>
+                                        <div className="d-flex flex-wrap gap-3 p-3 bg-light rounded border">
+                                            {AVAILABLE_PERMISSIONS.map(perm => (
+                                                <Form.Check 
+                                                    key={perm.id}
+                                                    type="checkbox"
+                                                    id={`perm-${perm.id}`}
+                                                    label={perm.label}
+                                                    checked={permissions.includes(perm.id)}
+                                                    onChange={(e) => {
+                                                        if (e.target.checked) {
+                                                            setPermissions([...permissions, perm.id]);
+                                                        } else {
+                                                            setPermissions(permissions.filter(p => p !== perm.id));
+                                                        }
+                                                    }}
+                                                />
+                                            ))}
+                                        </div>
+                                        <Form.Text className="text-muted">Atenção: Permissões de administrador dão acesso total às configurações do portal.</Form.Text>
+                                    </Form.Group>
+                                    
+                                    <Form.Group className="mb-4">
+                                        <Form.Label className="fw-bold text-muted small text-uppercase">Marcas Representadas (Departamento Técnico e Compras)</Form.Label>
+                                        <div className="d-flex flex-wrap gap-3 p-3 bg-light rounded border">
+                                            {fabricantes.length > 0 ? fabricantes.map(fab => (
+                                                <Form.Check 
+                                                    key={fab.id}
+                                                    type="checkbox"
+                                                    id={`fab-${fab.id}`}
+                                                    label={fab.name}
+                                                    checked={selectedFabricantes.includes(fab.id)}
+                                                    onChange={(e) => {
+                                                        if (e.target.checked) {
+                                                            setSelectedFabricantes([...selectedFabricantes, fab.id]);
+                                                        } else {
+                                                            setSelectedFabricantes(selectedFabricantes.filter(id => id !== fab.id));
+                                                        }
+                                                    }}
+                                                />
+                                            )) : <span className="text-muted small">Nenhuma marca cadastrada. Vá até Admin {'>'} Gerenciar Fabricantes.</span>}
+                                        </div>
+                                    </Form.Group>
+                                    
+                                    <Form.Group className="mb-3">
+                                        <Form.Label className="fw-bold text-muted small text-uppercase">Verticais DTC Representadas</Form.Label>
+                                        <div className="d-flex flex-wrap gap-3 p-3 bg-light rounded border">
+                                            {verticais.length > 0 ? verticais.map(vert => (
+                                                <Form.Check 
+                                                    key={vert.id}
+                                                    type="checkbox"
+                                                    id={`vert-${vert.id}`}
+                                                    label={vert.nome}
+                                                    checked={selectedVerticais.includes(vert.id)}
+                                                    onChange={(e) => {
+                                                        if (e.target.checked) {
+                                                            setSelectedVerticais([...selectedVerticais, vert.id]);
+                                                        } else {
+                                                            setSelectedVerticais(selectedVerticais.filter(id => id !== vert.id));
+                                                        }
+                                                    }}
+                                                />
+                                            )) : <span className="text-muted small">Nenhuma vertical cadastrada.</span>}
+                                        </div>
+                                    </Form.Group>
+                                    
+<Form.Group className="mb-4 position-relative">
+                                        <Form.Label className="fw-bold text-muted small text-uppercase">Responsabilidade FAQ (Subgrupos)</Form.Label>
+                                        
+                                        {/* 1. Área das Etiquetas (Pills) selecionadas */}
+                                        <div className="mb-2 d-flex flex-wrap gap-2">
+                                            {selectedSubgrupos.length === 0 && (
+                                                <span className="text-muted small fst-italic">Nenhum subgrupo atribuído.</span>
+                                            )}
+                                            {selectedSubgrupos.map(id => {
+                                                const sub = subgrupos.find(s => s.id === id);
+                                                if (!sub) return null;
+                                                return (
+                                                    <Badge 
+                                                        bg="primary" 
+                                                        key={id} 
+                                                        className="d-flex align-items-center p-2 shadow-sm" 
+                                                        style={{ fontSize: '0.85rem' }}
+                                                    >
+                                                        {sub.nome}
+                                                        <span 
+                                                            className="ms-2 ps-2 border-start border-light cursor-pointer" 
+                                                            style={{ cursor: 'pointer' }}
+                                                            title="Remover"
+                                                            onClick={() => setSelectedSubgrupos(selectedSubgrupos.filter(sId => sId !== id))}
+                                                        >
+                                                            &times;
+                                                        </span>
+                                                    </Badge>
+                                                );
+                                            })}
+                                        </div>
+
+                                        {/* 2. Campo de Busca (Autocomplete Inteligente) */}
+                                        <Form.Control 
+                                            type="text"
+                                            className="shadow-sm"
+                                            placeholder="🔍 Digite para buscar uma categoria..."
+                                            value={searchSubgrupo}
+                                            onChange={(e) => setSearchSubgrupo(e.target.value)}
+                                            onFocus={() => setShowSubgrupoDropdown(true)}
+                                            onBlur={() => setShowSubgrupoDropdown(false)}
+                                        />
+
+                                        {/* 3. Lista Flutuante de Resultados */}
+                                        {showSubgrupoDropdown && (
+                                            <div 
+                                                className="dropdown-menu show shadow w-100" 
+                                                style={{ maxHeight: '200px', overflowY: 'auto', position: 'absolute', zIndex: 1050 }}
+                                            >
+                                                {availableSubgrupos
+                                                    .filter(sub => !selectedSubgrupos.includes(sub.id) && sub.nome.toLowerCase().includes(searchSubgrupo.toLowerCase()))
+                                                    .length > 0 ? (
+                                                        
+                                                    availableSubgrupos
+                                                        .filter(sub => !selectedSubgrupos.includes(sub.id) && sub.nome.toLowerCase().includes(searchSubgrupo.toLowerCase()))
+                                                        .map(sub => (
+                                                            <button
+                                                                key={`opt-${sub.id}`}
+                                                                type="button"
+                                                                className="dropdown-item py-2"
+                                                                onMouseDown={(e) => {
+                                                                    // onMouseDown aciona antes do onBlur do input
+                                                                    e.preventDefault(); 
+                                                                    setSelectedSubgrupos([...selectedSubgrupos, sub.id]);
+                                                                    setSearchSubgrupo('');
+                                                                    setShowSubgrupoDropdown(false);
+                                                                }}
+                                                            >
+                                                                {sub.nome}
+                                                            </button>
+                                                        ))
+                                                ) : (
+                                                    <span className="dropdown-item text-muted disabled">
+                                                        Nenhuma categoria encontrada.
+                                                    </span>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        {availableSubgrupos.length === 0 && setorId && (
+                                            <Form.Text className="text-warning">
+                                                Nenhuma categoria cadastrada para o setor deste colaborador.
+                                            </Form.Text>
+                                        )}
+                                    </Form.Group>
+                                </div>
+                            </Tab>
+                        </Tabs>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary btn-sm" onClick={handleCloseAndResetModal}>Cancelar</Button>

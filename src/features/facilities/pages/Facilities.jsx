@@ -167,6 +167,7 @@ export default function Facilities() {
       setSuccess(p.ativo ? "Prestador inativado!" : "Prestador ativado!");
       setTimeout(() => setSuccess(""), 3000);
     } catch(e) {
+      console.error(e);
       setErr("Erro ao alterar status do prestador.");
     }
   };
@@ -201,7 +202,10 @@ export default function Facilities() {
       await apiClient.patch(`/api/facilities/equipamentos/${progManutData.id}/manutencao`, progManutData);
       setSuccess("Manutenção programada!");
       setShowProgManut(false); fetchData(); setTimeout(() => setSuccess(""), 3000);
-    } catch (e) { setErr("Erro ao programar manutenção."); }
+    } catch (e) { 
+      console.error(e);
+      setErr("Erro ao programar manutenção."); 
+    }
   };
 
   const handleSaveInativar = async () => {
@@ -209,7 +213,10 @@ export default function Facilities() {
       await apiClient.patch(`/api/facilities/equipamentos/${inativarData.id}/inativar`, inativarData);
       setSuccess("Equipamento baixado com sucesso!");
       setShowInativarModal(false); fetchData(); setTimeout(() => setSuccess(""), 3000);
-    } catch (e) { setErr("Erro ao inativar equipamento."); }
+    } catch (e) { 
+      console.error(e);
+      setErr("Erro ao inativar equipamento."); 
+    }
   };
 
   const handleOpenHistorico = async (equip) => {

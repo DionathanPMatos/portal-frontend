@@ -66,6 +66,7 @@ import GerenciamentoLeadsPage from './features/prospect-agent/pages/Gerenciament
 // ==========================================
 import AdminPage from "./features/configuration/pages/AdminPage.jsx"; // Renomeado
 import AdminTheme from "./features/configuration/pages/AdminThemePage.jsx"; // Renomeado
+import CategoriasAdmin from './features/configuration/pages/CategoriasAdmin.jsx'; // Ajuste a pasta se guardou noutro lado
 
 // ==========================================
 // MÓDULO RH
@@ -145,6 +146,7 @@ function App() {
             <Route path="/adminpage" element={<AdminPage />} />
             <Route path="/admin/theme" element={<AdminTheme />} />
             <Route path="/RegisterUser" element={<RegisterUserPage />} />
+            <Route path="/admin/CategoriasAdmin" element={<CategoriasAdmin />} />
             <Route path="/admin/noticias" element={<NewsManagerPage />} /> {/* Mantido */}
             <Route path="/noticias" element={<NewsPage />} />
             <Route path="/OrganogramaTecnico" element={<OrganogramaTecnicoPage />} />

@@ -1,34 +1,35 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState, useEffect, useCallback } from "react";
+import apiClient from "../../../services/api";
 import { Card, Form, Button, Alert, Spinner, ListGroup } from "react-bootstrap";
 
-export default function ChecklistManager({ projetoId, etapaId, checklists, onUpdate }) {
+export default function ChecklistManager({ projetoId , etapaId, checklists = [], onUpdate }) {
   const [checklistSelecionado, setChecklistSelecionado] = useState(null);
   const [itens, setItens] = useState([]);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
   const [novo, setNovo] = useState("");
 
-  useEffect(() => {
-    if (checklistSelecionado) {
-      fetchItens();
-    }
-  }, [checklistSelecionado]);
-
-  const fetchItens = async () => {
+  const fetchItens = useCallback(async () => {
+    if (!checklistSelecionado) return;
     setLoading(true);
     try {
-      const res = await axios.get(`/api/obras/checklist-itens/${checklistSelecionado.id}`);
+      const res = await apiClient.get(`/api/obras/checklist-itens/${checklistSelecionado.id}`);
       setItens(res.data || []);
     } catch (error) {
       setErro("Erro ao carregar itens: " + error.message);
     }
     setLoading(false);
-  };
+  }, [checklistSelecionado]);
+
+  useEffect(() => {
+    if (checklistSelecionado) {
+      fetchItens();
+    }
+  }, [checklistSelecionado, fetchItens]);
 
   const handleToggleItem = async (item) => {
     try {
-      await axios.put(`/api/obras/checklist-itens/${item.id}`, {
+      await apiClient.put(`/api/obras/checklist-itens/${item.id}`, {
         ...item,
         concluido: !item.concluido
       });
@@ -42,7 +43,7 @@ export default function ChecklistManager({ projetoId, etapaId, checklists, onUpd
   const handleAddItem = async () => {
     if (!novo.trim()) return;
     try {
-      await axios.post("/api/obras/checklist-itens", {
+      await apiClient.post("/api/obras/checklist-itens", {
         checklist_id: checklistSelecionado.id,
         descricao: novo,
         responsavel_id: null,

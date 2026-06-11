@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { Modal, Form, Button, Row, Col, Alert } from "react-bootstrap";
-
+import apiClient from "../../../services/api";
 export default function ModalMaterialDetalhes({ show, onHide, material, onUpdate }) {
   const [data, setData] = useState(material || {});
   const [erro, setErro] = useState("");
@@ -21,7 +20,7 @@ export default function ModalMaterialDetalhes({ show, onHide, material, onUpdate
   const handleSave = async () => {
     setLoading(true);
     try {
-      await axios.put(`/api/obras/materiais/${data.id}`, data);
+      await apiClient.put(`/api/obras/materiais/${data.id}`, data);
       setErro("");
       onUpdate();
       onHide();

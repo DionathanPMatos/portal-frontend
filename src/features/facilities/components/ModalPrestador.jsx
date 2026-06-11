@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Modal, Row, Col, Form, Button, Tabs, Tab, InputGroup, Spinner } from "react-bootstrap";
-import axios from "axios";
+import apiClient from "../../../services/api";
+
 
 export default function ModalPrestador({ show, onHide, prestadorData, setPrestadorData, onSave }) {
   const [loadingCnpj, setLoadingCnpj] = useState(false);
@@ -12,7 +13,7 @@ export default function ModalPrestador({ show, onHide, prestadorData, setPrestad
     
     setLoadingCnpj(true);
     try {
-      const res = await axios.get(`/api/utils/cnpj/${cnpjLimpo}`);
+      const res = await apiClient.get(`/api/utils/cnpj/${cnpjLimpo}`);
       setPrestadorData({
         ...prestadorData,
         ...res.data
@@ -30,7 +31,7 @@ export default function ModalPrestador({ show, onHide, prestadorData, setPrestad
 
     setLoadingCep(true);
     try {
-      const res = await axios.get(`/api/utils/cep/${cepLimpo}`);
+      const res = await apiClient.get(`/api/utils/cep/${cepLimpo}`);
       setPrestadorData({
         ...prestadorData,
         ...res.data

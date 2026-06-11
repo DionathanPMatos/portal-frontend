@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { FaUserPlus, FaIndustry, FaUsers, FaChevronRight } from 'react-icons/fa';
+import { FaUserPlus, FaIndustry, FaUsers, FaChevronRight, FaSitemap } from 'react-icons/fa';
 import { MdOutlineAttachMoney } from "react-icons/md";
 import { AiFillSafetyCertificate, AiFillAlert } from "react-icons/ai";
 import { SiHomeassistantcommunitystore } from "react-icons/si";
@@ -118,6 +118,12 @@ const dashboardSections = [
                 text: 'Customize as cores e o fundo do sistema.',
                 icon: <IoColorPalette size={24} />,
                 link: '/admin/theme',
+            },
+            {
+                title: 'Categorias e Subgrupos',
+                text: 'Gerencie as categorias e vínculos de FAQ.',
+                icon: <FaRegNewspaper size={24} />,
+                link: '/admin/CategoriasAdmin',
             },
             {
                 title: 'Mural de Avisos (News)',

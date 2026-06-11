@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import apiClient from "../../../services/api";  
 import { Modal, Form, Button, Row, Col, Alert } from "react-bootstrap";
 
 export default function ModalEtapa({ show, onHide, projetoId, onSave }) {
@@ -26,7 +26,7 @@ export default function ModalEtapa({ show, onHide, projetoId, onSave }) {
       return;
     }
     try {
-      await axios.post("/api/obras/etapas", {
+      await apiClient.post("/api/obras/etapas", {
         projeto_id: projetoId,
         ...data
       });
