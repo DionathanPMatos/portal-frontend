@@ -11,13 +11,14 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import Spinner from 'react-bootstrap/Spinner';
 import Alert from 'react-bootstrap/Alert';
 import Modal from 'react-bootstrap/Modal';
-import { FaEdit, FaTrash, FaUserPlus, FaFileImport, FaBriefcase, FaSitemap, FaSearch, FaUserTimes } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaUserPlus, FaFileImport, FaBriefcase, FaSitemap, FaSearch, FaUserTimes, } from 'react-icons/fa';
 import { Tabs, Tab } from 'react-bootstrap';
 import CargosModal from './CargosModal';
 import SetoresModal from './SetoresModal';
 import UnidadesModal from './UnidadesModal.jsx';
 import apiClient from '../../../services/api';
 import ImportModal from '../components/ImportModal';
+
 // A importação de '../../../App.jsx' foi removida.
 // Estilos globais devem ser importados no arquivo de entrada principal da sua aplicação (ex: main.jsx ou index.js).
 
@@ -64,6 +65,10 @@ const ManageEmployees = ({ isLoggedIn }) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [employeeToDelete, setEmployeeToDelete] = useState(null);
     const [showAddEditModal, setShowAddEditModal] = useState(false);
+
+    // Estados para a barra de pesquisa de subgrupos
+    const [searchSubgrupo, setSearchSubgrupo] = useState('');
+    const [showSubgrupoDropdown, setShowSubgrupoDropdown] = useState(false);
     
     const AVAILABLE_PERMISSIONS = [
         { id: 'admin', label: 'Administrador (Acesso Total)' },
@@ -270,6 +275,8 @@ const ManageEmployees = ({ isLoggedIn }) => {
         setUserpicFile(null); 
         setExistingUserpicUrl('');
         setError(null);
+        setSearchSubgrupo('');
+        setShowSubgrupoDropdown(false);
     };
 
     const handleAddClick = () => {
@@ -335,16 +342,14 @@ const ManageEmployees = ({ isLoggedIn }) => {
         return privArray.map(p => <Badge bg="secondary" className="me-1 text-uppercase" key={p}>{p}</Badge>);
     };
 
-    // 🚀 Lógica Inteligente: Filtra os Subgrupos com base no Setor selecionado E Fabricantes marcados
+// 🚀 Lógica Simplificada (Achatamento): 
+    // Filtra os Subgrupos APENAS com base no Setor do colaborador.
     const availableSubgrupos = subgrupos.filter(sub => {
-        const matchSetor = setorId ? String(sub.setor_id) === String(setorId) : true;
+        // Se o RH ainda não selecionou um setor para o colaborador, mostra todos.
+        if (!setorId) return true; 
         
-        // 🚀 Conversão Segura: Transforma tudo em String para evitar bugs de tipagem (1 vs "1")
-        const matchFabricante = sub.fabricantes && sub.fabricantes.some(f => 
-            selectedFabricantes.some(selecionado => String(selecionado) === String(f.fabricante_id))
-        );
-        
-        return matchSetor && matchFabricante;
+        // Se já selecionou, mostra apenas os subgrupos (ex: DAHUA-CAMERAS) que pertencem àquele setor.
+        return String(sub.setor_id) === String(setorId);
     });
 
     return (
@@ -596,7 +601,7 @@ const ManageEmployees = ({ isLoggedIn }) => {
                                     </Form.Group>
                                     
                                     <Form.Group className="mb-4">
-                                        <Form.Label className="fw-bold text-muted small text-uppercase">Marcas Representadas (Organograma Técnico)</Form.Label>
+                                        <Form.Label className="fw-bold text-muted small text-uppercase">Marcas Representadas (Departamento Técnico e Compras)</Form.Label>
                                         <div className="d-flex flex-wrap gap-3 p-3 bg-light rounded border">
                                             {fabricantes.length > 0 ? fabricantes.map(fab => (
                                                 <Form.Check 
@@ -639,23 +644,90 @@ const ManageEmployees = ({ isLoggedIn }) => {
                                         </div>
                                     </Form.Group>
                                     
-                                    <Form.Group className="mb-3">
+<Form.Group className="mb-4 position-relative">
                                         <Form.Label className="fw-bold text-muted small text-uppercase">Responsabilidade FAQ (Subgrupos)</Form.Label>
-                                        <div className="d-flex flex-wrap gap-3 p-3 bg-light rounded border">
-                                            {availableSubgrupos.length > 0 ? availableSubgrupos.map(sub => (
-                                                <Form.Check 
-                                                    key={`sub-${sub.id}`}
-                                                    type="checkbox"
-                                                    id={`sub-${sub.id}`}
-                                                    label={sub.nome}
-                                                    checked={selectedSubgrupos.includes(sub.id)}
-                                                    onChange={(e) => {
-                                                        if (e.target.checked) setSelectedSubgrupos([...selectedSubgrupos, sub.id]);
-                                                        else setSelectedSubgrupos(selectedSubgrupos.filter(id => id !== sub.id));
-                                                    }}
-                                                />
-                                            )) : <span className="text-muted small">Nenhum subgrupo disponível para os fabricantes e setor selecionados.</span>}
+                                        
+                                        {/* 1. Área das Etiquetas (Pills) selecionadas */}
+                                        <div className="mb-2 d-flex flex-wrap gap-2">
+                                            {selectedSubgrupos.length === 0 && (
+                                                <span className="text-muted small fst-italic">Nenhum subgrupo atribuído.</span>
+                                            )}
+                                            {selectedSubgrupos.map(id => {
+                                                const sub = subgrupos.find(s => s.id === id);
+                                                if (!sub) return null;
+                                                return (
+                                                    <Badge 
+                                                        bg="primary" 
+                                                        key={id} 
+                                                        className="d-flex align-items-center p-2 shadow-sm" 
+                                                        style={{ fontSize: '0.85rem' }}
+                                                    >
+                                                        {sub.nome}
+                                                        <span 
+                                                            className="ms-2 ps-2 border-start border-light cursor-pointer" 
+                                                            style={{ cursor: 'pointer' }}
+                                                            title="Remover"
+                                                            onClick={() => setSelectedSubgrupos(selectedSubgrupos.filter(sId => sId !== id))}
+                                                        >
+                                                            &times;
+                                                        </span>
+                                                    </Badge>
+                                                );
+                                            })}
                                         </div>
+
+                                        {/* 2. Campo de Busca (Autocomplete Inteligente) */}
+                                        <Form.Control 
+                                            type="text"
+                                            className="shadow-sm"
+                                            placeholder="🔍 Digite para buscar uma categoria..."
+                                            value={searchSubgrupo}
+                                            onChange={(e) => setSearchSubgrupo(e.target.value)}
+                                            onFocus={() => setShowSubgrupoDropdown(true)}
+                                            onBlur={() => setShowSubgrupoDropdown(false)}
+                                        />
+
+                                        {/* 3. Lista Flutuante de Resultados */}
+                                        {showSubgrupoDropdown && (
+                                            <div 
+                                                className="dropdown-menu show shadow w-100" 
+                                                style={{ maxHeight: '200px', overflowY: 'auto', position: 'absolute', zIndex: 1050 }}
+                                            >
+                                                {availableSubgrupos
+                                                    .filter(sub => !selectedSubgrupos.includes(sub.id) && sub.nome.toLowerCase().includes(searchSubgrupo.toLowerCase()))
+                                                    .length > 0 ? (
+                                                        
+                                                    availableSubgrupos
+                                                        .filter(sub => !selectedSubgrupos.includes(sub.id) && sub.nome.toLowerCase().includes(searchSubgrupo.toLowerCase()))
+                                                        .map(sub => (
+                                                            <button
+                                                                key={`opt-${sub.id}`}
+                                                                type="button"
+                                                                className="dropdown-item py-2"
+                                                                onMouseDown={(e) => {
+                                                                    // onMouseDown aciona antes do onBlur do input
+                                                                    e.preventDefault(); 
+                                                                    setSelectedSubgrupos([...selectedSubgrupos, sub.id]);
+                                                                    setSearchSubgrupo('');
+                                                                    setShowSubgrupoDropdown(false);
+                                                                }}
+                                                            >
+                                                                {sub.nome}
+                                                            </button>
+                                                        ))
+                                                ) : (
+                                                    <span className="dropdown-item text-muted disabled">
+                                                        Nenhuma categoria encontrada.
+                                                    </span>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        {availableSubgrupos.length === 0 && setorId && (
+                                            <Form.Text className="text-warning">
+                                                Nenhuma categoria cadastrada para o setor deste colaborador.
+                                            </Form.Text>
+                                        )}
                                     </Form.Group>
                                 </div>
                             </Tab>
