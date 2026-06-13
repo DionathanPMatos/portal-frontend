@@ -86,7 +86,7 @@
     display: flex;
     align-items: center;
     justify-content: flex-start; /* Alinha ícone + texto à esquerda no Desktop */
-    padding: 0.8rem 1.2rem;
+    padding: 0.3rem 1.2rem;
     color: var(--sidebar-icon-color, #ffffff) !important;
     text-decoration: none;
     transition: background-color 1s ease, color 0.2s ease; /* Transição suave para hover e ativo */
@@ -104,7 +104,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 1rem; /* Dá espaço entre o ícone e o texto ao lado */
+    margin-right: 0.8rem; /* Dá espaço entre o ícone e o texto ao lado */
 }
 
 /* 🚀 FORÇAR O NOME DAS OPÇÕES A APARECEREM NO DESKTOP */
@@ -163,13 +163,13 @@
 
 /* Estilização das opções internas da Cascata */
 .subitems li a {
-    padding: 0.6rem 1rem 0.6rem 3.2rem !important; /* Recuo extra para a esquerda cria a hierarquia visual */
+    padding: 0.2rem 1rem 0.6rem 3rem !important; /* Recuo extra para a esquerda cria a hierarquia visual */
     color: var(--sidebar-icon-color, #adb5bd) !important;
     text-decoration: none;
     white-space: nowrap;
     display: flex;
     align-items: center;
-    font-size: 13px;
+    font-size: 12px !important;
     border-radius: 0.3rem;
     margin: 0.1rem 0.5rem;
     background-color: transparent !important;
@@ -237,5 +237,15 @@
     .sidebar .main-menu li a .icon-wrapper {
         min-width: 2rem;
         margin-right: 1.5rem;
+    }
+}
+
+/* ==========================================================================
+   ESTILOS PARA SIDEBAR ESCONDIDO (HIDDEN) - EFEITO ERP
+   ========================================================================== */
+
+@media (min-width: 769px) { /* Aplica apenas em telas maiores que mobile */
+    .sidebar.hidden {
+        transform: translateX(-100%);
     }
 }

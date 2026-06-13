@@ -162,21 +162,25 @@ function CategoriasAdmin() {
   };
 
   return (
-    <Container fluid className="py-4">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 className="m-0 text-dark fw-bold"><FaSitemap className="me-2 text-primary"/> Gestão de Categorias e Verticais</h2>
-            <p className="text-muted mb-0">Gerencie as categorias/subgrupos e as Verticais de Negócio do sistema.</p>
+    <div className="container-main p-4">
+      <div className="page-header-colored mb-4">
+        <div className="page-header-title-wrapper">
+            <h2 className="page-header-title d-flex align-items-center gap-3">
+                <FaSitemap /> Gestão de Categorias e Verticais
+            </h2>
+            <p className="page-header-subtitle">Organize as categorias de FAQ e as verticais de negócio do sistema.</p>
         </div>
-        {activeTab === 'categorias' ? (
-            <Button variant="primary" className="shadow-sm" onClick={handleOpenCreate}>
-            <FaPlus className="me-2" /> Nova Categoria
-            </Button>
-        ) : (
-            <Button variant="primary" className="shadow-sm" onClick={handleOpenCreateVertical}>
-            <FaPlus className="me-2" /> Nova Vertical
-            </Button>
-        )}
+        <div className="page-header-actions-wrapper">
+          {activeTab === 'categorias' ? (
+              <Button variant="primary" onClick={handleOpenCreate}>
+              <FaPlus className="me-2" /> Nova Categoria
+              </Button>
+          ) : (
+              <Button variant="primary" onClick={handleOpenCreateVertical}>
+              <FaPlus className="me-2" /> Nova Vertical
+              </Button>
+          )}
+        </div>
       </div>
 
       <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} className="mb-4 custom-tabs">
@@ -363,7 +367,7 @@ function CategoriasAdmin() {
           </Modal.Footer>
         </Form>
       </Modal>
-    </Container>
+    </div>
   );
 }
 

@@ -1,7 +1,20 @@
 /* Dashboard.css / crm.css */
 
+.dash-grid {
+    /* Correção para componentes com posicionamento absoluto (como o calendário) não serem cortados */
+    overflow: visible !important;
+}
+
 .container-main {
-  padding: 24px;
+  /* 🚀 CORREÇÃO: O padding da página agora é controlado pelo .content-area (em App.css). */
+  /* A remoção do padding e do overflow-x:hidden aqui corrige o layout, */
+  /* permitindo que a grade do Bootstrap (.row) funcione corretamente sem empurrar outros elementos. */
+  width: 100%;
+  padding-top: 1rem !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important
+
+
 }
 
 /* Estilização dos Cards */
@@ -99,8 +112,8 @@
 }
 
 .page-title {
-  font-size: 1.75rem;
-  font-weight: 600;
+  font-size: 1.2rem !important;
+  font-weight: 400;
   color: var(--cor-texto-primario, #333);
   margin: 0;
 }
@@ -109,4 +122,324 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+
+
+/* ==========================================================================
+   ESTILO ERP PARA OS CARDS DE KPI DO DASHBOARD OPERACIONAL
+   ========================================================================== */
+/* Seletor para os cards de KPI para não afetar outros cards */
+.kpi-cards-row .card {
+    position: relative; /* Necessário para o pseudo-elemento */
+    overflow: hidden;   /* Garante que o fundo não vaze */
+    border-radius: 8px;
+    box-shadow: none;
+ 
+}
+
+/* Faz o conteúdo do card ficar por cima do fundo */
+.kpi-cards-row .card .card-body {
+    position: relative;
+    z-index: 2;
+}
+
+/* Pseudo-elemento para o gráfico de fundo */
+.kpi-cards-row .card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 1;
+    transition: opacity 0.3s ease;
+}
+/* Efeito de hover para destacar o card e o gráfico de fundo */
+.kpi-cards-row .card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--sombra-card, 0 6px 15px rgba(0, 0, 0, 0.07));
+}
+/* Aumenta a opacidade do gráfico de fundo ao passar o mouse */
+.kpi-cards-row .card:hover::after {
+    opacity: 0.15;
+}
+
+/* KPI Cards - Gráficos de Fundo Personalizados para Cada Card */
+/* Card 1 (Venda Ano) - Gráfico de Linha Ascendente com Cor Forte */
+.kpi-cards-row .col-xl-3:nth-child(1) .card::after {
+    /* Mudei stop-opacity para '0.9' (90% visível) e escureci a cor do gradiente */
+    background-image: url("data:image/svg+xml,%3Csvg width='100%25' height='80px' viewBox='0 0 400 100' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='areaGradient' x1='0' x2='0' y1='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%236e3ed9' stop-opacity='0.2' /%3E%3Cstop offset='100%25' stop-color='%236e3ed9' stop-opacity='0.05' /%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M 0 45 L 10 40 L 15 48 L 25 45 L 35 55 L 40 50 L 50 60 L 65 75 L 75 70 L 85 80 L 95 75 L 110 85 L 125 80 L 135 88 L 150 85 L 160 92 L 165 88 L 175 95 L 185 80 L 190 85 L 200 65 L 210 55 L 220 65 L 230 60 L 240 65 L 250 55 L 265 65 L 275 60 L 295 75 L 305 70 L 315 85 L 325 85 L 335 90 L 345 80 L 355 85 L 365 75 L 370 70 L 380 75 L 390 85 L 400 80 L 400 100 L 0 100 Z' fill='url(%23areaGradient)' /%3E%3Cpath d='M 0 45 L 10 40 L 15 48 L 25 45 L 35 55 L 40 50 L 50 60 L 65 75 L 75 70 L 85 80 L 95 75 L 110 85 L 125 80 L 135 88 L 150 85 L 160 92 L 165 88 L 175 95 L 185 80 L 190 85 L 200 65 L 210 55 L 220 65 L 230 60 L 240 65 L 250 55 L 265 65 L 275 60 L 295 75 L 305 70 L 315 85 L 325 85 L 335 90 L 345 80 L 355 85 L 365 75 L 370 70 L 380 75 L 390 85 L 400 80' fill='none' stroke='%23d0bbed' stroke-width='2' stroke-linejoin='round' stroke-linecap='round' /%3E%3C/svg%3E");
+    background-position: bottom left;
+    background-size: 100% 100%; 
+    background-repeat: no-repeat;
+    content: "";
+    top: auto;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50%; 
+    z-index: 0; 
+    border-radius: inherit; 
+}
+
+/* Certifique-se de que o elemento pai tenha as propriedades abaixo para o ::after funcionar bem */
+.kpi-cards-row .col-xl-3:nth-child(1) .card {
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+/* Card 2 (Venda Mês) - Gráfico de Linha com Variação */
+/* Card 2 (Venda Mês) - Gráfico Azul Volátil */
+.kpi-cards-row .col-xl-3:nth-child(2) .card::after {
+    /* Gradiente igual ao card 1 (0.2 a 0.05). Linha (stroke) na cor #a9c0ff (azul claro) com espessura 2 */
+    background-image: url("data:image/svg+xml,%3Csvg width='100%25' height='80px' viewBox='0 0 400 100' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='gradBlue' x1='0' x2='0' y1='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%233366ff' stop-opacity='0.2' /%3E%3Cstop offset='100%25' stop-color='%233366ff' stop-opacity='0.05' /%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M 0 60 L 15 50 L 30 65 L 45 40 L 60 55 L 75 30 L 90 45 L 110 20 L 130 35 L 150 15 L 170 40 L 190 25 L 210 50 L 230 30 L 250 60 L 270 45 L 290 70 L 310 50 L 330 75 L 350 55 L 370 65 L 385 45 L 400 55 L 400 100 L 0 100 Z' fill='url(%23gradBlue)' /%3E%3Cpath d='M 0 60 L 15 50 L 30 65 L 45 40 L 60 55 L 75 30 L 90 45 L 110 20 L 130 35 L 150 15 L 170 40 L 190 25 L 210 50 L 230 30 L 250 60 L 270 45 L 290 70 L 310 50 L 330 75 L 350 55 L 370 65 L 385 45 L 400 55' fill='none' stroke='%23a9c0ff' stroke-width='2' stroke-linejoin='round' stroke-linecap='round' /%3E%3C/svg%3E");
+    background-position: bottom left;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    content: "";
+    top: auto;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 30%;
+    z-index: 0;
+    border-radius: inherit;
+}
+
+
+/* Card 3 (Venda Dia) - Gráfico Rosa Queda e Recuperação */
+.kpi-cards-row .col-xl-3:nth-child(3) .card::after {
+    /* Gradiente igual ao card 1 (0.2 a 0.05). Linha (stroke) na cor #f9a8ce (rosa claro) com espessura 2 */
+    background-image: url("data:image/svg+xml,%3Csvg width='100%25' height='80px' viewBox='0 0 400 100' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='gradPink' x1='0' x2='0' y1='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%23f10075' stop-opacity='0.2' /%3E%3Cstop offset='100%25' stop-color='%23f10075' stop-opacity='0.05' /%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M 0 25 L 20 30 L 40 20 L 60 45 L 80 40 L 100 65 L 120 50 L 140 85 L 160 70 L 180 90 L 200 80 L 220 95 L 240 75 L 260 85 L 280 50 L 300 60 L 320 35 L 340 45 L 360 20 L 380 30 L 400 15 L 400 100 L 0 100 Z' fill='url(%23gradPink)' /%3E%3Cpath d='M 0 25 L 20 30 L 40 20 L 60 45 L 80 40 L 100 65 L 120 50 L 140 85 L 160 70 L 180 90 L 200 80 L 220 95 L 240 75 L 260 85 L 280 50 L 300 60 L 320 35 L 340 45 L 360 20 L 380 30 L 400 15' fill='none' stroke='%23f9a8ce' stroke-width='2' stroke-linejoin='round' stroke-linecap='round' /%3E%3C/svg%3E");
+    background-position: bottom left;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    content: "";
+    top: auto; 
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 30%;
+    z-index: 0;
+    border-radius: inherit;
+}
+
+/* Card 4 (Meta Mensal) - Gráfico Ciano Crescimento Constante */
+.kpi-cards-row .col-xl-3:nth-child(4) .card::after {
+    /* Gradiente igual ao card 1 (0.2 a 0.05). Linha (stroke) na cor #99eeee (ciano claro) com espessura 2 */
+    background-image: url("data:image/svg+xml,%3Csvg width='100%25' height='80px' viewBox='0 0 400 100' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='gradTeal' x1='0' x2='0' y1='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2300cccc' stop-opacity='0.2' /%3E%3Cstop offset='100%25' stop-color='%2300cccc' stop-opacity='0.05' /%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M 0 90 L 20 85 L 40 95 L 60 75 L 80 80 L 100 60 L 120 65 L 140 45 L 160 50 L 180 30 L 200 35 L 220 15 L 240 20 L 260 40 L 280 25 L 300 45 L 320 20 L 340 30 L 360 10 L 380 15 L 400 5 L 400 100 L 0 100 Z' fill='url(%23gradTeal)' /%3E%3Cpath d='M 0 90 L 20 85 L 40 95 L 60 75 L 80 80 L 100 60 L 120 65 L 140 45 L 160 50 L 180 30 L 200 35 L 220 15 L 240 20 L 260 40 L 280 25 L 300 45 L 320 20 L 340 30 L 360 10 L 380 15 L 400 5' fill='none' stroke='%2399eeee' stroke-width='2' stroke-linejoin='round' stroke-linecap='round' /%3E%3C/svg%3E");
+    background-position: bottom left;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    content: "";
+    top: auto; 
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 30%;
+    z-index: 0;
+    border-radius: inherit;
+}
+
+.kpi-cards-row .card .text-xs .fa-edit {
+    opacity: 0.4;
+    transition: opacity 0.2s ease;
+}
+.kpi-cards-row .card .text-xs:hover .fa-edit {
+    opacity: 1;
+}
+
+/* Ajusta o rodapé do card */
+.kpi-cards-row .card .border-top {
+    margin-top: 1rem !important;
+    padding-top: 0.75rem !important;
+    border-color: var(--cor-borda, #eef2f5) !important;
+}
+
+/* Estilo customizado para o valor principal dos KPIs */
+.kpi-main-metric {
+  color: #1c273c;
+  font-size: clamp(12px, 1.5vw, 26px);  font-weight: 700;
+  font-family: "Archivo", var(--bs-font-sans-serif);
+}
+
+/* Estilo para os títulos dos cards de KPI */
+.kpi-card-title-font {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+/* 🚀 Torna a fonte do KPI principal responsiva */
+@media (max-width: 1199.98px) {
+  .kpi-main-metric {
+    font-size: 22px; /* Reduz um pouco a fonte em telas de notebook e menores */
+  }
+}
+
+.kpi-icon-circle {
+    /* Mínimo de 36px, ideal de 4vw, e volta para os seus 48px originais no desktop */
+    width: 48px;
+    height: 48px;
+    min-width: 26px;
+    min-height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white; /* Cor do ícone */
+    flex-shrink: 0; /* Previne que o ícone seja esmagado pelo texto ao lado */
+    font-size: clamp(10px, 2vw, 24px) !important; /* Torna o ícone responsivo também */
+}
+/* Cores específicas para cada card de KPI */
+.kpi-icon-circle-purple { background-color: #6e3ed9;}
+.kpi-icon-circle-blue { background-color: #3366ff;}
+.kpi-icon-circle-pink { background-color: #f10075;}
+.kpi-icon-circle-cyan { background-color: #00cccc;}
+
+/* --- ESTILOS DO MURAL (CARROSSEL) --- */
+
+/* 1. O degradê escuro atrás do texto (para proteger a leitura em imagens claras) */
+.card-mural::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60%; /* Cobre a metade de baixo da imagem */
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+  z-index: 1;
+}
+
+/* 2. Container do texto do Bootstrap ajustado */
+.carousel-caption.conteudo-texto {
+  z-index: 2; /* Garante que fica acima do degradê */
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1.5rem 2rem; /* Mais espaço para não ficar colado nas bordas */
+  /* Opcional: Descomente as 2 linhas abaixo se quiser o Efeito Vidro Fosco em vez do Degradê solto */
+  /* background: rgba(0, 48, 73, 0.65); */
+  /* backdrop-filter: blur(8px); */
+}
+
+/* 3. Título: Maior, mais grosso e com sombra leve */
+.mural-titulo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff !important;
+  margin-bottom: 0.5rem;
+  text-shadow: 0px 2px 4px rgba(0,0,0,0.6);
+}
+
+/* 4. Descrição: Menor, elegante e levemente acinzentada (opacidade) */
+.mural-descricao {
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: #f8f9fa;
+  line-height: 1.5;
+  opacity: 0.9;
+  margin-bottom: 0;
+  text-shadow: 0px 1px 2px rgba(0,0,0,0.5);
+}
+
+/* ==========================================================================
+   RANKING DE VENDEDORES
+   ========================================================================== */
+.ranking-vendedores-container {
+  max-height: 420px; /* Limita a altura da lista */
+  overflow-y: auto;   /* Adiciona a barra de rolagem vertical quando necessário */
+}
+
+/* Reduz o espaçamento vertical de cada linha do ranking */
+.ranking-vendedor-row td {
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+}
+
+/* Diminui a fonte do nome do vendedor */
+.ranking-vendedor-nome {
+  font-size: 0.9rem; /* Fonte um pouco menor */
+}
+
+/* Estilização da barra de rolagem (para navegadores Webkit como Chrome, Safari) */
+.ranking-vendedores-container::-webkit-scrollbar {
+  width: 6px;
+}
+.ranking-vendedores-container::-webkit-scrollbar-thumb {
+  background: #d1d1d1;
+  border-radius: 6px;
+}
+
+/* ==========================================================================
+   CABEÇALHO DE PÁGINA COLORIDO (PADRÃO)
+   ========================================================================== */
+.page-header-colored {
+  background-color: var(--sidebar-bg-color, #002b49); /* Cor de fundo do sidebar */
+  color: white;
+  padding: 1.5rem 2rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.page-header-title-wrapper .page-header-title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.page-header-title-wrapper .page-header-subtitle {
+  margin: 0;
+  opacity: 0.8;
+  font-weight: 300;
+}
+
+.page-header-actions-wrapper {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.page-header-actions-wrapper .btn-header-action {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.page-header-actions-wrapper .btn-header-action:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+/* ==========================================================================
+   AJUSTE DE ESPAÇAMENTO DOS CARDS (GUTTERS)
+   ========================================================================== */
+/* Reduz o espaçamento para a linha de cards com g-4 (corpo principal do dashboard) */
+.container-main .row.g-4 {
+    --bs-gutter-x: 1.2rem; /* Padrão do Bootstrap é 1.5rem */
+    --bs-gutter-y: 1.2rem;
+}
+
+/* ==========================================================================
+   FIX PARA CALENDÁRIO (REACT-BIG-CALENDAR)
+   ========================================================================== */
+/* Garante que os pop-ups do calendário (como a lista de eventos "Ver mais"
+   e o seletor de visualização) fiquem por cima de outros elementos da página. */
+.rbc-overlay {
+  z-index: 1400 !important; /* Um valor alto, maior que o header (1000) e modais (1050) */
 }

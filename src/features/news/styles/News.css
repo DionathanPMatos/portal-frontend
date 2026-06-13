@@ -6,6 +6,19 @@
     scrollbar-width: thin;
 }
 
+/* Estilização da barra de rolagem para navegadores Webkit (Chrome, Safari) */
+.news-scroll-container::-webkit-scrollbar {
+    height: 8px;
+}
+.news-scroll-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 8px;
+}
+.news-scroll-container::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 8px;
+}
+
 .news-card {
     min-width: 300px;
     max-width: 320px;
@@ -49,4 +62,37 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+}
+
+/* Remove a altura fixa e a rolagem do container */
+.news-content-container {
+    /* Este container agora apenas envolve o conteúdo */
+}
+
+/* Estilo para as imagens dentro do conteúdo da notícia */
+.news-content-container img {
+    max-width: 100%; /* Garante que a imagem nunca ultrapasse a largura do modal */
+    height: auto;    /* Mantém a proporção da imagem */
+    display: block;  /* Remove espaços extras abaixo da imagem */
+    margin: 1rem 0;  /* Adiciona um espaçamento vertical */
+    border-radius: 8px; /* Bordas arredondadas para um visual mais moderno */
+}
+
+/* Wrapper para vídeos responsivos (YouTube, Vimeo) */
+.video-responsive-wrapper {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    padding-top: 56.25%; /* Proporção 16:9 */
+    margin: 1rem 0;
+    border-radius: 8px;
+}
+
+.video-responsive-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Row, Col, Card, Alert, Spinner } from 'react-bootstrap';
+import { IoColorPalette } from 'react-icons/io5';
 import { useTheme } from '../../../contexts/ThemeContext';
 import apiClient from '../../../services/api';
 
@@ -17,6 +18,7 @@ function AdminTheme() {
   const [sidebarActiveColor, setSidebarActiveColor] = useState('#a72323');
   const [cardHeaderBg, setCardHeaderBg] = useState('#153049');
   const [cardHeaderText, setCardHeaderText] = useState('#ffffff');
+  const [backgroundColor, setBackgroundColor] = useState('#f4f7f9'); // Novo estado para a cor de fundo
   
   // New login theme states
   const [login_bg_color, setLoginBgColor] = useState('#e9ecef');
@@ -40,6 +42,7 @@ function AdminTheme() {
         setSidebarActiveColor(data.sidebar_active_color || '#a72323');
         setCardHeaderBg(data.card_header_bg || '#153049');
         setCardHeaderText(data.card_header_text || '#ffffff');
+        setBackgroundColor(data.background_color || '#f4f7f9'); // Carrega a cor de fundo
         setLogoUrl(data.logo_url || '');
         
         // Set new login theme values
@@ -69,6 +72,7 @@ function AdminTheme() {
     formData.append('sidebarActiveColor', sidebarActiveColor);
     formData.append('card_header_bg', cardHeaderBg);
     formData.append('card_header_text', cardHeaderText);
+    formData.append('background_color', backgroundColor); // Adiciona a cor de fundo ao formulário
     
     // Append new login theme data
     formData.append('login_bg_color', login_bg_color);
@@ -103,14 +107,18 @@ function AdminTheme() {
   };
 
   return (
-    
-    <Container fluid className="p-4">
+    <div className="container-main p-4">
+      <div className="page-header-colored mb-4">
+          <div className="page-header-title-wrapper">
+              <h2 className="page-header-title d-flex align-items-center gap-3">
+                  <IoColorPalette /> Aparência do Sistema
+              </h2>
+              <p className="page-header-subtitle">Personalize as cores, logos e a aparência geral do portal.</p>
+          </div>
+      </div>
       <Row>
         <Col>
           <Card>
-            <Card.Header>
-              <Card.Title as="h4">Personalização do Tema</Card.Title>
-            </Card.Header>
             <Card.Body>
               {message.text && <Alert variant={message.type}>{message.text}</Alert>}
               {loading ? <div className="text-center"><Spinner animation="border" /></div> : (
@@ -170,6 +178,12 @@ function AdminTheme() {
                           <Form.Control type="color" value={cardHeaderText} onChange={e => setCardHeaderText(e.target.value)} style={{height: '40px'}} />
                         </Col>
                       </Form.Group>
+                      <Form.Group as={Row} className="mb-3 align-items-center">
+                        <Form.Label column sm="4">Cor de Fundo do Sistema</Form.Label>
+                        <Col sm="8">
+                          <Form.Control type="color" value={backgroundColor} onChange={e => setBackgroundColor(e.target.value)} style={{height: '40px'}} />
+                        </Col>
+                      </Form.Group>
                     </Col>
 
                     {/* Login Screen Settings Column */}
@@ -214,7 +228,7 @@ function AdminTheme() {
           </Card>
         </Col>
       </Row>
-    </Container>
+    </div>
   );
 }
 

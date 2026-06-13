@@ -16,6 +16,7 @@ import {
   FaChevronDown,
   FaChevronRight,
   FaBuilding,
+  FaChevronLeft,
 } from "react-icons/fa";
 /*import { SiMarketo } from "react-icons/si";*/
 import { GiHumanPyramid } from "react-icons/gi"; // Ícone para RH
@@ -120,8 +121,9 @@ const menuItems = [
     name: "Marketing",
     icon: <FaPencilAlt size={iconSize} />,
     subItems: [
-      { name: "Solicitar Material", link: "/marketing/solicitar-material" },
-      { name: "Reservar Sala/Showroom", link: "/marketing/reservar-sala" },
+      { name: "Painel de Marketing", link: "/marketing" },
+      { name: "Solicitar Material", link: "/marketing/solicitacoes" },
+      { name: "Reservar Sala/Showroom", link: "/marketing/reservas" },
       { name: "Cases de Sucesso", link: "#" },
       { name: "Politica de Marketing", link: "#" },
     ],
@@ -199,7 +201,7 @@ const menuItems = [
   },
 ];
 
-function Sidebar({ isLoggedIn, user, onLogout }) {
+function Sidebar({ isLoggedIn, user, onLogout, isHidden }) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeAccordion, setActiveAccordion] = useState(null);
   const sidebarRef = useRef(null);
@@ -235,7 +237,7 @@ function Sidebar({ isLoggedIn, user, onLogout }) {
         </div>
       )}
 
-      <div className={`sidebar ${isOpen ? "open" : ""}`} ref={sidebarRef}>
+      <div className={`sidebar ${isOpen ? "open" : ""} ${isHidden ? "hidden" : ""}`} ref={sidebarRef}>
         <div className="top">
           {/* 🚀 Bloco da Logomarca na Sidebar */}
           <div className="sidebar-logo">

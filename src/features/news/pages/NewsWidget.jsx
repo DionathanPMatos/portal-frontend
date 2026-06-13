@@ -1,14 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Badge, Modal, Button } from 'react-bootstrap';
-import { FaCalendarAlt, FaExclamationTriangle, FaInfoCircle, FaExclamationCircle, FaThumbtack } from 'react-icons/fa';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { Card, Badge, Modal, Button, Form, ListGroup, Spinner } from 'react-bootstrap';
+import { FaCalendarAlt, FaExclamationTriangle, FaInfoCircle, FaExclamationCircle, FaThumbtack, FaHeart, FaRegHeart, FaComment, FaPaperPlane, FaDownload } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import '../styles/News.css';
 import apiClient from '../../../services/api';
+import { useAuth } from '../../../contexts/AuthContext';
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
 
 
 export default function NewsWidget() {
+    const { user } = useAuth();
     const [newsList, setNewsList] = useState([]);
     const [selectedNews, setSelectedNews] = useState(null);
+    const [comments, setComments] = useState([]);
+    const [newComment, setNewComment] = useState('');
+    const [loadingComments, setLoadingComments] = useState(false);
+    const contentRef = useRef(null);
+
+    // State para a galeria de imagens
+    const [lightboxOpen, setLightboxOpen] = useState(false);
+    const [lightboxSlides, setLightboxSlides] = useState([]);
+    const [lightboxIndex, setLightboxIndex] = useState(0);
 
     useEffect(() => {
         fetchNews();
@@ -31,29 +44,115 @@ export default function NewsWidget() {
             default: return <FaInfoCircle className="news-icon text-primary" />;
         }
     };
-const handleOpenNews = async (news) => {
-        setSelectedNews(news);
+    const handleOpenNews = async (news) => {
+        setLoadingComments(true);
+        setSelectedNews({ ...news, comments: [] }); // Abre o modal imediatamente
+        try {
+            const { data: commentsData } = await apiClient.get(`/api/noticias/${news.id}/comments`);
+            setComments(commentsData);
+        } catch (err) {
+            console.error("Erro ao buscar comentários:", err);
+        } finally {
+            setLoadingComments(false);
+        }
         
         // Só fazemos o POST se a notícia ainda não estiver marcada como lida
         if (news.lida === false || news.lida === 0) {
             try {
                 await apiClient.post(`/api/noticias/${news.id}/lida`);
                 
-                // 🚀 FORÇA A ATUALIZAÇÃO: Em vez de confiar apenas no setNewsList,
-                // vamos atualizar o estado de forma imutável e correta.
                 setNewsList(prevNews => 
                     prevNews.map(item => 
                         item.id === news.id ? { ...item, lida: true } : item
                     )
                 );
                 
-                // Opcional: Se o seu componente for o "Sino" de notificações,
-                // dispare um evento para ele saber que precisa atualizar também
                 window.dispatchEvent(new Event('notificacao-atualizada'));
                 
             } catch (err) {
                 console.error("Erro ao marcar como lida:", err);
             }
+        }
+    };
+
+    // Efeito para configurar a galeria de imagens quando o modal abrir
+    useEffect(() => {
+        if (selectedNews && contentRef.current) {
+            const images = Array.from(contentRef.current.querySelectorAll('img'));
+            const slides = images.map(img => ({ src: img.src }));
+            setLightboxSlides(slides);
+            images.forEach((img, index) => {
+                img.style.cursor = 'pointer';
+                img.onclick = () => { setLightboxIndex(index); setLightboxOpen(true); };
+            });
+        }
+    }, [selectedNews]);
+
+    const processedContent = useMemo(() => {
+        if (!selectedNews?.conteudo) return '<i>Nenhum conteúdo adicional foi cadastrado para esta notícia.</i>';
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = selectedNews.conteudo;
+        const oembeds = Array.from(tempDiv.querySelectorAll('oembed[url]'));
+        oembeds.forEach(oembed => {
+            const url = oembed.getAttribute('url');
+            const wrapper = document.createElement('div');
+            wrapper.className = 'video-responsive-wrapper';
+            let iframeSrc = '';
+            const youtubeMatch = url.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
+            if (youtubeMatch) iframeSrc = `https://www.youtube.com/embed/${youtubeMatch[1]}`;
+            const vimeoMatch = url.match(/(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(\d+)/);
+            if (vimeoMatch) iframeSrc = `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+            if (iframeSrc) {
+                const iframe = document.createElement('iframe');
+                iframe.setAttribute('src', iframeSrc);
+                iframe.setAttribute('frameborder', '0');
+                iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
+                iframe.setAttribute('allowfullscreen', 'true');
+                wrapper.appendChild(iframe);
+                oembed.parentNode.replaceChild(wrapper, oembed);
+            }
+        });
+        return tempDiv.innerHTML;
+    }, [selectedNews]);
+
+    const handleLike = async (e, newsId) => {
+        e.stopPropagation(); // Impede que o modal da notícia abra ao clicar no like
+        try {
+            const { data } = await apiClient.post(`/api/noticias/${newsId}/like`);
+            setNewsList(prevList => prevList.map(n => 
+                n.id === newsId ? { ...n, likes_count: data.count, user_has_liked: data.liked } : n
+            ));
+            if (selectedNews && selectedNews.id === newsId) {
+                setSelectedNews(prev => ({ ...prev, likes_count: data.count, user_has_liked: data.liked }));
+            }
+        } catch (err) {
+            console.error("Erro ao curtir:", err);
+        }
+    };
+
+    const handleConfirmRead = async (newsId) => {
+        try {
+            await apiClient.post(`/api/noticias/${newsId}/confirm`);
+            setSelectedNews(prev => ({ ...prev, confirmado: true }));
+            setNewsList(prevList => prevList.map(n => n.id === newsId ? { ...n, confirmado: true } : n));
+        } catch (err) {
+            console.error("Erro ao confirmar leitura:", err);
+            alert("Não foi possível confirmar a leitura.");
+        }
+    };
+
+    const handleAddComment = async (e) => {
+        e.preventDefault();
+        if (!newComment.trim()) return;
+        try {
+            const { data: savedComment } = await apiClient.post(`/api/noticias/${selectedNews.id}/comments`, { conteudo: newComment });
+            // Adiciona o autor localmente para exibição imediata
+            const commentWithAuthor = { ...savedComment, autor_nome: user.nome_completo, autor_avatar: user.userpic_url };
+            setComments(prev => [...prev, commentWithAuthor]);
+            setNewComment('');
+        } catch (err) {
+            console.error("Erro ao adicionar comentário:", err);
+            alert("Não foi possível adicionar o comentário.");
         }
     };
 
@@ -87,8 +186,14 @@ const handleOpenNews = async (news) => {
                             </div>
                             <div className="news-title">{news.titulo}</div>
                             <div className="news-summary">{news.resumo}</div>
-                            <div className="mt-2 text-muted" style={{ fontSize: '0.75rem' }}>
-                                {new Date(news.created_at).toLocaleDateString('pt-BR')} • Por {news.autor || 'Sistema'}
+                            <div className="d-flex justify-content-between align-items-center mt-2">
+                                <div className="text-muted" style={{ fontSize: '0.75rem' }}>
+                                    {new Date(news.created_at).toLocaleDateString('pt-BR')} • Por {news.autor || 'Sistema'}
+                                </div>
+                                <div className="d-flex align-items-center gap-2 text-muted" onClick={(e) => handleLike(e, news.id)}>
+                                    {news.user_has_liked ? <FaHeart className="text-danger" /> : <FaRegHeart />}
+                                    <span style={{ fontSize: '0.8rem' }}>{news.likes_count}</span>
+                                </div>
                             </div>
                         </Card.Body>
                     </Card>
@@ -103,12 +208,74 @@ const handleOpenNews = async (news) => {
                     <div className="text-muted small mb-4 pb-2 border-bottom">
                         Publicado em: {selectedNews && new Date(selectedNews.created_at).toLocaleDateString('pt-BR')} | Tipo: <Badge bg="secondary">{selectedNews?.tipo}</Badge>
                     </div>
-                    <div style={{ overflowWrap: 'break-word', color: 'var(--text-primary-color)' }}>
-                        <div dangerouslySetInnerHTML={{ __html: selectedNews?.conteudo || '<i>Nenhum conteúdo adicional foi cadastrado para esta notícia.</i>' }} />
+                    <div ref={contentRef} className="news-content-container" style={{ overflowWrap: 'break-word', color: 'var(--text-primary-color)' }}
+                        dangerouslySetInnerHTML={{ __html: processedContent }}
+                    />
+
+                    {/* Anexos */}
+                    {selectedNews?.attachments && selectedNews.attachments.length > 0 && (
+                        <div className="mt-4">
+                            <h6 className="fw-bold">Anexos</h6>
+                            <ListGroup>
+                                {selectedNews.attachments.map(att => (
+                                    <ListGroup.Item key={att.id} action href={att.file_url} target="_blank" className="d-flex align-items-center gap-2">
+                                        <FaDownload /> {att.file_name}
+                                    </ListGroup.Item>
+                                ))}
+                            </ListGroup>
+                        </div>
+                    )}
+
+                    {/* Seção de Confirmação, Curtidas e Comentários */}
+                    <hr />
+                    <div className="d-flex justify-content-between align-items-center">
+                        {selectedNews?.requires_confirmation && (
+                            <Button variant={selectedNews.confirmado ? "success" : "primary"} disabled={selectedNews.confirmado} onClick={() => handleConfirmRead(selectedNews.id)}>
+                                {selectedNews.confirmado ? "Leitura Confirmada" : "Li e estou ciente"}
+                            </Button>
+                        )}
+                        <div className="d-flex align-items-center gap-2 text-muted ms-auto" style={{ cursor: 'pointer' }} onClick={(e) => handleLike(e, selectedNews.id)}>
+                            {selectedNews?.user_has_liked ? <FaHeart size="1.2em" className="text-danger" /> : <FaRegHeart size="1.2em" />}
+                            <span>{selectedNews?.likes_count} curtidas</span>
+                        </div>
                     </div>
+
+                    {/* Seção de Comentários */}
+                    <div className="mt-4">
+                        <h5 className="d-flex align-items-center gap-2"><FaComment /> Comentários</h5>
+                        {loadingComments ? <Spinner animation="border" size="sm" /> : (
+                            <ListGroup variant="flush" className="mt-3">
+                                {comments.map(comment => (
+                                    <ListGroup.Item key={comment.id} className="d-flex gap-3 border-0 px-0">
+                                        <img src={comment.autor_avatar || `https://ui-avatars.com/api/?name=${comment.autor_nome}&background=random`} alt={comment.autor_nome} className="rounded-circle" style={{ width: '40px', height: '40px' }} />
+                                        <div>
+                                            <strong className="mb-0">{comment.autor_nome}</strong>
+                                            <p className="mb-1">{comment.conteudo}</p>
+                                            <small className="text-muted">{comment.created_at}</small>
+                                        </div>
+                                    </ListGroup.Item>
+                                ))}
+                                {comments.length === 0 && <p className="text-muted small">Seja o primeiro a comentar!</p>}
+                            </ListGroup>
+                        )}
+                        <Form onSubmit={handleAddComment} className="mt-3 d-flex gap-2">
+                            <Form.Control as="textarea" rows={1} placeholder="Adicionar um comentário..." value={newComment} onChange={e => setNewComment(e.target.value)} required />
+                            <Button type="submit" variant="primary"><FaPaperPlane /></Button>
+                        </Form>
+                    </div>
+
                 </Modal.Body>
-                <Modal.Footer className="border-0"><Button variant="secondary" onClick={() => setSelectedNews(null)}>Fechar</Button></Modal.Footer>
+                <Modal.Footer className="border-0">
+                    <Button variant="secondary" onClick={() => setSelectedNews(null)}>Fechar</Button>
+                </Modal.Footer>
             </Modal>
+
+            <Lightbox
+                open={lightboxOpen}
+                close={() => setLightboxOpen(false)}
+                slides={lightboxSlides}
+                index={lightboxIndex}
+            />
         </div>
     );
 }

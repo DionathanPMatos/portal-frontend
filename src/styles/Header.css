@@ -4,26 +4,155 @@
    ========================= */
 .header-area {
     background-color: var(--header-color);
-    position: fixed;
     display: flex;
-    top: 0;
-    
-    /* 🚀 Nova Estrutura: Começa após a sidebar e ocupa o resto da tela */
-    left: var(--sidebar-width); 
-    width: calc(100% - var(--sidebar-width)); 
+    width: 100%; /* Garante que a área do header ocupe todo o espaço do container pai <header> */
     z-index: 1001; 
-    
     height: var(--header-height);
     padding: 0 var(--page-padding-x); 
-    
     justify-content: space-between;
     align-items: center; 
     border-bottom: 2px solid var(--cor-borda, #eef2f5);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    transition: left 0.3s ease-in-out, width 0.3s ease-in-out; /* Acompanha a sidebar se ela recolher */
 }
 
+.header-left-section {
+    display: flex;
+    align-items: center;
+    flex-grow: 1; /* Permite que a seção esquerda cresça e a barra de pesquisa se ajuste */
+}
 
+/* Botão de toggle da sidebar no header */
+.sidebar-toggle-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-primary-color, #153049);
+    cursor: pointer;
+    font-size: 1.3rem;
+    padding: 0.1rem;
+    margin-right: 0.5rem; /* Espaço entre o botão e o resto do conteúdo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Cotação do Dólar */
+.dollar-rate-container {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    text-decoration: none;
+    color: var(--text-primary-color, #313132);
+    background-color: var(--background-color, #f0f2f5);
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+}
+
+.dollar-rate-container:hover {
+    background-color: #e9ecef;
+    color: var(--text-primary-color, #313132);
+}
+
+.dollar-icon { color: #28a745; /* Verde */ }
+
+/* Barra de Pesquisa */
+.header-search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-left: 1.5rem; /* Espaçamento do botão de toggle */
+    flex-grow: 1; /* Faz a barra de pesquisa ocupar o espaço disponível */
+    max-width: 600px; /* Limita a largura máxima da barra */
+}
+
+.search-icon {
+    position: absolute;
+    left: 15px;
+    color: #8a949f; /* Cor do ícone */
+    font-size: 0.9rem;
+    pointer-events: none; /* Para poder clicar no input através do ícone */
+}
+
+.search-input {
+    background-color: var(--background-color, #f0f2f5);
+    border: 1px solid transparent;
+    border-radius: 20px; /* Bordas bem arredondadas */
+    padding: 0.5rem 1rem 0.5rem 2.5rem; /* Padding: top/bottom, right, left (para dar espaço ao ícone) */
+    width: 100%; /* Ocupa toda a largura do container */
+    font-size: 0.9rem;
+    color: var(--text-primary-color);
+    transition: all 0.3s ease;
+}
+
+.search-input::placeholder {
+    color: #8a949f;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--cor-destaque, #0063c6);
+    background-color: var(--cor-fundo-card, #ffffff);
+    box-shadow: 0 0 0 2px rgba(0, 99, 198, 0.2);
+}
+
+/* Dropdown de Resultados da Pesquisa */
+.search-results-dropdown {
+    position: absolute;
+    top: calc(100% + 8px); /* 8px abaixo da barra de pesquisa */
+    left: 0;
+    width: 100%;
+    background-color: var(--cor-fundo-card, #ffffff);
+    border-radius: 0.75rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    z-index: 1100;
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid var(--cor-borda, #eef2f5);
+}
+
+.search-result-item, .search-result-item-static {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1.25rem;
+    text-decoration: none;
+    color: var(--text-primary-color);
+    border-bottom: 1px solid var(--cor-borda, #eef2f5);
+    transition: background-color 0.2s ease;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+.search-result-item:hover {
+    background-color: var(--background-color, #f0f2f5);
+}
+
+.search-result-item-static {
+    color: #8a949f;
+    font-style: italic;
+}
+
+.result-title {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.result-type {
+    font-size: 0.75rem;
+    color: #8a949f;
+    background-color: var(--background-color, #f0f2f5);
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.25rem;
+    margin-left: 1rem;
+    flex-shrink: 0;
+}
 
 .nav {
     /* Navegação do header */
@@ -74,6 +203,27 @@
     color: #313132;
 }
 
+/* Link para o perfil do usuário, envolvendo a foto e o nome */
+.user-profile-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Mantém o mesmo espaçamento do container pai */
+    text-decoration: none;
+    color: inherit; /* Herda a cor do texto do container pai */
+    transition: opacity 0.2s ease;
+}
+.user-profile-link:hover {
+    opacity: 0.8; /* Efeito sutil ao passar o mouse */
+}
+
+.user-profile-pic {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--cor-borda, #eef2f5);
+}
+
 .login-button {
     display: flex;
     align-items: center;
@@ -83,20 +233,33 @@
     font-weight: 500; /* Aumenta o peso da fonte para 500 px */
     color: #313132;
     background-color: transparent;
-    border: 1px solid #313132; /* Remove a borda para um visual mais limpo */
+    border: 1px solid #4e4d4d; /* Remove a borda para um visual mais limpo */
     cursor: pointer;
+}
+
+;.login-button:hover {
+    background-color: var(--background-color, #f0f2f5);
+}
+
+.logout-button {
+    background: transparent;
+    border: none;
+    color: #313132;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* =========================
    NOTIFICAÇÕES
    ========================= */
 .notification-container {
-    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    padding: 4px;
     transition: transform 0.2s ease;
 }
 
@@ -106,18 +269,84 @@
 
 .notification-bell {
     font-size: 1.2rem;
-    color: var(--text-primary-color, #313132); /* Adapta as cores com o modo escuro */
+    color: var(--text-primary-color, #313132);
 }
 
-.notification-badge {
+/* =========================
+   NOTIFICAÇÕES - NOVO ESTILO
+   ========================= */
+
+.notification-dropdown {
     position: absolute;
-    top: 2px;
-    right: 4px;
-    width: 8px;
-    height: 8px;
-    background-color: #e53935;
-    border-radius: 50%;
-    box-shadow: 0 0 0 2px var(--header-color); /* Cria um contorno suave em volta da bolinha */
+    right: 0;
+    top: 55px; /* Ajuste para não colar no sino */
+    width: 380px; /* Um pouco mais largo */
+    max-height: 450px;
+    overflow: hidden; /* Oculta o overflow, o scroll será interno */
+    z-index: 1050;
+    border: 1px solid var(--cor-borda, #eef2f5);
+    border-radius: 0.75rem;
+    background-color: var(--cor-fundo-card, #ffffff);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.notification-dropdown .dropdown-header {
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--cor-borda, #eef2f5);
+    color: var(--text-primary-color);
+    margin-bottom: 0; /* Reseta o margin do bootstrap */
+}
+
+.notification-list {
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.notification-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--cor-borda, #eef2f5);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    white-space: normal;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item:hover {
+    background-color: var(--background-color, #f8f9fa);
+}
+
+.notification-icon {
+    flex-shrink: 0;
+    margin-right: 1rem;
+    font-size: 1.5rem;
+    width: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2px;
+}
+
+.notification-content { flex-grow: 1; }
+.notification-text { font-size: 0.875rem; color: var(--text-secondary-color, #555); line-height: 1.5; }
+.notification-text strong { color: var(--text-primary-color); font-weight: 600; }
+.notification-item-empty { text-align: center; padding: 3rem 1rem; color: #8a949f; font-size: 0.9rem; }
+
+.notification-dropdown .dropdown-footer { padding: 0.75rem; text-align: center; border-top: 1px solid var(--cor-borda, #eef2f5); background-color: var(--background-color, #f8f9fa); }
+.notification-dropdown .dropdown-footer a { font-size: 0.85rem; font-weight: 500; color: var(--cor-destaque, #0063c6); text-decoration: none; }
+.notification-dropdown .dropdown-footer a:hover { text-decoration: underline; }
+
+/* Remove estilos antigos do Bootstrap que podem conflitar */
+.notification-dropdown .dropdown-item {
+    all: unset;
 }
 
 /* =========================
@@ -135,6 +364,7 @@
   .nav-link,            /* Esconde os links "Início" e "Loja Online" */
   .flag,                /* Esconde as bandeiras de idioma */
   .card-flag,           /* Esconde o container das bandeiras */
+  .header-search-container, /* Esconde a barra de pesquisa */
   .flag-container,      /* Esconde o container das bandeiras no header */
   .theme-switch-wrapper { /* 👈 ISSO ESCONDE O BOTÃO DE TEMA NO MOBILE! */
       display: none !important;

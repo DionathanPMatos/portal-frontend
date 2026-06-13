@@ -1,11 +1,11 @@
 import React from 'react';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { FaUserPlus, FaIndustry, FaUsers, FaChevronRight, FaSitemap } from 'react-icons/fa';
+import { FaUserPlus, FaIndustry, FaUsers, FaChevronRight, FaSitemap, FaImages, FaCogs } from 'react-icons/fa';
 import { MdOutlineAttachMoney, MdCardGiftcard } from "react-icons/md";
 import { AiFillSafetyCertificate, AiFillAlert } from "react-icons/ai";
 import { SiHomeassistantcommunitystore } from "react-icons/si";
-import { GiFloorHatch } from "react-icons/gi";
+import { GiFloorHatch, GiKeyCard } from "react-icons/gi";
 import { RiTeamFill, RiProjectorFill } from "react-icons/ri";
 import { IoColorPalette } from "react-icons/io5"; // Novo ícone
 import { FaChartPie, FaRegNewspaper, FaBoxOpen } from "react-icons/fa"; 
@@ -36,9 +36,9 @@ const dashboardSections = [
             },
             {
                 title: 'Gerenciar Dashboard',
-                text: 'Importar faturamento (.csv) e gerenciar avisos.',
+                text: 'Importar faturamento, limpar dados e definir metas.',
                 icon: <FaChartPie size={24} />,
-                link: '/admin/gerenciar-dashboard',
+                link: '/admin/resultados',
             },
         ]
     },
@@ -120,10 +120,16 @@ const dashboardSections = [
                 link: '/admin/marketing/produtos',
             },
             {
-                title: 'Gestão de Solicitações',
-                text: 'Aprove ou recuse solicitações de materiais e reservas de sala.',
+                title: 'Gerenciar Pedidos de Material',
+                text: 'Aprove ou recuse as solicitações de materiais de marketing.',
                 icon: <MdCardGiftcard size={24} />,
-                link: '/admin/marketing/gestao',
+                link: '/admin/gerenciar-solicitacoes-marketing',
+            },
+            {
+                title: 'Gerenciar Locais de Reserva',
+                text: 'Cadastre e gerencie os locais para reserva (Ex: Showroom).',
+                icon: <GiKeyCard size={24} />,
+                link: '/admin/marketing/locais',
             },
         ]
     },
@@ -148,6 +154,12 @@ const dashboardSections = [
                 icon: <FaRegNewspaper size={24} />,
                 link: '/admin/noticias',
             },
+            {
+                title: 'Gerenciar Tela Inicial',
+                text: 'Gerencie o carrossel de imagens e outros elementos da página inicial.',
+                icon: <FaImages size={24} />,
+                link: '/admin/homepage',
+            },
         ],
     },
 ];
@@ -157,11 +169,12 @@ const Dashboard = () => {
         <div className='dash-grid'>
             <div className="container-main p-4">
                 <Container fluid className="px-0">
-                    {/* Header da Página */}
-                    <div className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
-                        <div>
-                            <h2 className="fw-bold mb-1 text-dark">Painel de Administração</h2>
-                            <p className="text-muted mb-0">Gerencie módulos, configurações e acessos do Portal DCA.</p>
+                    <div className="page-header-colored mb-4">
+                        <div className="page-header-title-wrapper">
+                            <h2 className="page-header-title d-flex align-items-center gap-3">
+                                <FaCogs /> Painel de Administração
+                            </h2>
+                            <p className="page-header-subtitle">Gerencie módulos, configurações e acessos do Portal DCA.</p>
                         </div>
                     </div>
 
