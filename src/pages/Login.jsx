@@ -7,31 +7,6 @@ import { FaMicrosoft } from 'react-icons/fa';
 import ForgotPasswordModal from '../features/human-resources/pages/ForgotPasswordModal';
 import '../styles/Login.css';
 
-const urlParams = new URLSearchParams(window.location.search);
-const tokenDaURL = urlParams.get('token');
-
-if (tokenDaURL) {
-  try {
-    console.log("Token capturado no ar!");
-    
-    // Decodifica os dados do usuário de dentro do token
-    const base64Url = tokenDaURL.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
-    
-    // Salva os dados exatamente como o seu sistema espera
-    localStorage.setItem('@portal_token', tokenDaURL);
-    localStorage.setItem('@portal_user', jsonPayload); // jsonPayload já é uma string JSON
-    
-    // Força o redirecionamento para o dashboard imediatamente!
-    window.location.replace('/'); 
-  } catch (e) {
-    console.error("Falha ao decodificar token interceptado:", e);
-  }
-}
-
 function Login() {
   const { theme } = useTheme();
   const [error, setError] = useState('');
@@ -55,7 +30,9 @@ function Login() {
     const tokenFromUrl = searchParams.get('token');
     const errorFromUrl = searchParams.get('login_error');
 
-    if (tokenFromUrl) {
+    // Este efeito é para o callback do login da Microsoft, que envia um token JWT.
+    // Verificamos se o token parece um JWT (tem 3 partes separadas por '.') antes de processar.
+    if (tokenFromUrl && tokenFromUrl.split('.').length === 3) {
       try {
         console.log("Token recebido da Microsoft, processando...");
         

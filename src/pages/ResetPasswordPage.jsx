@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { Container, Card, Form, Button, Spinner, Alert } from 'react-bootstrap';
+import { Container, Card, Form, Button, Spinner, Alert, Row, Col } from 'react-bootstrap';
 import apiClient from '../services/api';
 
 const ResetPasswordPage = () => {

@@ -172,8 +172,118 @@ const UserProfilePage = () => {
                     </Card.Body>
                 </Card>
 
+                
                 {/* Abas de Conteúdo */}
-                <Tabs defaultActiveKey="overview" id="profile-tabs" className="mb-3 custom-tabs">
+                <Tabs defaultActiveKey="meus-dados" id="profile-tabs" className="mb-3 custom-tabs">
+                    <Tab eventKey ="meus-dados" title={<><FaAddressCard className="me-2" />Informações Pessoais</>}>
+                        <Alert variant="info" className="mt-3">
+                            <FaShieldAlt className="me-2" />
+                            Alterações em contatos e medidas são atualizadas imediatamente. Alterações de endereço e dados bancários serão enviadas para aprovação do RH.
+                        </Alert>
+                        <Form onSubmit={handleUpdateProfile}>
+                            <Row>
+                                <Col md={6}>
+                                    <Card className="shadow-sm border-0 mb-4">
+                                        <Card.Header className="fw-bold">Contatos & Emergência</Card.Header>
+                                        <Card.Body>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Celular (WhatsApp)</Form.Label>
+                                                <IMaskInput
+                                                    mask="(00) 00000-0000"
+                                                    value={myDataForm.contato || ''}
+                                                    name="contato"
+                                                    onAccept={(value) => handleMyDataChange({ target: { name: 'contato', value } })}
+                                                    className="form-control"
+                                                />
+                                            </Form.Group>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>E-mail Pessoal</Form.Label>
+                                            <Form.Control 
+                                                type="email" 
+                                                name="email_pessoal" value={myDataForm.email_pessoal || ''} onChange={handleMyDataChange} 
+                                            />
+                                            </Form.Group>
+                                            <hr />
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Nome do Contato de Emergência</Form.Label>
+                                                <Form.Control type="text" name="contato_emergencia_nome" value={myDataForm.contato_emergencia_nome || ''} onChange={handleMyDataChange} />
+                                            </Form.Group>
+                                            <Row>
+                                            <Col><Form.Group className="mb-3"><Form.Label>Parentesco</Form.Label><Form.Control type="text" name="contato_emergencia_parentesco" value={myDataForm.contato_emergencia_parentesco || ''} onChange={handleMyDataChange} /></Form.Group></Col>
+                                                <Col><Form.Group className="mb-3"><Form.Label>Telefone</Form.Label>
+                                                    <IMaskInput
+                                                        mask="(00) 00000-0000"
+                                                        value={myDataForm.contato_emergencia_telefone || ''}
+                                                        name="contato_emergencia_telefone"
+                                                        onAccept={(value) => handleMyDataChange({ target: { name: 'contato_emergencia_telefone', value } })}
+                                                        className="form-control"
+                                                    />
+                                                </Form.Group></Col>
+                                            </Row>
+                                        </Card.Body>
+                                    </Card>
+
+                                    <Card className="shadow-sm border-0 mb-4">
+                                        <Card.Header className="fw-bold">Medidas (Marketing/RH)</Card.Header>
+                                        <Card.Body>
+                                            <Row>
+                                                <Col><Form.Group className="mb-3"><Form.Label>Tamanho da Camiseta</Form.Label><Form.Select name="tamanho_camiseta" value={myDataForm.tamanho_camiseta || ''} onChange={handleMyDataChange}><option value="">Selecione</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XG</option></Form.Select></Form.Group></Col>
+                                                <Col><Form.Group className="mb-3"><Form.Label>Tamanho do Calçado</Form.Label><Form.Control type="number" name="tamanho_calcado" value={myDataForm.tamanho_calcado || ''} onChange={handleMyDataChange} /></Form.Group></Col>
+                                            </Row>
+                                        </Card.Body>
+                                    </Card>
+                                </Col>
+                                <Col md={6}>
+                                    <Card className="shadow-sm border-0 mb-4">
+                                        <Card.Header className="fw-bold">Endereço Residencial</Card.Header>
+                                        <Card.Body>
+                                            <Row><Col md={5}><Form.Group className="mb-3"><Form.Label>CEP</Form.Label>
+                                                <IMaskInput
+                                                    mask="00000-000"
+                                                    value={myDataForm.cep || ''}
+                                                    name="cep"
+                                                    onAccept={(value) => handleMyDataChange({ target: { name: 'cep', value } })}
+                                                    onBlur={handleCepBlur}
+                                                    className="form-control"
+                                                />
+                                            </Form.Group></Col></Row>
+                                            <Form.Group className="mb-3"><Form.Label>Rua / Logradouro</Form.Label><Form.Control type="text" name="logradouro" value={myDataForm.logradouro || ''} onChange={handleMyDataChange} /></Form.Group>
+                                            <Row>
+                                                <Col><Form.Group className="mb-3"><Form.Label>Número</Form.Label><Form.Control type="text" name="numero" value={myDataForm.numero || ''} onChange={handleMyDataChange} /></Form.Group></Col>
+                                                <Col><Form.Group className="mb-3"><Form.Label>Complemento</Form.Label><Form.Control type="text" name="complemento" value={myDataForm.complemento || ''} onChange={handleMyDataChange} /></Form.Group></Col>
+                                            </Row>
+                                            <Form.Group className="mb-3"><Form.Label>Bairro</Form.Label><Form.Control type="text" name="bairro" value={myDataForm.bairro || ''} onChange={handleMyDataChange} /></Form.Group>
+                                            <Row>
+                                                <Col><Form.Group className="mb-3"><Form.Label>Cidade</Form.Label><Form.Control type="text" name="cidade" value={myDataForm.cidade || ''} onChange={handleMyDataChange} /></Form.Group></Col>
+                                                <Col md={4}><Form.Group className="mb-3"><Form.Label>Estado</Form.Label><Form.Control type="text" name="uf" value={myDataForm.uf || ''} onChange={handleMyDataChange} maxLength="2" /></Form.Group></Col>
+                                            </Row>
+                                        </Card.Body>
+                                    </Card>
+
+                                    <Card className="shadow-sm border-0 mb-4">
+                                        <Card.Header className="fw-bold">Dados Bancários (Pagamentos)</Card.Header>
+                                        <Card.Body>
+                                            <Form.Group className="mb-3"><Form.Label>Banco</Form.Label><Form.Control type="text" name="banco" value={myDataForm.banco || ''} onChange={handleMyDataChange} /></Form.Group>
+                                            <Row>
+                                                <Col><Form.Group className="mb-3"><Form.Label>Agência</Form.Label><Form.Control type="text" name="agencia" value={myDataForm.agencia || ''} onChange={handleMyDataChange} /></Form.Group></Col>
+                                                <Col><Form.Group className="mb-3"><Form.Label>Conta Corrente</Form.Label><Form.Control type="text" name="conta" value={myDataForm.conta || ''} onChange={handleMyDataChange} /></Form.Group></Col>
+                                            </Row>
+                                            <Row>
+                                                <Col md={5}><Form.Group className="mb-3"><Form.Label>Tipo de Chave</Form.Label><Form.Select name="chave_pix_tipo" value={myDataForm.chave_pix_tipo || ''} onChange={handleMyDataChange}><option value="">Selecione</option><option value="CPF">CPF</option><option value="CNPJ">CNPJ</option><option value="Email">E-mail</option><option value="Celular">Celular</option><option value="Aleatoria">Aleatória</option></Form.Select></Form.Group></Col>
+                                                <Col md={7}><Form.Group className="mb-3"><Form.Label>Chave PIX</Form.Label><Form.Control type="text" name="chave_pix" value={myDataForm.chave_pix || ''} onChange={handleMyDataChange} /></Form.Group></Col>
+                                            </Row>
+                                        </Card.Body>
+                                    </Card>
+                                </Col>
+                            </Row>
+                            <div className="text-end mt-3">
+                                <Button type="submit" variant="primary" size="lg" disabled={saving}>
+                                    {saving ? <><Spinner as="span" size="sm" /> Salvando...</> : 'Salvar Alterações'}
+                                </Button>
+                            </div>
+                        </Form>
+                    </Tab>
+                    
                     <Tab eventKey="overview" title={<><FaBook className="me-2" />Visão Geral</>}>
                         <Row className="g-4">
                             <Col md={6}>
@@ -294,114 +404,7 @@ const UserProfilePage = () => {
                         </Card>
                     </Tab>
                     
-                    <Tab eventKey="meus-dados" title={<><FaAddressCard className="me-2" />Meus Dados</>}>
-                        <Alert variant="info" className="mt-3">
-                            <FaShieldAlt className="me-2" />
-                            Alterações em contatos e medidas são atualizadas imediatamente. Alterações de endereço e dados bancários serão enviadas para aprovação do RH.
-                        </Alert>
-                        <Form onSubmit={handleUpdateProfile}>
-                            <Row>
-                                <Col md={6}>
-                                    <Card className="shadow-sm border-0 mb-4">
-                                        <Card.Header className="fw-bold">Contatos & Emergência</Card.Header>
-                                        <Card.Body>
-                                            <Form.Group className="mb-3">
-                                                <Form.Label>Celular (WhatsApp)</Form.Label>
-                                                <IMaskInput
-                                                    mask="(00) 00000-0000"
-                                                    value={myDataForm.contato || ''}
-                                                    name="contato"
-                                                    onAccept={(value) => handleMyDataChange({ target: { name: 'contato', value } })}
-                                                    className="form-control"
-                                                />
-                                            </Form.Group>
-                                            <Form.Group className="mb-3">
-                                                <Form.Label>E-mail Pessoal</Form.Label>
-                                            <Form.Control 
-                                                type="email" 
-                                                name="email_pessoal" value={myDataForm.email_pessoal || ''} onChange={handleMyDataChange} 
-                                            />
-                                            </Form.Group>
-                                            <hr />
-                                            <Form.Group className="mb-3">
-                                                <Form.Label>Nome do Contato de Emergência</Form.Label>
-                                                <Form.Control type="text" name="contato_emergencia_nome" value={myDataForm.contato_emergencia_nome || ''} onChange={handleMyDataChange} />
-                                            </Form.Group>
-                                            <Row>
-                                            <Col><Form.Group className="mb-3"><Form.Label>Parentesco</Form.Label><Form.Control type="text" name="contato_emergencia_parentesco" value={myDataForm.contato_emergencia_parentesco || ''} onChange={handleMyDataChange} /></Form.Group></Col>
-                                                <Col><Form.Group className="mb-3"><Form.Label>Telefone</Form.Label>
-                                                    <IMaskInput
-                                                        mask="(00) 00000-0000"
-                                                        value={myDataForm.contato_emergencia_telefone || ''}
-                                                        name="contato_emergencia_telefone"
-                                                        onAccept={(value) => handleMyDataChange({ target: { name: 'contato_emergencia_telefone', value } })}
-                                                        className="form-control"
-                                                    />
-                                                </Form.Group></Col>
-                                            </Row>
-                                        </Card.Body>
-                                    </Card>
-
-                                    <Card className="shadow-sm border-0 mb-4">
-                                        <Card.Header className="fw-bold">Medidas (Marketing/RH)</Card.Header>
-                                        <Card.Body>
-                                            <Row>
-                                                <Col><Form.Group className="mb-3"><Form.Label>Tamanho da Camiseta</Form.Label><Form.Select name="tamanho_camiseta" value={myDataForm.tamanho_camiseta || ''} onChange={handleMyDataChange}><option value="">Selecione</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XG</option></Form.Select></Form.Group></Col>
-                                                <Col><Form.Group className="mb-3"><Form.Label>Tamanho do Calçado</Form.Label><Form.Control type="number" name="tamanho_calcado" value={myDataForm.tamanho_calcado || ''} onChange={handleMyDataChange} /></Form.Group></Col>
-                                            </Row>
-                                        </Card.Body>
-                                    </Card>
-                                </Col>
-                                <Col md={6}>
-                                    <Card className="shadow-sm border-0 mb-4">
-                                        <Card.Header className="fw-bold">Endereço Residencial</Card.Header>
-                                        <Card.Body>
-                                            <Row><Col md={5}><Form.Group className="mb-3"><Form.Label>CEP</Form.Label>
-                                                <IMaskInput
-                                                    mask="00000-000"
-                                                    value={myDataForm.cep || ''}
-                                                    name="cep"
-                                                    onAccept={(value) => handleMyDataChange({ target: { name: 'cep', value } })}
-                                                    onBlur={handleCepBlur}
-                                                    className="form-control"
-                                                />
-                                            </Form.Group></Col></Row>
-                                            <Form.Group className="mb-3"><Form.Label>Rua / Logradouro</Form.Label><Form.Control type="text" name="logradouro" value={myDataForm.logradouro || ''} onChange={handleMyDataChange} /></Form.Group>
-                                            <Row>
-                                                <Col><Form.Group className="mb-3"><Form.Label>Número</Form.Label><Form.Control type="text" name="numero" value={myDataForm.numero || ''} onChange={handleMyDataChange} /></Form.Group></Col>
-                                                <Col><Form.Group className="mb-3"><Form.Label>Complemento</Form.Label><Form.Control type="text" name="complemento" value={myDataForm.complemento || ''} onChange={handleMyDataChange} /></Form.Group></Col>
-                                            </Row>
-                                            <Form.Group className="mb-3"><Form.Label>Bairro</Form.Label><Form.Control type="text" name="bairro" value={myDataForm.bairro || ''} onChange={handleMyDataChange} /></Form.Group>
-                                            <Row>
-                                                <Col><Form.Group className="mb-3"><Form.Label>Cidade</Form.Label><Form.Control type="text" name="cidade" value={myDataForm.cidade || ''} onChange={handleMyDataChange} /></Form.Group></Col>
-                                                <Col md={4}><Form.Group className="mb-3"><Form.Label>Estado</Form.Label><Form.Control type="text" name="uf" value={myDataForm.uf || ''} onChange={handleMyDataChange} maxLength="2" /></Form.Group></Col>
-                                            </Row>
-                                        </Card.Body>
-                                    </Card>
-
-                                    <Card className="shadow-sm border-0 mb-4">
-                                        <Card.Header className="fw-bold">Dados Bancários (Pagamentos)</Card.Header>
-                                        <Card.Body>
-                                            <Form.Group className="mb-3"><Form.Label>Banco</Form.Label><Form.Control type="text" name="banco" value={myDataForm.banco || ''} onChange={handleMyDataChange} /></Form.Group>
-                                            <Row>
-                                                <Col><Form.Group className="mb-3"><Form.Label>Agência</Form.Label><Form.Control type="text" name="agencia" value={myDataForm.agencia || ''} onChange={handleMyDataChange} /></Form.Group></Col>
-                                                <Col><Form.Group className="mb-3"><Form.Label>Conta Corrente</Form.Label><Form.Control type="text" name="conta" value={myDataForm.conta || ''} onChange={handleMyDataChange} /></Form.Group></Col>
-                                            </Row>
-                                            <Row>
-                                                <Col md={5}><Form.Group className="mb-3"><Form.Label>Tipo de Chave</Form.Label><Form.Select name="chave_pix_tipo" value={myDataForm.chave_pix_tipo || ''} onChange={handleMyDataChange}><option value="">Selecione</option><option value="CPF">CPF</option><option value="CNPJ">CNPJ</option><option value="Email">E-mail</option><option value="Celular">Celular</option><option value="Aleatoria">Aleatória</option></Form.Select></Form.Group></Col>
-                                                <Col md={7}><Form.Group className="mb-3"><Form.Label>Chave PIX</Form.Label><Form.Control type="text" name="chave_pix" value={myDataForm.chave_pix || ''} onChange={handleMyDataChange} /></Form.Group></Col>
-                                            </Row>
-                                        </Card.Body>
-                                    </Card>
-                                </Col>
-                            </Row>
-                            <div className="text-end mt-3">
-                                <Button type="submit" variant="primary" size="lg" disabled={saving}>
-                                    {saving ? <><Spinner as="span" size="sm" /> Salvando...</> : 'Salvar Alterações'}
-                                </Button>
-                            </div>
-                        </Form>
-                    </Tab>
+                    
                 </Tabs>
             </Container>
 
