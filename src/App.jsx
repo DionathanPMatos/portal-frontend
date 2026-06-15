@@ -199,12 +199,16 @@ function App() {
             <Route path="/noticias" element={<NewsPage />} />
             <Route path="/OrganogramaTecnico" element={<OrganogramaTecnicoPage />} />
             <Route path="/dtc/repositorio" element={<RepositorioTecnicoPage />} />
+
+            {/* ROTAS DO RH */}
             <Route path="/manage-employees" element={<ManageEmployeesPage isLoggedIn={isLoggedIn} />} />
             <Route path="/funcionarios" element={<FuncionariosPage />} />
             <Route path="/rh/dashboard" element={<HRDashboardPage />} />
             <Route path="/rh/colaboradores/:id" element={<EmployeeDetailsPage />} /> {/* 🚀 NOVA ROTA */}
             <Route path="/perfil" element={<UserProfilePage />} />
             <Route path="/rh/beneficios" element={<BeneficiosHubPage />} />
+            <Route path="/rh/manageemployee" element={<ManageEmployeesPage />} />
+
             <Route path="/crm/dashboard-dtc" element={<DashboardDTCPage />} />
             <Route path="/compras" element={<PurchaseDashboardPage />} />
             <Route path="/ferramentas/calculadora-solar" element={<CalculadoraSolarPage />} /> {/* A rota para a calculadora solar */}

@@ -10,14 +10,15 @@ import Button from 'react-bootstrap/Button';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Form from 'react-bootstrap/Form';
 import Spinner from 'react-bootstrap/Spinner';
-import Alert from 'react-bootstrap/Alert'; 
+import Alert from 'react-bootstrap/Alert';
 import Modal from 'react-bootstrap/Modal';
-import { FaEdit, FaTrash, FaUserPlus, FaFileImport, FaBriefcase, FaSitemap, FaSearch, FaUserTimes, FaCog, FaFilter, FaBuilding, FaUsers, FaDollarSign } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaUserPlus, FaFileImport, FaBriefcase, FaSitemap, FaSearch, FaUserTimes, FaCog, FaFilter, FaBuilding, FaUsers, FaDollarSign, FaClipboardList } from 'react-icons/fa';
 import CargosModal from './CargosModal';
 import SetoresModal from './SetoresModal';
 import UnidadesModal from './UnidadesModal.jsx';
 import TimesModal from '../components/TimesModal.jsx';
 import CentroCustoModal from '../components/CentroCustoModal.jsx';
+import OnboardingTemplateModal from '../components/OnboardingTemplateModal.jsx';
 import apiClient from '../../../services/api';
 import EmployeeEditModal from '../components/EmployeeEditModal.jsx';
 import ImportModal from '../components/ImportModal';
@@ -38,6 +39,7 @@ const ManageEmployees = () => {
     const [isCargosModalOpen, setIsCargosModalOpen] = useState(false);
     const [isSetoresModalOpen, setIsSetoresModalOpen] = useState(false);
     const [isUnidadesModalOpen, setIsUnidadesModalOpen] = useState(false);
+    const [isOnboardingTemplateModalOpen, setIsOnboardingTemplateModalOpen] = useState(false);
     const [isCentroCustoModalOpen, setIsCentroCustoModalOpen] = useState(false);
     const [isTimesModalOpen, setIsTimesModalOpen] = useState(false);
     const [showImportModal, setShowImportModal] = useState(false); 
@@ -214,6 +216,7 @@ const ManageEmployees = () => {
                             <Dropdown.Item onClick={() => setIsSetoresModalOpen(true)}><FaSitemap className="me-2" />Gerenciar Setores</Dropdown.Item>
                             <Dropdown.Item onClick={() => setIsCentroCustoModalOpen(true)}><FaDollarSign className="me-2" />Gerenciar Centros de Custo</Dropdown.Item>
                             <Dropdown.Item onClick={() => setIsTimesModalOpen(true)}><FaUsers className="me-2" />Gerenciar Times</Dropdown.Item>
+                            <Dropdown.Item onClick={() => setIsOnboardingTemplateModalOpen(true)}><FaClipboardList className="me-2" />Gerenciar Modelos de Onboarding</Dropdown.Item>
                             <Dropdown.Item onClick={() => setIsUnidadesModalOpen(true)}><FaBuilding className="me-2" />Gerenciar Filiais</Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
@@ -308,6 +311,7 @@ const ManageEmployees = () => {
             <CargosModal show={isCargosModalOpen} onHide={() => setIsCargosModalOpen(false)} onCargosUpdate={fetchCargos} />
             <SetoresModal show={isSetoresModalOpen} onHide={() => setIsSetoresModalOpen(false)} onSetoresUpdate={fetchSetores} /> 
             <CentroCustoModal show={isCentroCustoModalOpen} onHide={() => setIsCentroCustoModalOpen(false)} />
+            <OnboardingTemplateModal show={isOnboardingTemplateModalOpen} onHide={() => setIsOnboardingTemplateModalOpen(false)} />
             <TimesModal show={isTimesModalOpen} onHide={() => setIsTimesModalOpen(false)} />
             <UnidadesModal show={isUnidadesModalOpen} onHide={() => setIsUnidadesModalOpen(false)} onUnidadesUpdate={() => {}} />
             

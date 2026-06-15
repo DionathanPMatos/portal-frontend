@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Modal, Spinner, Alert, Button } from 'react-bootstrap';
-import { FaGifts } from 'react-icons/fa';
+import { Row, Col, Card, Modal, Spinner, Alert, Button, Badge, Toast, ToastContainer } from 'react-bootstrap';
+import { FaGifts, FaCheckCircle, FaHourglassHalf } from 'react-icons/fa';
 import apiClient from '../../../services/api';
 
 const Beneficios = () => {
@@ -9,12 +9,20 @@ const Beneficios = () => {
     const [error, setError] = useState(null);
     const [selectedBeneficio, setSelectedBeneficio] = useState(null);
     const [showModal, setShowModal] = useState(false);
+    const [profileData, setProfileData] = useState(null);
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
 
     useEffect(() => {
-        const fetchBeneficios = async () => {
+        const fetchData = async () => {
+            setLoading(true);
             try {
-                const response = await apiClient.get('/api/beneficios');
-                setBeneficios(response.data);
+                const [beneficiosRes, profileRes] = await Promise.all([
+                    apiClient.get('/api/beneficios'),
+                    apiClient.get('/api/users/me/profile')
+                ]);
+                setBeneficios(beneficiosRes.data);
+                setProfileData(profileRes.data);
             } catch (err) {
                 console.error('Erro ao carregar benefícios:', err);
                 setError('Não foi possível carregar os benefícios.');
@@ -22,7 +30,7 @@ const Beneficios = () => {
                 setLoading(false);
             }
         };
-        fetchBeneficios();
+        fetchData();
     }, []);
 
     const handleShowModal = (beneficio) => {
@@ -30,8 +38,33 @@ const Beneficios = () => {
         setShowModal(true);
     };
 
+    const handleRequestBeneficio = async (beneficioId) => {
+        try {
+            await apiClient.post('/api/beneficios/solicitar', { beneficio_id: beneficioId });
+            setToastMessage('Benefício solicitado com sucesso! Aguarde a aprovação do RH.');
+            setShowToast(true);
+            setShowModal(false); // Fecha o modal
+            // Recarrega os dados do perfil para atualizar o status
+            const profileRes = await apiClient.get('/api/users/me/profile');
+            setProfileData(profileRes.data);
+        } catch (err) {
+            console.error(err);
+            setToastMessage(err.response?.data?.error || 'Erro ao solicitar benefício.');
+            setShowToast(true);
+        }
+    };
+
     return (
         <>
+            <ToastContainer position="top-end" className="p-3" style={{ zIndex: 1055 }}>
+                <Toast onClose={() => setShowToast(false)} show={showToast} delay={5000} autohide>
+                    <Toast.Header>
+                        <strong className="me-auto">Notificação</strong>
+                    </Toast.Header>
+                    <Toast.Body>{toastMessage}</Toast.Body>
+                </Toast>
+            </ToastContainer>
+
             <div className="mb-4">
                 <p className="text-muted">
                     Conheça as vantagens e benefícios oferecidos aos colaboradores. Clique em um benefício para ver os detalhes.
@@ -75,7 +108,7 @@ const Beneficios = () => {
             )}
             {/* Modal para Visualização do Benefício */}
             <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" centered>
-                {selectedBeneficio && (
+                {selectedBeneficio && profileData && (
                     <>
                         <Modal.Header closeButton className="border-bottom">
                             <Modal.Title className="fw-bold fs-5">{selectedBeneficio.nome}</Modal.Title>
@@ -91,6 +124,18 @@ const Beneficios = () => {
                         </Modal.Body>
                         <Modal.Footer className="border-top pt-2">
                             <Button variant="secondary" onClick={() => setShowModal(false)}>Fechar</Button>
+                            {(() => {
+                                const isAtribuido = profileData.beneficios_atribuidos?.some(b => b.beneficio_id === selectedBeneficio.id);
+                                const isPendente = profileData.solicitacoes_beneficios?.some(s => s.beneficio_id === selectedBeneficio.id && s.status === 'Pendente');
+
+                                if (isAtribuido) {
+                                    return <Badge bg="success" className="p-2"><FaCheckCircle /> Você já possui este benefício</Badge>;
+                                } else if (isPendente) {
+                                    return <Badge bg="warning" text="dark" className="p-2"><FaHourglassHalf /> Solicitação Pendente</Badge>;
+                                } else {
+                                    return <Button variant="primary" onClick={() => handleRequestBeneficio(selectedBeneficio.id)}>Solicitar Benefício</Button>;
+                                }
+                            })()}
                         </Modal.Footer>
                     </>
                 )}

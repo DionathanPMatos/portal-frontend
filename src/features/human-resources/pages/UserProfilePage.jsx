@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Container, Row, Col, Card, Image, Tabs, Tab, Spinner, Alert, Badge, ListGroup, Form, ProgressBar, Button, Toast, ToastContainer } from 'react-bootstrap';
 import { FaUser, FaSitemap, FaBuilding, FaUserTie, FaClock, FaMoneyBillWave, FaCar, FaChartLine, FaCog, FaFileInvoiceDollar, FaBook, FaAddressCard, FaShieldAlt, FaGift, FaCheckCircle, FaHourglassHalf } from 'react-icons/fa';
 import { IMaskInput } from 'react-imask';
@@ -194,7 +195,7 @@ const UserProfilePage = () => {
 
                 
                 {/* Abas de Conteúdo */}
-                <Tabs defaultActiveKey="meus-dados" id="profile-tabs" className="mb-3 custom-tabs">
+                <Tabs defaultActiveKey="meus-dados" id="profile-tabs" className="mb-3 custom-tabs" justify>
                     <Tab eventKey ="meus-dados" title={<><FaAddressCard className="me-2" />Informações Pessoais</>}>
                         <Alert variant="info" className="mt-3">
                             <FaShieldAlt className="me-2" />
@@ -281,37 +282,6 @@ const UserProfilePage = () => {
                                     </Card>
 
                                     <Card className="shadow-sm border-0 mb-4">
-                                        <Card.Header className="fw-bold">Meus Benefícios</Card.Header>
-                                        <Card.Body>
-                                            <ListGroup variant="flush">
-                                                {allBeneficios.map(beneficio => {
-                                                    const atribuido = profileData.beneficios_atribuidos?.some(b => b.beneficio_id === beneficio.id);
-                                                    const pendente = profileData.solicitacoes_beneficios?.some(s => s.beneficio_id === beneficio.id && s.status === 'Pendente');
-                                                    
-                                                    let status;
-                                                    if (atribuido) {
-                                                        status = <Badge bg="success"><FaCheckCircle /> Atribuído</Badge>;
-                                                    } else if (pendente) {
-                                                        status = <Badge bg="warning" text="dark"><FaHourglassHalf /> Pendente</Badge>;
-                                                    } else {
-                                                        status = <Button size="sm" variant="outline-primary" onClick={() => handleRequestBeneficio(beneficio.id)}>Solicitar</Button>;
-                                                    }
-
-                                                    return (
-                                                        <ListGroup.Item key={beneficio.id} className="d-flex justify-content-between align-items-center">
-                                                            <span>
-                                                                <FaGift className="me-2 text-muted" /> {beneficio.nome}
-                                                            </span>
-                                                            {status}
-                                                        </ListGroup.Item>
-                                                    );
-                                                })}
-                                            </ListGroup>
-                                        </Card.Body>
-                                    </Card>
-
-
-                                    <Card className="shadow-sm border-0 mb-4">
                                         <Card.Header className="fw-bold">Dados Bancários (Pagamentos)</Card.Header>
                                         <Card.Body>
                                             <Form.Group className="mb-3"><Form.Label>Banco</Form.Label><Form.Control type="text" name="banco" value={myDataForm.banco || ''} onChange={handleMyDataChange} /></Form.Group>
@@ -333,6 +303,53 @@ const UserProfilePage = () => {
                                 </Button>
                             </div>
                         </Form>
+                    </Tab>
+
+                    <Tab eventKey="beneficios" title={<><FaGift className="me-2" />Meus Benefícios</>}>
+                        <Row className="g-4 mt-2">
+                            <Col md={12}>
+                                <Card className="shadow-sm border-0">
+                                    <Card.Header className="fw-bold">Benefícios Ativos</Card.Header>
+                                    <ListGroup variant="flush">
+                                        {profileData.beneficios_atribuidos?.length > 0 ? (
+                                            profileData.beneficios_atribuidos.map(item => (
+                                                <ListGroup.Item key={item.beneficio.id} className="d-flex align-items-center p-3">
+                                                    {item.beneficio.logo_url ? (
+                                                        <Image src={item.beneficio.logo_url} style={{ height: '40px', width: '60px', objectFit: 'contain', marginRight: '1rem' }} />
+                                                    ) : (
+                                                        <FaGift className="me-3 text-primary" size={24} />
+                                                    )}
+                                                    <div>
+                                                        <h6 className="mb-0 fw-bold">{item.beneficio.nome}</h6>
+                                                        <div className="text-muted small" dangerouslySetInnerHTML={{ __html: item.beneficio.descricao?.substring(0, 120) + '...' }} />
+                                                    </div>
+                                                </ListGroup.Item>
+                                            ))
+                                        ) : (
+                                            <ListGroup.Item className="text-muted p-4 text-center">Você ainda não possui benefícios ativos.</ListGroup.Item>
+                                        )}
+                                    </ListGroup>
+                                </Card>
+                            </Col>
+                            <Col md={12}>
+                                <Card className="shadow-sm border-0">
+                                    <Card.Header className="fw-bold">Minhas Solicitações</Card.Header>
+                                    <ListGroup variant="flush">
+                                        {profileData.solicitacoes_beneficios?.filter(s => s.status === 'Pendente').length > 0 ? (
+                                            profileData.solicitacoes_beneficios.filter(s => s.status === 'Pendente').map(solicitacao => (
+                                                <ListGroup.Item key={solicitacao.id} className="d-flex justify-content-between align-items-center">
+                                                    <span>Benefício <strong>{allBeneficios.find(b => b.id === solicitacao.beneficio_id)?.nome}</strong> solicitado em {new Date(solicitacao.data_solicitacao).toLocaleDateString()}.</span>
+                                                    <Badge bg="warning" text="dark"><FaHourglassHalf /> Pendente</Badge>
+                                                </ListGroup.Item>
+                                            ))
+                                        ) : (
+                                            <ListGroup.Item className="text-muted text-center p-4">Nenhuma solicitação de benefício pendente.</ListGroup.Item>
+                                        )}
+                                    </ListGroup>
+                                     <Card.Footer className="text-center"><Link to="/rh/beneficios"><Button variant="outline-primary">Ver todos os benefícios e solicitar novos</Button></Link></Card.Footer>
+                                </Card>
+                            </Col>
+                        </Row>
                     </Tab>
 
                     <Tab eventKey="requests" title={<><FaMoneyBillWave className="me-2" />Meu Hub de Solicitações</>}>

@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Tabs, Tab } from 'react-bootstrap';
 import { FaGift, FaClipboardCheck } from 'react-icons/fa';
 import ManageBeneficios from './ManageBeneficios';
@@ -6,6 +7,10 @@ import Beneficios from './Beneficios';
 import ManageBenefitRequests from '../components/ManageBenefitRequests';
 
 const BeneficiosHubPage = () => {
+    const [searchParams] = useSearchParams();
+    const initialTab = searchParams.get('tab') || 'visualizacao';
+    const [activeTab, setActiveTab] = useState(initialTab);
+
     return (
         <div className="container-main p-4">
             <div className="page-header-colored mb-4">
@@ -17,7 +22,7 @@ const BeneficiosHubPage = () => {
                 </div>
             </div>
 
-            <Tabs defaultActiveKey="visualizacao" id="beneficios-hub-tabs" className="mb-3 custom-tabs">
+            <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} id="beneficios-hub-tabs" className="mb-3 custom-tabs">
                 <Tab eventKey="visualizacao" title="Benefícios Disponíveis">
                     <div className="p-3">
                         <Beneficios />

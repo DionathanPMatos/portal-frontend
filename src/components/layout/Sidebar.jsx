@@ -166,7 +166,7 @@ const menuItems = [
         target: "_blank",
       },
       { name: "Ouvidoria", link: "#" },
-      { name: "Colaboradores", link: "/funcionarios" },
+      { name: "Colaboradores", link: "/rh/manageemployee" },
       { name: "Politicas de RH", link: "#" },
     ],
   },

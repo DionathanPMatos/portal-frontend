@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Card, Spinner, Alert, ListGroup, Image, Form, Carousel } from 'react-bootstrap';
-import { FaUsers, FaUserPlus, FaUserMinus, FaBirthdayCake, FaChartPie, FaVenusMars, FaChartLine, FaSyncAlt } from 'react-icons/fa';
+import { Row, Col, Card, Spinner, Alert, ListGroup, Image, Form, Carousel, Button } from 'react-bootstrap';
+import { FaUsers, FaUserPlus, FaUserMinus, FaBirthdayCake, FaChartPie, FaVenusMars, FaChartLine, FaSyncAlt, FaClipboardCheck, FaUserClock } from 'react-icons/fa';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line } from 'recharts';
+import { Link } from 'react-router-dom';
 import apiClient from '../../../services/api';
 import KpiDetailsModal from '../components/KpiDetailsModal';
 
@@ -70,7 +71,7 @@ const HRDashboardPage = () => {
         return <Alert variant="danger">{error}</Alert>;
     }
 
-    const { kpis, distribuicaoSetor, distribuicaoGenero, proximosAniversariantes, headcountEvolution, turnoverEvolution } = dashboardData;
+    const { kpis, distribuicaoSetor, distribuicaoGenero, proximosAniversariantes, headcountEvolution, turnoverEvolution, recentRequests } = dashboardData;
 
     return (
         <div className="container-main p-4">
@@ -105,8 +106,8 @@ const HRDashboardPage = () => {
             </div>
 
             {/* KPI Cards */}
-            <Row className="g-4 mb-4 kpi-cards-row">
-                <Col md={6} lg={3}>
+            <Row xs={1} sm={2} lg={3} xl={5} className="g-4 mb-4 kpi-cards-row">
+                <Col>
                     <Card className="h-100">
                         <Card.Body>
                             <div className="d-flex align-items-center justify-content-between">
@@ -121,7 +122,7 @@ const HRDashboardPage = () => {
                         </Card.Body>
                     </Card>
                 </Col>
-                <Col md={6} lg={3}>
+                <Col>
                     <Card className="h-100">
                         <Card.Body>
                             <div className="d-flex align-items-center justify-content-between">
@@ -136,7 +137,7 @@ const HRDashboardPage = () => {
                         </Card.Body>
                     </Card>
                 </Col>
-                <Col md={6} lg={3}>
+                <Col>
                     <Card className="h-100">
                         <Card.Body>
                             <div className="d-flex align-items-center justify-content-between">
@@ -151,7 +152,20 @@ const HRDashboardPage = () => {
                         </Card.Body>
                     </Card>
                 </Col>
-                <Col md={6} lg={3}>
+                <Col>
+                    <Card className="h-100">
+                        <Card.Body>
+                            <div className="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <span className="text-muted font-weight-bold kpi-card-title-font">Média de Idade</span>
+                                    <h4 className="mt-1 mb-0 kpi-main-metric">{kpis.mediaIdade} anos</h4>
+                                </div>
+                                <div className="kpi-icon-circle kpi-icon-circle-cyan"><FaUserClock /></div>
+                            </div>
+                        </Card.Body>
+                    </Card>
+                </Col>
+                <Col>
                     <Card className="h-100">
                         <Card.Body>
                             <div className="d-flex align-items-center justify-content-between">
@@ -170,7 +184,7 @@ const HRDashboardPage = () => {
 
             {/* Charts */}
             <Row className="g-4">
-                <Col lg={7}>
+                <Col lg={6}>
                     <Card className="h-100">
                         <Card.Header className="fw-bold d-flex align-items-center gap-2"><FaChartPie /> Distribuição por Departamento</Card.Header>
                         <Card.Body>
@@ -187,26 +201,38 @@ const HRDashboardPage = () => {
                         </Card.Body>
                     </Card>
                 </Col>
-                <Col lg={5}>
+                <Col lg={6}>
                     <Card className="h-100">
-                        <Card.Header className="fw-bold d-flex align-items-center gap-2"><FaVenusMars /> Distribuição por Gênero</Card.Header>
-                        <Card.Body>
-                            <ResponsiveContainer width="100%" height={300}>
-                                <PieChart>
-                                    <Pie data={distribuicaoGenero} cx="50%" cy="50%" labelLine={false} outerRadius={80} fill="#8884d8" dataKey="value" nameKey="name" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
-                                        {distribuicaoGenero.map((entry, index) => (<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />))}
-                                    </Pie>
-                                    <Tooltip />
-                                    <Legend />
-                                </PieChart>
-                            </ResponsiveContainer>
-                        </Card.Body>
+                        <Card.Header className="fw-bold d-flex justify-content-between align-items-center">
+                            <span className="d-flex align-items-center gap-2">
+                                <FaClipboardCheck /> Solicitações Recentes
+                            </span>
+                            <Link to="/rh/beneficios?tab=solicitacoes" className="btn btn-sm btn-outline-primary">Ver Todas</Link>
+                        </Card.Header>
+                        <ListGroup variant="flush" style={{ maxHeight: '350px', overflowY: 'auto' }}>
+                            {recentRequests && recentRequests.length > 0 ? (
+                                recentRequests.map(req => (
+                                    <ListGroup.Item key={`req-${req.id}`} className="d-flex align-items-center gap-3 p-3">
+                                        <Image src={req.user_pic || `https://ui-avatars.com/api/?name=${req.user_name}&background=random`} roundedCircle style={{ width: '45px', height: '45px', objectFit: 'cover' }} />
+                                        <div>
+                                            <div className="fw-bold">{req.description}</div>
+                                            <div className="text-muted small">
+                                                {new Date(req.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })}
+                                            </div>
+                                        </div>
+                                    </ListGroup.Item>
+                                ))
+                            ) : (
+                                <ListGroup.Item className="text-muted p-3 text-center">Nenhuma solicitação pendente.</ListGroup.Item>
+                            )}
+                        </ListGroup>
                     </Card>
                 </Col>
+                
             </Row>
             
             <Row className="g-4 mt-4">
-                <Col lg={7}>
+                <Col lg={6}>
                     <Card className="h-100">
                         <Card.Header className="fw-bold d-flex align-items-center gap-2"><FaChartLine /> Evolução do Headcount (Últimos 12 Meses)</Card.Header>
                         <Card.Body>
@@ -223,7 +249,27 @@ const HRDashboardPage = () => {
                         </Card.Body>
                     </Card>
                 </Col>
-                <Col lg={5}>
+                <Col lg={6}>
+                    <Card>
+                        <Card.Header className="fw-bold d-flex align-items-center gap-2"><FaSyncAlt /> Taxa de Turnover (Últimos 12 Meses)</Card.Header>
+                        <Card.Body>
+                            <ResponsiveContainer width="100%" height={300}>
+                                <LineChart data={turnoverEvolution} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="name" />
+                                    <YAxis unit="%" allowDecimals={false} />
+                                    <Tooltip formatter={(value) => `${value.toFixed(2)}%`} />
+                                    <Legend />
+                                    <Line type="monotone" dataKey="Taxa (%)" stroke="#ff8042" activeDot={{ r: 8 }} />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </Card.Body>
+                    </Card>
+                </Col>
+            </Row>
+
+            <Row className="g-4 mt-4">
+                <Col lg={6}>
                     <Card className="h-100">
                         <Card.Header className="fw-bold d-flex align-items-center gap-2"><FaBirthdayCake /> Próximos Aniversariantes</Card.Header>
                         {proximosAniversariantes && proximosAniversariantes.length > 5 ? (
@@ -259,26 +305,23 @@ const HRDashboardPage = () => {
                         )}
                     </Card>
                 </Col>
-            </Row>
-            
-            <Row className="g-4 mt-4">
-                <Col>
-                    <Card>
-                        <Card.Header className="fw-bold d-flex align-items-center gap-2"><FaSyncAlt /> Taxa de Turnover (Últimos 12 Meses)</Card.Header>
+                <Col lg={5}>
+                    <Card className="h-100">
+                        <Card.Header className="fw-bold d-flex align-items-center gap-2"><FaVenusMars /> Distribuição por Gênero</Card.Header>
                         <Card.Body>
                             <ResponsiveContainer width="100%" height={300}>
-                                <LineChart data={turnoverEvolution} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="name" />
-                                    <YAxis unit="%" allowDecimals={false} />
-                                    <Tooltip formatter={(value) => `${value.toFixed(2)}%`} />
+                                <PieChart>
+                                    <Pie data={distribuicaoGenero} cx="50%" cy="50%" labelLine={false} outerRadius={80} fill="#8884d8" dataKey="value" nameKey="name" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                                        {distribuicaoGenero.map((entry, index) => (<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />))}
+                                    </Pie>
+                                    <Tooltip />
                                     <Legend />
-                                    <Line type="monotone" dataKey="Taxa (%)" stroke="#ff8042" activeDot={{ r: 8 }} />
-                                </LineChart>
+                                </PieChart>
                             </ResponsiveContainer>
                         </Card.Body>
                     </Card>
                 </Col>
+                
             </Row>
 
             <KpiDetailsModal

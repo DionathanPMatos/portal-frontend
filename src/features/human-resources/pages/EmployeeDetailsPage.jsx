@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Container, Tabs, Tab, Card, Row, Col, Spinner, Alert, ListGroup, Badge, Breadcrumb, Image, Button, Table, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Container, Tabs, Tab, Card, Row, Col, Spinner, Alert, ListGroup, Badge, Breadcrumb, Image, Button, Table, OverlayTrigger, Tooltip, ProgressBar, Form } from 'react-bootstrap';
 import { FaArrowLeft, FaUser, FaSitemap, FaBuilding, FaUserTie, FaCalendarAlt, FaIdCard, FaDollarSign, FaAddressCard, FaEnvelope, FaUsers, FaEdit, FaPlus, FaTrash, FaFileUpload, FaDownload } from 'react-icons/fa';
 import apiClient from '../../../services/api';
 import EmployeeEditModal from '../components/EmployeeEditModal'; // 🚀 Importa o modal
 import DependentsModal from '../components/DependentsModal'; // Importa o modal de dependentes
 import ExamePeriodicoModal from '../components/ExamePeriodicoModal'; // Importa o modal de exames
+import StartOnboardingModal from '../components/StartOnboardingModal';
 
 const EmployeeDetailsPage = () => {
     const { id: employeeId } = useParams(); // Pega o ID da URL
@@ -16,6 +17,7 @@ const EmployeeDetailsPage = () => {
     const [showDependentsModal, setShowDependentsModal] = useState(false);
     const [editingDependent, setEditingDependent] = useState(null);
     const [showExameModal, setShowExameModal] = useState(false);
+    const [showStartOnboardingModal, setShowStartOnboardingModal] = useState(false);
     const [editingExame, setEditingExame] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
     const fileInputRef = useRef(null);
@@ -177,6 +179,20 @@ const EmployeeDetailsPage = () => {
             }
         }
     };
+
+    const handleToggleOnboardingStep = async (etapaId) => {
+        try {
+            await apiClient.put(`/api/onboarding/etapas/${etapaId}/toggle`);
+            setSuccessMessage('Etapa atualizada!');
+            setTimeout(() => setSuccessMessage(null), 100); // Recarrega
+        } catch (err) {
+            setError('Erro ao atualizar etapa.');
+        }
+    };
+
+    const onboardingProgress = employee?.onboarding ? 
+        (employee.onboarding.etapas.filter(e => e.status === 'Concluído').length / employee.onboarding.etapas.length) * 100 
+        : 0;
 
     const renderDocumentsList = (docType) => {
         const docs = employee.documentos?.filter(d => d.tipo_documento === docType) || [];
@@ -690,6 +706,41 @@ const EmployeeDetailsPage = () => {
                                 </Table>
                             </Card>
                         </Tab>
+                        <Tab eventKey="onboarding" title="Onboarding">
+                            {employee.onboarding ? (
+                                <Card>
+                                    <Card.Header>
+                                        <div className="d-flex justify-content-between align-items-center">
+                                            <span>Progresso do Onboarding</span>
+                                            <span className="fw-bold">{onboardingProgress.toFixed(0)}%</span>
+                                        </div>
+                                    </Card.Header>
+                                    <Card.Body>
+                                        <ProgressBar now={onboardingProgress} label={`${onboardingProgress.toFixed(0)}%`} className="mb-4" />
+                                        <ListGroup>
+                                            {employee.onboarding.etapas.map(etapa => (
+                                                <ListGroup.Item key={etapa.id}>
+                                                    <Form.Check 
+                                                        type="checkbox"
+                                                        id={`etapa-${etapa.id}`}
+                                                        label={etapa.etapa_template.titulo}
+                                                        checked={etapa.status === 'Concluído'}
+                                                        onChange={() => handleToggleOnboardingStep(etapa.id)}
+                                                    />
+                                                    {etapa.status === 'Concluído' && (
+                                                        <div className="text-muted small ps-4">
+                                                            Concluído por {etapa.concluido_por?.nome_completo || 'N/A'} em {new Date(etapa.data_conclusao).toLocaleDateString()}
+                                                        </div>
+                                                    )}
+                                                </ListGroup.Item>
+                                            ))}
+                                        </ListGroup>
+                                    </Card.Body>
+                                </Card>
+                            ) : (
+                                <Alert variant="info">Nenhum processo de onboarding iniciado para este colaborador. <Button variant="link" onClick={() => setShowStartOnboardingModal(true)}>Iniciar Onboarding</Button></Alert>
+                            )}
+                        </Tab>
                     </Tabs>
                 </Col>
             </Row>
@@ -723,6 +774,17 @@ const EmployeeDetailsPage = () => {
                 }}
                 employeeId={employeeId}
                 exameToEdit={editingExame}
+            />
+
+            <StartOnboardingModal
+                show={showStartOnboardingModal}
+                onHide={() => setShowStartOnboardingModal(false)}
+                employeeId={employeeId}
+                onSuccess={() => {
+                    setShowStartOnboardingModal(false);
+                    setSuccessMessage('Onboarding iniciado com sucesso!');
+                    setTimeout(() => setSuccessMessage(null), 100);
+                }}
             />
         </div>
     );
