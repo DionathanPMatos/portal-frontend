@@ -117,7 +117,7 @@ const dashboardSections = [
                 title: 'Gerenciar Produtos',
                 text: 'Cadastre e edite materiais de marketing (brindes, etc).',
                 icon: <FaBoxOpen size={24} />,
-                link: '/admin/marketing/produtos',
+                link: '/admin/gerenciar-produtos-marketing',
             },
             {
                 title: 'Gerenciar Pedidos de Material',

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Container, Row, Col, Card, Form, InputGroup, Button, Table, Badge, Modal, Spinner, Alert } from 'react-bootstrap';
+import { Row, Col, Card, Form, InputGroup, Button, Table, Badge, Modal, Spinner, Alert } from 'react-bootstrap';
 import { FaSearch, FaPlus, FaExternalLinkAlt, FaTrash, FaCheck, FaWrench } from 'react-icons/fa';
 import apiClient from '../../../services/api';
 // import '../../../styles/App.css';
@@ -123,59 +123,65 @@ const FerramentasUteisPage = () => {
     };
 
     return (
-        <div className="dash-grid">
-            <div className="container-main p-4">
-                <Container fluid className="px-0">
-                    <Row>
-                        <Col>
-                            <Card className="shadow-sm border-0">
-                                <Card.Header>
-                                    <Card.Title as="h4" className="d-flex align-items-center gap-2 mb-0"> <FaWrench /> Ferramentas Úteis</Card.Title>
-                                </Card.Header>
-                                <Card.Body>
-                                    <div className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
-                                        <div>
-                                            <h4 className="fw-bold mb-1 text-dark">Caixa de Ferramentas</h4>
-                                            <p className="text-muted mb-0">Calculadoras, simuladores e ferramentas oficiais de fabricantes para o pré-vendas.</p>
-                                        </div>
-                                        <Button variant="primary" className="d-flex align-items-center gap-2 shadow-sm" onClick={handleOpenModal}>
-                                            <FaPlus /> Nova Ferramenta
-                                        </Button>
-                                    </div>
+        <div className='container-main p-4'>
+            <div className="page-header-colored mb-4">
+                <div className="page-header-title-wrapper">
+                    <h2 className="page-header-title d-flex align-items-center gap-3">
+                        <FaWrench /> Caixa de Ferramentas
+                    </h2>
+                    <p className="page-header-subtitle">Calculadoras, simuladores e ferramentas oficiais de fabricantes para o pré-vendas.</p>
+                </div>
+                <div className="page-header-actions-wrapper">
+                    <Button variant="primary" className="btn-header-action" onClick={handleOpenModal}>
+                        <FaPlus className="me-2" /> Nova Ferramenta
+                    </Button>
+                </div>
+            </div>
 
-                                    {error && <Alert variant="danger">{error}</Alert>}
+            {error && <Alert variant="danger">{error}</Alert>}
 
-                                    <Row className="mb-4 g-3">
-                                        <Col md={12} lg={4}>
-                                            <InputGroup className="shadow-sm">
-                                                <InputGroup.Text className="bg-white border-end-0"><FaSearch className="text-muted" /></InputGroup.Text>
-                                                <Form.Control placeholder="Buscar ferramenta..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="border-start-0 ps-0 shadow-none"/>
-                                            </InputGroup>
-                                        </Col>
-                                        <Col md={6} lg={4}>
-                                            <Form.Select className="shadow-sm shadow-none" value={filtroCategoria} onChange={(e) => setFiltroCategoria(e.target.value)}>
-                                                <option value="">Todas as Soluções</option>
-                                                {categorias.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                                            </Form.Select>
-                                        </Col>
-                                        <Col md={6} lg={4}>
-                                            <Form.Select className="shadow-sm shadow-none" value={filtroFabricante} onChange={(e) => setFiltroFabricante(e.target.value)}>
-                                                <option value="">Todos os Fabricantes</option>
-                                                {fabricantes.map(fab => <option key={fab.id} value={fab.id}>{fab.name}</option>)}
-                                            </Form.Select>
-                                        </Col>
-                                    </Row>
+            <Card className="shadow-sm border-0 mb-4">
+                <Card.Body>
+                    <Row className="g-3 align-items-center">
+                        <Col lg={4}>
+                            <div className="header-search-container">
+                                <FaSearch className="search-icon" />
+                                <Form.Control 
+                                    type="text"
+                                    className="search-input"
+                                    placeholder="Buscar ferramenta..." 
+                                    value={searchTerm} 
+                                    onChange={(e) => setSearchTerm(e.target.value)} 
+                                />
+                            </div>
+                        </Col>
+                        <Col lg={4}>
+                            <Form.Select value={filtroCategoria} onChange={(e) => setFiltroCategoria(e.target.value)}>
+                                <option value="">Todas as Soluções</option>
+                                {categorias.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                            </Form.Select>
+                        </Col>
+                        <Col lg={4}>
+                            <Form.Select value={filtroFabricante} onChange={(e) => setFiltroFabricante(e.target.value)}>
+                                <option value="">Todos os Fabricantes</option>
+                                {fabricantes.map(fab => <option key={fab.id} value={fab.id}>{fab.name}</option>)}
+                            </Form.Select>
+                        </Col>
+                    </Row>
+                </Card.Body>
+            </Card>
 
+            <Card className="shadow-sm border-0">
                                     <div className="table-responsive">
                                         <Table hover className="align-middle border mb-0">
                                             <thead className="table-light text-muted small text-uppercase">
                                                 <tr>
-                                                    <th className="py-3 px-4">Ferramenta</th>
-                                                    <th className="py-3">Solução</th>
-                                                    <th className="py-3">Fabricante</th>
-                                                    <th className="py-3">Criado por</th>
-                                                    <th className="py-3">Data</th>
-                                                    <th className="py-3 text-end px-4">Acessar</th>
+                                                    <th className="px-4 py-3 fw-bold border-0">Ferramenta</th>
+                                                    <th className="py-3 fw-bold border-0">Solução</th>
+                                                    <th className="py-3 fw-bold border-0">Fabricante</th>
+                                                    <th className="py-3 fw-bold border-0">Criado por</th>
+                                                    <th className="py-3 fw-bold border-0">Data</th>
+                                                    <th className="text-end px-4 py-3 fw-bold border-0">Acessar</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -201,10 +207,7 @@ const FerramentasUteisPage = () => {
                                             </tbody>
                                         </Table>
                                     </div>
-                                </Card.Body>
-                            </Card>
-                        </Col>
-                    </Row>
+            </Card>
 
                     <Modal show={showModal} onHide={handleCloseModal} size="md" centered>
                         <Form onSubmit={handleSaveTool}>
@@ -233,8 +236,6 @@ const FerramentasUteisPage = () => {
                             </Modal.Footer>
                         </Form>
                     </Modal>
-                </Container>
-            </div>
         </div>
     );
 };

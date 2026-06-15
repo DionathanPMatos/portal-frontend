@@ -11,23 +11,18 @@ export default function VisitasPage({ user }) { // Renomeado
     const isManager = privilegios.includes('admin') || privilegios.includes('gestor');
 
     return (
-        <Container fluid className="px-4">
-            <Row>
-                <Col>
-                    <Card className="shadow-sm border-0">
-                        <Card.Header>
-                            <Card.Title  as="h4"> <FaMapMarkedAlt />&nbsp;Painel de Visitas Comerciais</Card.Title>
-                        </Card.Header>
-                        <Card.Body>
-                            {/* Header Padrão do Sistema */}
-                            <div className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
-                                <div>
-                                    <h4 className="fw-bold mb-1 text-dark d-flex align-items-center gap-2">
-                                         Monitore o fluxo de agendamentos, o volume de visitas autorizadas e a produtividade da força de vendas.
-                                    </h4>
-                                    <p className="text-muted mb-0">Acompanhe as métricas e gerencie as solicitações de visitas a clientes.</p>
-                                </div>
-                            </div>
+        <div className='container-main p-4'>
+            <div className="page-header-colored mb-4">
+                <div className="page-header-title-wrapper">
+                    <h2 className="page-header-title d-flex align-items-center gap-3">
+                        <FaMapMarkedAlt /> Painel de Visitas Comerciais
+                    </h2>
+                    <p className="page-header-subtitle">Monitore o fluxo de agendamentos, o volume de visitas autorizadas e a produtividade da força de vendas.</p>
+                </div>
+            </div>
+
+            <Card className="shadow-sm border-0 mb-4">
+                <Card.Body>
 
                             <Tabs defaultActiveKey={isManager ? "dashboard" : "minhas-visitas"} className="mb-4">
                                 {isManager && (
@@ -46,8 +41,6 @@ export default function VisitasPage({ user }) { // Renomeado
                             </Tabs>
                         </Card.Body>
                     </Card>
-                </Col>
-            </Row>
-        </Container>
+        </div>
     );
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Card, Tabs, Tab, Spinner, Button } from 'react-bootstrap';
+import { Card, Tabs, Tab, Spinner, Button } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaIndustry } from 'react-icons/fa';
 import apiClient from '../../../services/api'; // Importa a instância configurada do Axios
@@ -25,11 +25,17 @@ const FabricantePerfilPage = () => { // Renomeado
     }, [id]);
 
     if (loading) {
-        return <div className="text-center mt-5"><Spinner animation="border" /></div>;
+        return (
+            <div className="dash-grid">
+                <div className='container-main'>
+                    <div className="mt-5 text-center"><Spinner animation="border" /></div>
+                </div>
+            </div>
+        );
     }
 
     if (!fabricante) {
-        return <div className="text-center mt-5"><h5>Fabricante não encontrado.</h5><Button onClick={() => navigate(-1)}>Voltar</Button></div>;
+        return <div className="container-main p-4 text-center mt-5"><h5>Fabricante não encontrado.</h5><Button onClick={() => navigate(-1)}>Voltar</Button></div>;
     }
 
     const renderContent = (content) => {
@@ -38,7 +44,7 @@ const FabricantePerfilPage = () => { // Renomeado
     };
 
     return (
-        <Container fluid className="px-4 py-4">
+        <div className="container-main p-4">
             <Button variant="link" className="text-decoration-none text-muted mb-3 px-0 d-flex align-items-center gap-2" onClick={() => navigate(-1)}>
                 <FaArrowLeft /> Voltar para lista
             </Button>
@@ -89,7 +95,7 @@ const FabricantePerfilPage = () => { // Renomeado
                     </Tabs>
                 </Card.Body>
             </Card>
-        </Container>
+        </div>
     );
 };
 export default FabricantePerfilPage; // Exporta o nome atualizado

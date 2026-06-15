@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Card, Table, Button, Modal, Form, Alert, Spinner, Badge } from 'react-bootstrap';
+import { Card, Table, Button, Modal, Form, Alert, Spinner, Badge } from 'react-bootstrap';
 import { FaEdit, FaPlus, FaTrash, FaMapMarkerAlt } from 'react-icons/fa';
 import apiClient from '../../../services/api';
 
@@ -76,23 +76,25 @@ const ManageMarketingLocationsPage = () => {
     };
 
     return (
-        <div className="dash-grid">
-            <div className="container-main p-4">
-                <Container fluid className="px-0">
-                    <div className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
-                        <div>
-                            <h2 className="fw-bold mb-1 text-dark">Locais de Reserva</h2>
-                            <p className="text-muted mb-0">Gerencie os locais disponíveis para reserva (Ex: Showroom, Sala de Reunião).</p>
-                        </div>
-                        <Button variant="primary" onClick={() => handleShowModal()} className="d-flex align-items-center gap-2">
-                            <FaPlus /> Novo Local
-                        </Button>
-                    </div>
+        <div className='container-main p-4'>
+            <div className="page-header-colored mb-4">
+                <div className="page-header-title-wrapper">
+                    <h2 className="page-header-title d-flex align-items-center gap-3">
+                        <FaMapMarkerAlt /> Locais de Reserva
+                    </h2>
+                    <p className="page-header-subtitle">Gerencie os locais disponíveis para reserva (Ex: Showroom, Sala de Reunião).</p>
+                </div>
+                <div className="page-header-actions-wrapper">
+                    <Button variant="primary" className="btn-header-action" onClick={() => handleShowModal()}>
+                        <FaPlus className="me-2" /> Novo Local
+                    </Button>
+                </div>
+            </div>
 
-                    {error && <Alert variant="danger">{error}</Alert>}
-                    {success && <Alert variant="success" onClose={() => setSuccess(null)} dismissible>{success}</Alert>}
+            {error && <Alert variant="danger">{error}</Alert>}
+            {success && <Alert variant="success" onClose={() => setSuccess(null)} dismissible>{success}</Alert>}
 
-                    <Card className="shadow-sm border-0">
+            <Card className="shadow-sm border-0 mb-4">
                         <Card.Body>
                             {loading ? (
                                 <div className="text-center"><Spinner animation="border" /></div>
@@ -129,8 +131,6 @@ const ManageMarketingLocationsPage = () => {
                             )}
                         </Card.Body>
                     </Card>
-                </Container>
-            </div>
 
             <Modal show={showModal} onHide={handleCloseModal} centered>
                 <Modal.Header closeButton>

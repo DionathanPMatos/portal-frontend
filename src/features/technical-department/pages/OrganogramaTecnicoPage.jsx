@@ -152,42 +152,38 @@ const formatarNome = (nome) => {
     );
 
     return (
-            
-                <Container fluid className="px-4">
-                    <Row>
-                        <Col>
-                        <Card className="shadow-sm border-0">
-                        <Card.Header>
-                            <Card.Title as="h4"> <FaUserTie />&nbsp;Departamento Técnico</Card.Title>
-                        </Card.Header>
-                        <Card.Body>
-                            {/* Cabecalho da página */}
-                            <div className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
-                                <div>
-                                    <h4 className="fw-bold mb-1 text-dark d-flex align-items-center gap-2">
-                                        Conheça os gerentes de produto e as marcas que representam.
+        <div className='container-main p-4'>
+            <div className="page-header-colored mb-4">
+                <div className="page-header-title-wrapper">
+                    <h2 className="page-header-title d-flex align-items-center gap-3">
+                        <FaUserTie /> Departamento Técnico
+                    </h2>
+                    <p className="page-header-subtitle">Conheça os gerentes de produto, as marcas que representam e a estrutura hierárquica.</p>
+                </div>
+            </div>
 
-
-                                    </h4>
-                                </div>
-                            </div>
-
-                            {/* Filtro de Busca */}
-                            <Row className="mb-4">
-                        <Col md={6} lg={4}>
-                            <InputGroup className="shadow-sm">
-                                <InputGroup.Text className="bg-white border-end-0">
-                                    <FaSearch className="text-muted" />
-                                </InputGroup.Text>
+            {/* Filtro de Busca */}
+            <Card className="shadow-sm border-0 mb-4">
+                <Card.Body>
+                    <Row className="align-items-center">
+                        <Col lg={6}>
+                            <div className="header-search-container">
+                                <FaSearch className="search-icon" />
                                 <Form.Control 
+                                    type="text"
+                                    className="search-input"
                                     placeholder="Buscar por gerente ou fabricante..." 
                                     value={searchTerm} 
                                     onChange={(e) => setSearchTerm(e.target.value)} 
-                                    className="border-start-0 ps-0 shadow-none" 
                                 />
-                            </InputGroup>
+                            </div>
                         </Col>
                     </Row>
+                </Card.Body>
+            </Card>
+
+            <Card className="shadow-sm border-0">
+                <Card.Body>
 
                             {/* Exibição em Árvore Hierárquica */}
                             <div className="organograma-wrapper text-center">
@@ -265,12 +261,7 @@ const formatarNome = (nome) => {
 
                         </Card.Body>
                     </Card>
-                        </Col>
-                    </Row>
-                </Container>
-            
-        
-          
+        </div>
     );
 };
 

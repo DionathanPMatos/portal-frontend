@@ -10,6 +10,7 @@ import ModalHistoricoEquip from "../components/ModalHistoricoEquip";
 import ModalImportarEquip from "../components/ModalImportarEquip";
 import ModalImportarPrestador from "../components/ModalImportarPrestador";
 import apiClient from "../../../services/api";
+import { FaBuilding } from 'react-icons/fa';
 
 const emptyEquip = { nome: "", categoria: "Ar Condicionado", marca: "", modelo: "", numero_serie: "", data_aquisicao: "", valor_aquisicao: "", garantia_meses: "", filial_id: "", centro_custo: "", fornecedor_id: "", fornecedor_nome: "", status: "Ativo", notas: "", exige_manutencao_programada: false };
 const emptyPrestador = { 
@@ -310,10 +311,18 @@ export default function Facilities() {
   const custosSede = manutencoesComFilial.filter(m => !m.filial_id && m.status === 'Concluída');
   resumoPorFilial.push({ filial: 'Sede / Base', valorBens: bensSede.reduce((acc, e) => acc + (parseFloat(e.valor_aquisicao) || 0), 0), valorCustos: custosSede.reduce((acc, m) => acc + (parseFloat(m.custo_final) || 0), 0) });
 
-  if (loading) return <Container className="mt-5 text-center"><Spinner animation="border" /></Container>;
+  if (loading) {
+      return (
+          <div className="dash-grid">
+              <div className='container-main'>
+                  <Container className="mt-5 text-center"><Spinner animation="border" /></Container>
+              </div>
+          </div>
+      );
+  }
 
   return (
-    <Container fluid className="px-4 mt-4">
+    <div className='container-main p-4'>
       <style>
         {`
           @keyframes blink-badge {
@@ -327,15 +336,16 @@ export default function Facilities() {
       {err && <Alert variant="danger" onClose={() => setErr("")} dismissible>{err}</Alert>}
       {success && <Alert variant="success" onClose={() => setSuccess("")} dismissible>{success}</Alert>}
 
-      <Card className="shadow-sm border-0">
-        <Card.Header className="bg-white">
-          <Row className="align-items-center">
-            <Col>
-              <Card.Title as="h5" className="mb-0"> <i className="bi bi-building me-2"></i>Gestão de Facilities & Ativos</Card.Title>
-            </Col>
-          </Row>
-        </Card.Header>
-        
+      <div className="page-header-colored mb-4">
+          <div className="page-header-title-wrapper">
+              <h2 className="page-header-title d-flex align-items-center gap-3">
+                  <FaBuilding /> Gestão de Facilities & Ativos
+              </h2>
+              <p className="page-header-subtitle">Acompanhe e gerencie todos os ativos, manutenções e prestadores de serviços do portal.</p>
+          </div>
+      </div>
+
+      <Card className="shadow-sm border-0 mb-4">
         <Card.Body>
           <Tabs 
             activeKey={activeTab}
@@ -721,6 +731,6 @@ export default function Facilities() {
         historico={historicoData}
       />
 
-    </Container>
+    </div>
   );
 }

@@ -204,9 +204,15 @@ const KpiComercialPage = () => {
     };
 
     return (
-        <Container fluid className="p-4">
-            <h2 className="fw-bold mb-1 text-dark">KPIs da Equipe Comercial</h2>
-            <p className="text-muted mb-4">Análise de performance de vendas e funil.</p>
+        <div className='container-main p-4'>
+            <div className="page-header-colored mb-4">
+                <div className="page-header-title-wrapper">
+                    <h2 className="page-header-title d-flex align-items-center gap-3">
+                        <FaChartLine /> KPIs da Equipe Comercial
+                    </h2>
+                    <p className="page-header-subtitle">Análise de performance de vendas e funil.</p>
+                </div>
+            </div>
 
             <Tabs id="kpi-tabs" activeKey={key} onSelect={(k) => setKey(k)} className="mb-3">
                 <Tab eventKey="geral" title={<><FaChartLine className="me-2"/> Dashboard Geral</>}>
@@ -253,7 +259,7 @@ const KpiComercialPage = () => {
                     </Card>
                 </Tab>
             </Tabs>
-        </Container>
+        </div>
     );
 };
 

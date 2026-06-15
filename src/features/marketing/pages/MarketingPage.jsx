@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { FaCalendarAlt, FaBoxOpen, FaTasks, FaCogs } from 'react-icons/fa';
+import { FaCalendarAlt, FaBoxOpen, FaTasks, FaCogs, FaBullhorn } from 'react-icons/fa';
 
 const MarketingPage = ({ user }) => {
     // Assumindo que o objeto 'user' tem uma propriedade como 'isAdmin' ou um 'role'
@@ -24,11 +24,11 @@ const MarketingPage = ({ user }) => {
             adminOnly: false,
         },
         {
-            title: 'Gerenciar Produtos',
-            description: 'Adicione ou edite os itens de marketing disponíveis.',
+            title: 'Estoque e Produtos',
+            description: 'Cadastre brindes, controle estoque, fornecedores e valores.',
             link: '/admin/gerenciar-produtos-marketing',
-            icon: <FaCogs size={30} />,
-            adminOnly: true,
+            icon: <FaBoxOpen size={30} />,
+            adminOnly: false,
         },
         {
             title: 'Gerenciar Pedidos de Material',
@@ -42,27 +42,29 @@ const MarketingPage = ({ user }) => {
     const accessibleFeatures = features.filter(feature => !feature.adminOnly || isAdmin);
 
     return (
-        <div className="dash-grid">
-            <Container fluid className="p-4">
-                <div className="mb-4 pb-3 border-bottom">
-                    <h2 className="fw-bold mb-1 text-dark">Módulo de Marketing</h2>
-                    <p className="text-muted mb-0">Central de ferramentas e solicitações de marketing.</p>
+        <div className='container-main p-4'>
+            <div className="page-header-colored mb-4">
+                <div className="page-header-title-wrapper">
+                    <h2 className="page-header-title d-flex align-items-center gap-3">
+                        <FaBullhorn /> Módulo de Marketing
+                    </h2>
+                    <p className="page-header-subtitle">Central de ferramentas e solicitações de marketing.</p>
                 </div>
+            </div>
 
-                <Row xs={1} md={2} lg={3} className="g-4">
-                    {accessibleFeatures.map((feature, index) => (
-                        <Col key={index}>
-                            <Link to={feature.link} className="text-decoration-none">
-                                <Card as="div" className="h-100 shadow-sm border-0 text-center py-4 px-3" style={{ transition: 'all .2s ease-in-out' }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseOut={e => e.currentTarget.style.transform = 'none'}>
+            <Row xs={1} md={2} lg={3} className="g-4 mb-4">
+                {accessibleFeatures.map((feature, index) => (
+                    <Col key={index}>
+                        <Link to={feature.link} className="text-decoration-none">
+                            <Card as="div" className="h-100 shadow-sm border-0 text-center py-4 px-3" style={{ transition: 'all .2s ease-in-out' }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseOut={e => e.currentTarget.style.transform = 'none'}>
                                     <div className="text-primary mb-3">{feature.icon}</div>
                                     <h5 className="fw-bold text-dark">{feature.title}</h5>
                                     <p className="text-muted small mb-0">{feature.description}</p>
-                                </Card>
-                            </Link>
-                        </Col>
-                    ))}
-                </Row>
-            </Container>
+                            </Card>
+                        </Link>
+                    </Col>
+                ))}
+            </Row>
         </div>
     );
 };
