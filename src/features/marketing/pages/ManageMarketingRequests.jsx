@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Container, Card, Button, Alert, Spinner, Table, Badge, Form } from 'react-bootstrap';
-import { FaBoxOpen } from 'react-icons/fa';
+import { Card, Alert, Spinner, Table, Badge, Form } from 'react-bootstrap';
+import { FaTasks, FaBoxOpen } from 'react-icons/fa';
 import apiClient from '../../../services/api';
 
 const ManageMarketingRequestsPage = () => {
@@ -35,7 +35,7 @@ const ManageMarketingRequestsPage = () => {
             window.dispatchEvent(new Event('notificacao-atualizada'));
         } catch (err) {
             console.error(err);
-            setError('Falha ao atualizar status.');
+            setError(err.response?.data?.error || 'Falha ao atualizar status.');
         }
     };
 
@@ -48,20 +48,20 @@ const ManageMarketingRequestsPage = () => {
     };
 
     return (
-        <div className="dash-grid">
-            <div className="container-main p-4">
-                <Container fluid className="px-0">
-                    <div className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
-                        <div>
-                            <h2 className="fw-bold mb-1 text-dark">Gestão de Pedidos de Material</h2>
-                            <p className="text-muted mb-0">Gerencie os pedidos de materiais feitos pelos colaboradores.</p>
-                        </div>
-                    </div>
+        <div className='container-main p-4'>
+            <div className="page-header-colored mb-4">
+                <div className="page-header-title-wrapper">
+                    <h2 className="page-header-title d-flex align-items-center gap-3">
+                        <FaTasks /> Gestão de Pedidos de Material
+                    </h2>
+                    <p className="page-header-subtitle">Gerencie os pedidos de materiais feitos pelos colaboradores.</p>
+                </div>
+            </div>
 
-                    {error && <Alert variant="danger" onClose={() => setError(null)} dismissible>{error}</Alert>}
-                    {success && <Alert variant="success" onClose={() => setSuccess(null)} dismissible>{success}</Alert>}
+            {error && <Alert variant="danger" onClose={() => setError(null)} dismissible>{error}</Alert>}
+            {success && <Alert variant="success" onClose={() => setSuccess(null)} dismissible>{success}</Alert>}
 
-                    <Card className="shadow-sm border-0">
+            <Card className="shadow-sm border-0 mb-4">
                         <Card.Header className="fw-bold d-flex align-items-center gap-2">
                             <FaBoxOpen /> Solicitações de Materiais
                         </Card.Header>
@@ -75,7 +75,8 @@ const ManageMarketingRequestsPage = () => {
                                             <td>{sol.solicitante.nome_completo}</td>
                                             <td>{new Date(sol.data_solicitacao).toLocaleDateString()}</td>
                                             <td>
-                                                {sol.itens.map(item => <div key={item.produto_id}>{item.quantidade}x {item.produto.nome}</div>)}
+                                                {sol.itens.map(item => <div key={item.produto_id} className="fw-bold">{item.quantidade}x {item.produto.nome}</div>)}
+                                                <small className="text-muted d-block mt-1"><strong>Motivo:</strong> {sol.justificativa || 'Não informada'}</small>
                                             </td>
                                             <td>
                                                 <Form.Select size="sm" value={sol.status} onChange={(e) => handleMaterialStatusChange(sol.id, e.target.value)} style={{minWidth: '120px'}}>
@@ -94,10 +95,10 @@ const ManageMarketingRequestsPage = () => {
                             </Table>
                         )}
                     </Card>
-                </Container>
-            </div>
+
         </div>
     );
 };
+
 
 export default ManageMarketingRequestsPage;

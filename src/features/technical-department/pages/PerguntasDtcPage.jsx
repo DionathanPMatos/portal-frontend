@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Form, Button, Badge, Modal, InputGroup, Spinner } from 'react-bootstrap';
+import { Row, Col, Card, Form, Button, Badge, Modal, InputGroup, Spinner } from 'react-bootstrap';
 import { FaSearch, FaCommentDots, FaCheckCircle, FaClock, FaPlus, FaReply } from 'react-icons/fa';
 import apiClient from '../../../services/api';
 
@@ -146,17 +146,19 @@ export default function PerguntasDtcPage({ user }) {
     };
 
     return (
-        <Container fluid className="px-4 pb-5">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h4 className="fw-bold mb-1 d-flex align-items-center gap-2 text-dark">
-                        <FaCommentDots className="text-primary" /> Central de Dúvidas DTC
-                    </h4>
-                    <p className="text-muted mb-0">Pesquise por dúvidas anteriores ou faça uma nova pergunta técnica.</p>
+        <div className='container-main p-4'>
+            <div className="page-header-colored mb-4">
+                <div className="page-header-title-wrapper">
+                    <h2 className="page-header-title d-flex align-items-center gap-3">
+                        <FaCommentDots /> Central de Dúvidas DTC
+                    </h2>
+                    <p className="page-header-subtitle">Pesquise por dúvidas anteriores ou faça uma nova pergunta técnica.</p>
                 </div>
-                <Button variant="primary" className="d-flex align-items-center gap-2" onClick={() => setShowNovaModal(true)}>
-                    <FaPlus /> Nova Pergunta
-                </Button>
+                <div className="page-header-actions-wrapper">
+                    <Button variant="primary" className="btn-header-action" onClick={() => setShowNovaModal(true)}>
+                        <FaPlus className="me-2" /> Nova Pergunta
+                    </Button>
+                </div>
             </div>
 
             {/* Filtros */}
@@ -164,12 +166,18 @@ export default function PerguntasDtcPage({ user }) {
                 <Card.Body>
                     <Row className="g-3">
                         <Col md={4}>
-                            <InputGroup>
-                                <InputGroup.Text className="bg-light"><FaSearch /></InputGroup.Text>
-                                <Form.Control placeholder="Pesquisar em perguntas ou respostas..." value={search} onChange={(e) => setSearch(e.target.value)} />
-                            </InputGroup>
+                            <div className="header-search-container">
+                                <FaSearch className="search-icon" />
+                                <Form.Control 
+                                    type="text"
+                                    className="search-input"
+                                    placeholder="Pesquisar em perguntas ou respostas..." 
+                                    value={search} 
+                                    onChange={(e) => setSearch(e.target.value)} 
+                                />
+                            </div>
                         </Col>
-                        <Col md={3}>
+                        <Col md={3} className="mt-md-0 mt-3">
                             <Form.Select value={filtroVertical} onChange={(e) => setFiltroVertical(e.target.value)}>
                                 <option value="">Todas as Verticais</option>
                                 {verticaisNomes.map(nome => <option key={nome} value={nome}>{nome}</option>)}
@@ -268,6 +276,6 @@ export default function PerguntasDtcPage({ user }) {
                     <Modal.Footer><Button variant="secondary" onClick={() => setShowResponderModal(false)}>Cancelar</Button><Button variant="success" type="submit">Publicar Resposta</Button></Modal.Footer>
                 </Form>
             </Modal>
-        </Container>
+        </div>
     );
 }

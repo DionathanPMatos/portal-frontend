@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Container, Card, Button, Alert, Spinner, Table, Badge, Tabs, Tab, Modal, ListGroup, Form } from 'react-bootstrap';
+import { Card, Button, Alert, Spinner, Table, Badge, Tabs, Tab, Modal, ListGroup, Form } from 'react-bootstrap';
 import { FaCalendarAlt, FaPlus, FaList, FaTasks, FaHistory, FaUsers, FaTags, FaCheck, FaTimes, FaUserTie, FaCogs, FaTrash } from 'react-icons/fa';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
@@ -219,183 +219,180 @@ const ReserveRoomPage = () => {
     }, []);
 
     return (
-        <div className="dash-grid">
-            <div className="container-main p-4">
-                <Container fluid className="px-0">
-                    <div className="page-header-colored mb-4">
-                        <div className="page-header-title-wrapper">
-                            <h2 className="page-header-title d-flex align-items-center gap-3">
-                                <FaCalendarAlt /> Reserva de Salas e Showroom
-                            </h2>
-                            <p className="page-header-subtitle">Consulte a disponibilidade, gerencie solicitações e configure as opções de reserva.</p>
-                        </div>
-                    </div>
-
-                    {error && <Alert variant="danger" onClose={() => setError(null)} dismissible>{error}</Alert>}
-                    {success && <Alert variant="success" dismissible onClose={() => setSuccess(null)}>{success}</Alert>}
-
-                    {loading ? (
-                        <div className="text-center p-5"><Spinner animation="border" /></div>
-                    ) : (
-                        <Tabs defaultActiveKey="calendario" id="reserva-tabs" className="mb-3 custom-tabs">
-                            <Tab eventKey="calendario" title={<><FaCalendarAlt className="me-2" />Disponibilidade</>}>
-                                <Card className="shadow-sm border-0">
-                                    <Card.Body>
-                                        <p className="text-muted">Calendário de reservas já <strong>aprovadas</strong>. Use os horários livres para sua solicitação.</p>
-                                        <div style={{ height: '600px' }}>
-                                            <Calendar
-                                                localizer={localizer}
-                                                selectable
-                                                events={eventos}
-                                                startAccessor="start"
-                                                endAccessor="end"
-                                                style={{ height: '600' }}
-                                                messages={calendarMessages}
-                                                culture="pt-BR"
-                                                onSelectEvent={handleSelectEvent}
-                                                onSelectSlot={handleSelectSlot}
-                                                date={currentDate}
-                                                view={currentView}
-                                                onNavigate={(newDate) => setCurrentDate(newDate)}
-                                                onView={(newView) => setCurrentView(newView)}
-                                                eventPropGetter={(event) => {
-                                                    let backgroundColor = '#007bff';
-                                                    if (event.status === 'Aprovado') backgroundColor = '#28a745';
-                                                    if (event.status === 'Recusado') backgroundColor = '#dc3545';
-                                                    return { style: { backgroundColor, color: 'white', borderRadius: '4px' } };
-                                                }}    
-                                            />
-                                        </div>
-                                        <div className="mt-4 pt-3 border-top">
-                                            <h6 className="text-muted small">LEGENDA DE CORES</h6>
-                                            <div className="d-flex flex-wrap gap-3">
-                                                {categorias.map(cat => (
-                                                    <div key={cat.id} className="d-flex align-items-center gap-2">
-                                                        <div style={{ width: '15px', height: '15px', backgroundColor: cat.cor, borderRadius: '3px', border: '1px solid #ddd' }}></div>
-                                                        <span className="small">{cat.nome}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </Card.Body>
-                                </Card>
-                            </Tab>
-                            <Tab eventKey="solicitacoes" title={<><FaList className="me-2" />Minhas Reservas</>}>
-                                <Card className="shadow-sm border-0">
-                                    <Card.Header className="d-flex justify-content-between align-items-center bg-light">
-                                        <h5 className="mb-0 fw-bold text-dark">Minhas Solicitações</h5>
-                                        <Button variant="primary" onClick={() => setShowModal(true)}>
-                                            <FaPlus className="me-2" /> Nova Solicitação
-                                        </Button>
-                                    </Card.Header>
-                                    <Table responsive hover className="align-middle mb-0">
-                                        <thead className="text-muted small text-uppercase">
-                                            <tr>
-                                                <th>Compromisso</th>
-                                                <th>Cliente</th>
-                                                <th>Local</th>
-                                                <th>Data</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {userReservas.length > 0 ? userReservas.map(res => (
-                                                <tr key={res.id}>
-                                                    <td className="fw-bold">{res.titulo}</td>
-                                                    <td>{res.nome_cliente}</td>
-                                                    <td>{res.local?.nome || 'N/A'}</td>
-                                                    <td>{new Date(res.data_inicio_visita).toLocaleString()}</td>
-                                                    <td>
-                                                        {getStatusBadge(res.status)}
-                                                        {res.status === 'Recusado' && res.motivo_recusa && (
-                                                            <div className="text-muted small mt-1" title={res.motivo_recusa}>
-                                                                Motivo: {res.motivo_recusa.substring(0, 30)}{res.motivo_recusa.length > 30 ? '...' : ''}
-                                                            </div>
-                                                        )}
-                                                    </td>
-                                                </tr>
-                                            )) : (
-                                                <tr><td colSpan="5" className="text-center py-4 text-muted">Nenhuma solicitação encontrada.</td></tr>
-                                            )}
-                                        </tbody>
-                                    </Table>
-                                </Card>
-                            </Tab>
-                            {canManage && (
-                                <Tab eventKey="gerenciar" title={<><FaTasks className="me-2" />Gerenciar Solicitações <Badge pill bg="danger">{pendingReservas.length}</Badge></>}>
-                                    <Tabs defaultActiveKey="pendentes" className="mb-3 nav-pills">
-                                        <Tab eventKey="pendentes" title={<>Pendentes <Badge pill bg="warning">{pendingReservas.length}</Badge></>}>
-                                            <Card className="shadow-sm border-0">
-                                                <Card.Header className="fw-bold">Solicitações Pendentes de Aprovação</Card.Header>
-                                                <Table responsive hover className="align-middle mb-0">
-                                                    <thead><tr><th>Solicitante</th><th>Cliente</th><th>Local</th><th>Período</th><th>Ação</th></tr></thead>
-                                                    <tbody>
-                                                        {pendingReservas.length > 0 ? pendingReservas.map(res => (
-                                                            <tr key={res.id}>
-                                                                <td>{res.solicitante.nome_completo}</td>
-                                                                <td>{res.nome_cliente}</td>
-                                                                <td>{res.local.nome}</td>
-                                                                <td>{new Date(res.data_inicio_visita).toLocaleString()} até {new Date(res.data_fim_visita).toLocaleString()}</td>
-                                                                <td><Button variant="primary" size="sm" onClick={() => handleShowApprovalModal(res)}>Gerenciar</Button></td>
-                                                            </tr>
-                                                        )) : <tr><td colSpan="5" className="text-center py-4 text-muted">Nenhuma reserva pendente.</td></tr>}
-                                                    </tbody>
-                                                </Table>
-                                            </Card>
-                                        </Tab>
-                                        <Tab eventKey="historico" title={<><FaHistory className="me-2" />Histórico</>}>
-                                            <Card className="shadow-sm border-0">
-                                                <Card.Header className="fw-bold">Histórico de Solicitações Processadas</Card.Header>
-                                                <Table responsive hover className="align-middle mb-0 small">
-                                                    <thead><tr><th>Solicitante</th><th>Cliente</th><th>Local</th><th>Período</th><th>Apresentador</th><th>Processado por</th><th>Status</th><th className="text-end">Ações</th></tr></thead>
-                                                    <tbody>
-                                                        {processedReservas.length > 0 ? processedReservas.map(res => (
-                                                            <tr key={res.id}>
-                                                                <td>{res.solicitante.nome_completo}</td>
-                                                                <td>{res.nome_cliente}</td>
-                                                                <td>{res.local.nome}</td>
-                                                                <td>{new Date(res.data_inicio_visita).toLocaleString()}</td>
-                                                                <td>{res.apresentador?.nome_completo || '-'}</td>
-                                                                <td>{res.aprovador?.nome_completo || 'N/A'}</td>
-                                                                <td>
-                                                                    {getStatusBadge(res.status)}
-                                                                    {res.status === 'Recusado' && res.motivo_recusa && (
-                                                                        <div className="text-muted small mt-1" title={res.motivo_recusa}>
-                                                                            Motivo: {res.motivo_recusa.substring(0, 30)}{res.motivo_recusa.length > 30 ? '...' : ''}
-                                                                        </div>
-                                                                    )}
-                                                                </td>
-                                                                <td className="text-end">
-                                                                    <Button variant="light" size="sm" className="text-danger" onClick={() => handleDeleteReserva(res.id)} title="Excluir Reserva Permanentemente">
-                                                                        <FaTrash />
-                                                                    </Button>
-                                                                </td>
-                                                            </tr>
-                                                        )) : <tr><td colSpan="8" className="text-center py-4 text-muted">Nenhuma reserva processada.</td></tr>}
-                                                    </tbody>
-                                                </Table>
-                                            </Card>
-                                        </Tab>
-                                    </Tabs>
-                                </Tab>
-                            )}
-                            {canManage && (
-                                <Tab eventKey="configuracoes" title={<><FaCogs className="me-2" />Configurações</>}>
-                                    <p className="text-muted">Gerencie as opções disponíveis para o agendamento de visitas.</p>
-                                    <Tabs defaultActiveKey="categorias" className="mb-3 nav-pills">
-                                        <Tab eventKey="categorias" title="Categorias de Reserva">
-                                            <ManageBookingCategories />
-                                        </Tab>
-                                        <Tab eventKey="interesses" title="Áreas de Interesse">
-                                            <ManageBookingInterests />
-                                        </Tab>
-                                    </Tabs>
-                                </Tab>
-                            )}
-                        </Tabs>
-                    )}
-                </Container>
+        <div className='container-main p-4'>
+            <div className="page-header-colored mb-4">
+                <div className="page-header-title-wrapper">
+                    <h2 className="page-header-title d-flex align-items-center gap-3">
+                        <FaCalendarAlt /> Reserva de Salas e Showroom
+                    </h2>
+                    <p className="page-header-subtitle">Consulte a disponibilidade, gerencie solicitações e configure as opções de reserva.</p>
+                </div>
             </div>
+
+            {error && <Alert variant="danger" onClose={() => setError(null)} dismissible>{error}</Alert>}
+            {success && <Alert variant="success" dismissible onClose={() => setSuccess(null)}>{success}</Alert>}
+
+            {loading ? (
+                <div className="text-center p-5"><Spinner animation="border" /></div>
+            ) : (
+                <Tabs defaultActiveKey="calendario" id="reserva-tabs" className="mb-4 custom-tabs bg-white p-3 rounded shadow-sm">
+                    <Tab eventKey="calendario" title={<><FaCalendarAlt className="me-2" />Disponibilidade</>}>
+                        <Card className="shadow-sm border-0 mt-3">
+                            <Card.Body>
+                                <p className="text-muted">Calendário de reservas já <strong>aprovadas</strong>. Use os horários livres para sua solicitação.</p>
+                                <div style={{ height: '600px' }}>
+                                    <Calendar
+                                        localizer={localizer}
+                                        selectable
+                                        events={eventos}
+                                        startAccessor="start"
+                                        endAccessor="end"
+                                        style={{ height: '600px' }}
+                                        messages={calendarMessages}
+                                        culture="pt-BR"
+                                        onSelectEvent={handleSelectEvent}
+                                        onSelectSlot={handleSelectSlot}
+                                                date={currentDate}
+                                        view={currentView}
+                                        onNavigate={(newDate) => setCurrentDate(newDate)}
+                                        onView={(newView) => setCurrentView(newView)}
+                                        eventPropGetter={(event) => {
+                                            let backgroundColor = '#007bff';
+                                            if (event.status === 'Aprovado') backgroundColor = '#28a745';
+                                            if (event.status === 'Recusado') backgroundColor = '#dc3545';
+                                            return { style: { backgroundColor, color: 'white', borderRadius: '4px' } };
+                                        }}    
+                                    />
+                                </div>
+                                <div className="mt-4 pt-3 border-top">
+                                    <h6 className="text-muted small">LEGENDA DE CORES</h6>
+                                    <div className="d-flex flex-wrap gap-3">
+                                        {categorias.map(cat => (
+                                            <div key={cat.id} className="d-flex align-items-center gap-2">
+                                                <div style={{ width: '15px', height: '15px', backgroundColor: cat.cor, borderRadius: '3px', border: '1px solid #ddd' }}></div>
+                                                <span className="small">{cat.nome}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </Card.Body>
+                        </Card>
+                    </Tab>
+                    <Tab eventKey="solicitacoes" title={<><FaList className="me-2" />Minhas Reservas</>}>
+                        <Card className="shadow-sm border-0 mt-3">
+                            <Card.Header className="d-flex justify-content-between align-items-center bg-light">
+                                <h5 className="mb-0 fw-bold text-dark">Minhas Solicitações</h5>
+                                <Button variant="primary" onClick={() => setShowModal(true)}>
+                                    <FaPlus className="me-2" /> Nova Solicitação
+                                </Button>
+                            </Card.Header>
+                            <Table responsive hover className="align-middle mb-0">
+                                <thead className="text-muted small text-uppercase">
+                                    <tr>
+                                        <th>Compromisso</th>
+                                        <th>Cliente</th>
+                                        <th>Local</th>
+                                        <th>Data</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {userReservas.length > 0 ? userReservas.map(res => (
+                                        <tr key={res.id}>
+                                            <td className="fw-bold">{res.titulo}</td>
+                                            <td>{res.nome_cliente}</td>
+                                            <td>{res.local?.nome || 'N/A'}</td>
+                                            <td>{new Date(res.data_inicio_visita).toLocaleString()}</td>
+                                            <td>
+                                                {getStatusBadge(res.status)}
+                                                {res.status === 'Recusado' && res.motivo_recusa && (
+                                                    <div className="text-muted small mt-1" title={res.motivo_recusa}>
+                                                        Motivo: {res.motivo_recusa.substring(0, 30)}{res.motivo_recusa.length > 30 ? '...' : ''}
+                                                    </div>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    )) : (
+                                        <tr><td colSpan="5" className="text-center py-4 text-muted">Nenhuma solicitação encontrada.</td></tr>
+                                    )}
+                                </tbody>
+                            </Table>
+                        </Card>
+                    </Tab>
+                    {canManage && (
+                        <Tab eventKey="gerenciar" title={<><FaTasks className="me-2" />Gerenciar Solicitações <Badge pill bg="danger">{pendingReservas.length}</Badge></>}>
+                            <Tabs defaultActiveKey="pendentes" className="mb-3 mt-3 nav-pills">
+                                <Tab eventKey="pendentes" title={<>Pendentes <Badge pill bg="warning">{pendingReservas.length}</Badge></>}>
+                                    <Card className="shadow-sm border-0">
+                                        <Card.Header className="fw-bold">Solicitações Pendentes de Aprovação</Card.Header>
+                                        <Table responsive hover className="align-middle mb-0">
+                                            <thead><tr><th>Solicitante</th><th>Cliente</th><th>Local</th><th>Período</th><th>Ação</th></tr></thead>
+                                            <tbody>
+                                                {pendingReservas.length > 0 ? pendingReservas.map(res => (
+                                                    <tr key={res.id}>
+                                                        <td>{res.solicitante.nome_completo}</td>
+                                                        <td>{res.nome_cliente}</td>
+                                                        <td>{res.local.nome}</td>
+                                                        <td>{new Date(res.data_inicio_visita).toLocaleString()} até {new Date(res.data_fim_visita).toLocaleString()}</td>
+                                                        <td><Button variant="primary" size="sm" onClick={() => handleShowApprovalModal(res)}>Gerenciar</Button></td>
+                                                    </tr>
+                                                )) : <tr><td colSpan="5" className="text-center py-4 text-muted">Nenhuma reserva pendente.</td></tr>}
+                                            </tbody>
+                                        </Table>
+                                    </Card>
+                                </Tab>
+                                <Tab eventKey="historico" title={<><FaHistory className="me-2" />Histórico</>}>
+                                    <Card className="shadow-sm border-0">
+                                        <Card.Header className="fw-bold">Histórico de Solicitações Processadas</Card.Header>
+                                        <Table responsive hover className="align-middle mb-0 small">
+                                            <thead><tr><th>Solicitante</th><th>Cliente</th><th>Local</th><th>Período</th><th>Apresentador</th><th>Processado por</th><th>Status</th><th className="text-end">Ações</th></tr></thead>
+                                            <tbody>
+                                                {processedReservas.length > 0 ? processedReservas.map(res => (
+                                                    <tr key={res.id}>
+                                                        <td>{res.solicitante.nome_completo}</td>
+                                                        <td>{res.nome_cliente}</td>
+                                                        <td>{res.local.nome}</td>
+                                                        <td>{new Date(res.data_inicio_visita).toLocaleString()}</td>
+                                                        <td>{res.apresentador?.nome_completo || '-'}</td>
+                                                        <td>{res.aprovador?.nome_completo || 'N/A'}</td>
+                                                        <td>
+                                                            {getStatusBadge(res.status)}
+                                                            {res.status === 'Recusado' && res.motivo_recusa && (
+                                                                <div className="text-muted small mt-1" title={res.motivo_recusa}>
+                                                                    Motivo: {res.motivo_recusa.substring(0, 30)}{res.motivo_recusa.length > 30 ? '...' : ''}
+                                                                </div>
+                                                            )}
+                                                        </td>
+                                                        <td className="text-end">
+                                                            <Button variant="light" size="sm" className="text-danger" onClick={() => handleDeleteReserva(res.id)} title="Excluir Reserva Permanentemente">
+                                                                <FaTrash />
+                                                            </Button>
+                                                        </td>
+                                                    </tr>
+                                                )) : <tr><td colSpan="8" className="text-center py-4 text-muted">Nenhuma reserva processada.</td></tr>}
+                                            </tbody>
+                                        </Table>
+                                    </Card>
+                                </Tab>
+                            </Tabs>
+                        </Tab>
+                    )}
+                    {canManage && (
+                        <Tab eventKey="configuracoes" title={<><FaCogs className="me-2" />Configurações</>}>
+                            <p className="text-muted mt-3">Gerencie as opções disponíveis para o agendamento de visitas.</p>
+                            <Tabs defaultActiveKey="categorias" className="mb-3 nav-pills">
+                                <Tab eventKey="categorias" title="Categorias de Reserva">
+                                    <ManageBookingCategories />
+                                </Tab>
+                                <Tab eventKey="interesses" title="Áreas de Interesse">
+                                    <ManageBookingInterests />
+                                </Tab>
+                            </Tabs>
+                        </Tab>
+                    )}
+                </Tabs>
+            )}
+
             <BookingFormModal
                 show={showModal}
                 onHide={() => {

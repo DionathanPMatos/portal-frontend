@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Container, Row, Col, Card, Form, InputGroup, Button, Table, Badge, Modal, Spinner, Alert } from 'react-bootstrap';
+import { Row, Col, Card, Form, InputGroup, Button, Table, Badge, Modal, Spinner, Alert } from 'react-bootstrap';
 import { FaFolderOpen, FaSearch, FaPlus, FaExternalLinkAlt, FaTrash, FaCheck } from 'react-icons/fa';
 import apiClient from '../../../services/api'; // Importa a instância configurada do Axios
 // import '../../App.css'; // Removido: estilos globais devem ser importados apenas em main.jsx ou App.jsx
@@ -169,72 +169,64 @@ const RepositorioTecnico = () => {
     };
 
     return (
-        <Container fluid className="px-4">
-            <Row>
-                <Col>
-                    <Card className="shadow-sm border-0">
-                        <Card.Header className="d-flex justify-content-between align-items-center">
-                            <Card.Title as="h4" className="mb-0 d-flex align-items-center gap-2">
-                                <FaFolderOpen /> Repositório Técnico
-                            </Card.Title>
-                        </Card.Header>
-                        <Card.Body>
-                            {/* Header Interno Padrão */}
-                            <div className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
-                                <div>
-                                    <h4 className="fw-bold mb-1 text-dark">
-                                        Central de Documentos
-                                    </h4>
-                                    <p className="text-muted mb-0">
-                                        Acesse propostas, TRs, manuais e materiais de apoio organizados por solução.
-                                    </p>
-                                </div>
-                                <Button variant="primary" className="d-flex align-items-center gap-2 shadow-sm" onClick={handleOpenModal}>
-                                    <FaPlus /> Adicionar Documento
-                                </Button>
+        <div className='container-main p-4'>
+            <div className="page-header-colored mb-4">
+                <div className="page-header-title-wrapper">
+                    <h2 className="page-header-title d-flex align-items-center gap-3">
+                        <FaFolderOpen /> Repositório Técnico
+                    </h2>
+                    <p className="page-header-subtitle">Acesse propostas, TRs, manuais e materiais de apoio organizados por solução.</p>
+                </div>
+                <div className="page-header-actions-wrapper">
+                    <Button variant="primary" className="btn-header-action" onClick={handleOpenModal}>
+                        <FaPlus className="me-2" /> Adicionar Documento
+                    </Button>
+                </div>
+            </div>
+
+            {error && <Alert variant="danger">{error}</Alert>}
+
+            <Card className="shadow-sm border-0 mb-4">
+                <Card.Body>
+                    <Row className="g-3 align-items-center">
+                        <Col lg={4}>
+                            <div className="header-search-container">
+                                <FaSearch className="search-icon" />
+                                <Form.Control
+                                    type="text"
+                                    className="search-input"
+                                    placeholder="Buscar pelo nome do arquivo..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
                             </div>
+                        </Col>
+                        <Col lg={4}>
+                            <Form.Select value={filtroCategoria} onChange={(e) => setFiltroCategoria(e.target.value)}>
+                                <option value="">Todas as Categorias (Solução)</option>
+                                {categorias.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                            </Form.Select>
+                        </Col>
+                        <Col lg={4}>
+                            <Form.Select value={filtroTipo} onChange={(e) => setFiltroTipo(e.target.value)}>
+                                <option value="">Todos os Tipos</option>
+                                {tipos.map(tipo => <option key={tipo} value={tipo}>{tipo}</option>)}
+                            </Form.Select>
+                        </Col>
+                    </Row>
+                </Card.Body>
+            </Card>
 
-                            {error && <Alert variant="danger">{error}</Alert>}
-
-                            {/* Barra de Filtros */}
-                            <Row className="mb-4 g-3">
-                                <Col md={12} lg={4}>
-                                    <InputGroup className="shadow-sm">
-                                        <InputGroup.Text className="bg-white border-end-0">
-                                            <FaSearch className="text-muted" />
-                                        </InputGroup.Text>
-                                        <Form.Control
-                                            placeholder="Buscar pelo nome do arquivo..."
-                                            value={searchTerm}
-                                            onChange={(e) => setSearchTerm(e.target.value)}
-                                            className="border-start-0 ps-0 shadow-none"
-                                        />
-                                    </InputGroup>
-                                </Col>
-                                <Col md={6} lg={4}>
-                                    <Form.Select className="shadow-sm shadow-none" value={filtroCategoria} onChange={(e) => setFiltroCategoria(e.target.value)}>
-                                        <option value="">Todas as Categorias (Solução)</option>
-                                        {categorias.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                                    </Form.Select>
-                                </Col>
-                                <Col md={6} lg={4}>
-                                    <Form.Select className="shadow-sm shadow-none" value={filtroTipo} onChange={(e) => setFiltroTipo(e.target.value)}>
-                                        <option value="">Todos os Tipos</option>
-                                        {tipos.map(tipo => <option key={tipo} value={tipo}>{tipo}</option>)}
-                                    </Form.Select>
-                                </Col>
-                            </Row>
-
-                            {/* Tabela de Dados */}
+            <Card className="shadow-sm border-0">
                             <div className="table-responsive">
                                 <Table hover className="align-middle border mb-0">
                                     <thead className="table-light text-muted small text-uppercase">
                                         <tr>
-                                            <th className="py-3 px-4">Nome do Documento</th>
-                                            <th className="py-3">Solução</th>
-                                            <th className="py-3">Tipo</th>
-                                            <th className="py-3">Descrição Breve</th>
-                                            <th className="py-3 text-end px-4">Ações</th>
+                                            <th className="px-4 py-3 fw-bold border-0">Nome do Documento</th>
+                                            <th className="py-3 fw-bold border-0">Solução</th>
+                                            <th className="py-3 fw-bold border-0">Tipo</th>
+                                            <th className="py-3 fw-bold border-0">Descrição Breve</th>
+                                            <th className="text-end px-4 py-3 fw-bold border-0">Ações</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -273,10 +265,7 @@ const RepositorioTecnico = () => {
                                     </tbody>
                                 </Table>
                             </div>
-                        </Card.Body>
-                    </Card>
-                </Col>
-            </Row>
+            </Card>
 
             {/* MODAL DE CADASTRO */}
             <Modal show={showModal} onHide={handleCloseModal} size="lg" centered backdrop="static">
@@ -350,7 +339,7 @@ const RepositorioTecnico = () => {
                     </Modal.Footer>
                 </Form>
             </Modal>
-        </Container>
+        </div>
     );
 };
 

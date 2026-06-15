@@ -12,7 +12,7 @@ import ModalEtapaDetalhes from "../components/ModalEtapaDetalhes";
 import ModalOrcamentoDetalhes from "../components/ModalOrcamentoDetalhes";
 import ModalMaterialDetalhes from "../components/ModalMaterialDetalhes";
 import ChecklistManager from "../components/ChecklistManager";
-import { FaHistory } from "react-icons/fa"; // Ícone para o histórico
+import { FaHistory, FaHammer } from "react-icons/fa"; // Ícone para o histórico
 import { useAuth } from "../../../contexts/AuthContext"; // Para permissões de usuário
 import apiClient from "../../../services/api";
 
@@ -170,32 +170,46 @@ export default function GestaoObras() {
     return matchesSearch && matchesStatus && matchesPrioridade;
   });
 
-  if (loading) return <Spinner animation="border" />;
+  if (loading) {
+      return (
+          <div className="dash-grid">
+              <div className='container-main'>
+                  <Container className="mt-5 text-center"><Spinner animation="border" /></Container>
+              </div>
+          </div>
+      );
+  }
 
   return (
-    <Container fluid className="px-4 py-4">
-        <Card className="mb-4 shadow-sm border-left-0">
-            <Card.Header className="bg-white">  
-                <Row className="align-items-center"> 
-                    <Col>
-              <Card.Title as="h4" className="mb-0"> <i className="bi bi-hammer me-2"></i>Gestão de Obras e Reformas</Card.Title>
-                    </Col>  
-                    </Row>
-            </Card.Header>
-       
-
+    <div className='container-main p-4'>
       {err && <Alert variant="danger" onClose={() => setErr("")} dismissible>{err}</Alert>}
       {success && <Alert variant="success" onClose={() => setSuccess("")} dismissible>{success}</Alert>}
-    <Card.Body>
-      <Row className="mb-4">
-        <Col md={3}>
+
+      <div className="page-header-colored mb-4">
+          <div className="page-header-title-wrapper">
+              <h2 className="page-header-title d-flex align-items-center gap-3">
+                  <FaHammer /> Gestão de Obras e Reformas
+              </h2>
+              <p className="page-header-subtitle">Acompanhe projetos, etapas, orçamentos e materiais das obras.</p>
+          </div>
+          <div className="page-header-actions-wrapper">
+              <Button variant="primary" className="btn-header-action" onClick={() => { setProjectData(emptyProject); setShowProject(true); }}>
+                  <i className="bi bi-plus-circle me-2"></i> Novo Projeto
+              </Button>
+          </div>
+      </div>
+
+      <Card className="shadow-sm border-0 mb-4">
+        <Card.Body>
+          <Row className="g-3 align-items-center">
+            <Col md={4}>
           <Form.Control
             placeholder="Buscar projeto..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </Col>
-        <Col md={3}>
+        <Col md={4}>
           <Form.Select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
             <option value="">Todos os status</option>
             <option value="Planejamento">Planejamento</option>
@@ -204,7 +218,7 @@ export default function GestaoObras() {
             <option value="Concluído">Concluído</option>
           </Form.Select>
         </Col>
-        <Col md={3}>
+        <Col md={4}>
           <Form.Select value={filterPrioridade} onChange={(e) => setFilterPrioridade(e.target.value)}>
             <option value="">Todas as prioridades</option>
             <option value="Baixa">Baixa</option>
@@ -213,20 +227,12 @@ export default function GestaoObras() {
             <option value="Crítica">Crítica</option>
           </Form.Select>
         </Col>
-        <Col md={3}>
-          <Button
-            variant="success"
-            onClick={() => {
-              setProjectData(emptyProject);
-              setShowProject(true);
-            }}
-            className="w-100"
-          >
-            <i className="bi bi-plus-circle"></i> Novo Projeto
-          </Button>
-        </Col>
       </Row>
+      </Card.Body>
+      </Card>
 
+      <Card className="shadow-sm border-0 mb-4">
+        <Card.Body>
       <Row>
         <Col lg={4}>
           <Card className="shadow-sm">
@@ -680,9 +686,8 @@ export default function GestaoObras() {
         onUpdate={() => fetchProjectDetails(projetoSelecionado.id)}
       />
 
-    </Card.Body>
-    </Card>
-    
-    </Container>
+        </Card.Body>
+      </Card>
+    </div>
   );
 }
