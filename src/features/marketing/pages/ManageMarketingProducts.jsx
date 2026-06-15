@@ -14,7 +14,7 @@ const ManageMarketingProductsPage = () => {
     // Modal state
     const [showModal, setShowModal] = useState(false);
     const [editingProduto, setEditingProduto] = useState(null);
-    const [formData, setFormData] = useState({ nome: '', descricao: '', estoque: 0, fornecedor: '', valor: '' });
+    const [formData, setFormData] = useState({ nome: '', descricao: '', estoque: 0, fornecedor: '', valor: '', filial_id: '' });
     
     // Transfer Modal State
     const [showTransfer, setShowTransfer] = useState(false);
@@ -50,8 +50,9 @@ const ManageMarketingProductsPage = () => {
             descricao: produto.descricao || '',
             estoque: produto.estoque || 0,
             fornecedor: produto.fornecedor || '',
-            valor: produto.valor || ''
-        } : { nome: '', descricao: '', estoque: 0, fornecedor: '', valor: '' });
+            valor: produto.valor || '',
+            filial_id: '' // Na edição não movemos o estoque inicial, usa-se a transferência
+        } : { nome: '', descricao: '', estoque: 0, fornecedor: '', valor: '', filial_id: '' });
         setShowModal(true);
         setError(null);
         setSuccess(null);
@@ -256,19 +257,28 @@ const ManageMarketingProductsPage = () => {
                             <Form.Control type="text" value={formData.nome} onChange={e => setFormData({ ...formData, nome: e.target.value })} required />
                         </Form.Group>
                         <Row className="mb-3">
-                            <Col md={4}>
+                            <Col md={3}>
                                 <Form.Group>
                                     <Form.Label>Estoque Inicial</Form.Label>
                                     <Form.Control type="number" min="0" value={formData.estoque} onChange={e => setFormData({ ...formData, estoque: e.target.value })} />
                                 </Form.Group>
                             </Col>
-                            <Col md={4}>
+                            <Col md={3}>
+                                <Form.Group>
+                                    <Form.Label>Armazenar em</Form.Label>
+                                    <Form.Select value={formData.filial_id} onChange={e => setFormData({ ...formData, filial_id: e.target.value })} disabled={!!editingProduto}>
+                                        <option value="">Sede Principal</option>
+                                        {filiais.map(f => <option key={f.id} value={f.id}>{f.nome_unidade}</option>)}
+                                    </Form.Select>
+                                </Form.Group>
+                            </Col>
+                            <Col md={3}>
                                 <Form.Group>
                                     <Form.Label>Fornecedor</Form.Label>
                                     <Form.Control type="text" value={formData.fornecedor} onChange={e => setFormData({ ...formData, fornecedor: e.target.value })} />
                                 </Form.Group>
                             </Col>
-                            <Col md={4}>
+                            <Col md={3}>
                                 <Form.Group>
                                     <Form.Label>Valor Unitário</Form.Label>
                                     <Form.Control type="number" step="0.01" min="0" value={formData.valor} onChange={e => setFormData({ ...formData, valor: e.target.value })} />
