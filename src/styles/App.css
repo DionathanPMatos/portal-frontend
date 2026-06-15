@@ -24,6 +24,7 @@
     background-color: transparent; /* Torna a área de conteúdo transparente para mostrar o fundo do body */
 }
 
+
 /* Layout Desktop - Onde o sidebar e o header são fixos */
 @media (min-width: 769px) {
     .header {

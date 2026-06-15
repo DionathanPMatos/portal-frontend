@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Image, Tabs, Tab, Spinner, Alert, Badge, ListGroup, Form, ProgressBar, Button, Toast, ToastContainer } from 'react-bootstrap';
-import { FaUser, FaSitemap, FaBuilding, FaUserTie, FaClock, FaMoneyBillWave, FaCar, FaChartLine, FaCog, FaFileInvoiceDollar, FaBook, FaAddressCard, FaShieldAlt } from 'react-icons/fa';
+import { FaUser, FaSitemap, FaBuilding, FaUserTie, FaClock, FaMoneyBillWave, FaCar, FaChartLine, FaCog, FaFileInvoiceDollar, FaBook, FaAddressCard, FaShieldAlt, FaGift, FaCheckCircle, FaHourglassHalf } from 'react-icons/fa';
 import { IMaskInput } from 'react-imask';
 import apiClient from '../../../services/api';
 import axios from 'axios';
 import { useAuth } from '../../../contexts/AuthContext';
 import ChangePasswordModal from '../components/ChangePasswordModal';
-import '../../../styles/Dashboard.css';
 
 const UserProfilePage = () => {
     const { user } = useAuth();
     const [profileData, setProfileData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [allBeneficios, setAllBeneficios] = useState([]);
     const [saving, setSaving] = useState(false);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
@@ -21,23 +21,25 @@ const UserProfilePage = () => {
     // State para o formulário "Meus Dados"
     const [myDataForm, setMyDataForm] = useState({});
 
-    useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                setLoading(true);
-                const response = await apiClient.get('/api/users/me/profile');
-                setProfileData(response.data);
-                // Inicializa o formulário com os dados do perfil
-                setMyDataForm(response.data);
-            } catch (err) {
-                setError('Não foi possível carregar os dados do perfil.');
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchProfileData = async () => {
+        try {
+            const [profileRes, beneficiosRes] = await Promise.all([
+                apiClient.get('/api/users/me/profile'),
+                apiClient.get('/api/beneficios')
+            ]);
+            setProfileData(profileRes.data);
+            setAllBeneficios(beneficiosRes.data);
+            setMyDataForm(profileRes.data);
+        } catch (err) {
+            setError('Não foi possível carregar os dados do perfil.');
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-        fetchProfile();
+    useEffect(() => {
+        fetchProfileData();
     }, []);
 
     const handleMyDataChange = (e) => {
@@ -85,6 +87,20 @@ const UserProfilePage = () => {
         }
     };
 
+    const handleRequestBeneficio = async (beneficioId) => {
+        try {
+            await apiClient.post('/api/beneficios/solicitar', { beneficio_id: beneficioId });
+            setToastMessage('Benefício solicitado com sucesso! Aguarde a aprovação do RH.');
+            setShowToast(true);
+            // Recarrega os dados para atualizar o status
+            fetchProfileData();
+        } catch (err) {
+            console.error(err);
+            setToastMessage(err.response?.data?.error || 'Erro ao solicitar benefício.');
+            setShowToast(true);
+        }
+    };
+
     const calculateTenure = (startDate) => {
         if (!startDate) return 'N/A';
         const start = new Date(startDate);
@@ -125,6 +141,10 @@ const UserProfilePage = () => {
 
     if (error) {
         return <Alert variant="danger">{error}</Alert>;
+    }
+
+    if (!profileData) {
+        return <Alert variant="warning">Não foi possível encontrar os dados do perfil. Tente fazer login novamente.</Alert>;
     }
 
     return (
@@ -184,7 +204,7 @@ const UserProfilePage = () => {
                             <Row>
                                 <Col md={6}>
                                     <Card className="shadow-sm border-0 mb-4">
-                                        <Card.Header className="fw-bold">Contatos & Emergência</Card.Header>
+                                        <Card.Header className="fw-bold">Contatos Pessoais</Card.Header>
                                         <Card.Body>
                                             <Form.Group className="mb-3">
                                                 <Form.Label>Celular (WhatsApp)</Form.Label>
@@ -261,6 +281,37 @@ const UserProfilePage = () => {
                                     </Card>
 
                                     <Card className="shadow-sm border-0 mb-4">
+                                        <Card.Header className="fw-bold">Meus Benefícios</Card.Header>
+                                        <Card.Body>
+                                            <ListGroup variant="flush">
+                                                {allBeneficios.map(beneficio => {
+                                                    const atribuido = profileData.beneficios_atribuidos?.some(b => b.beneficio_id === beneficio.id);
+                                                    const pendente = profileData.solicitacoes_beneficios?.some(s => s.beneficio_id === beneficio.id && s.status === 'Pendente');
+                                                    
+                                                    let status;
+                                                    if (atribuido) {
+                                                        status = <Badge bg="success"><FaCheckCircle /> Atribuído</Badge>;
+                                                    } else if (pendente) {
+                                                        status = <Badge bg="warning" text="dark"><FaHourglassHalf /> Pendente</Badge>;
+                                                    } else {
+                                                        status = <Button size="sm" variant="outline-primary" onClick={() => handleRequestBeneficio(beneficio.id)}>Solicitar</Button>;
+                                                    }
+
+                                                    return (
+                                                        <ListGroup.Item key={beneficio.id} className="d-flex justify-content-between align-items-center">
+                                                            <span>
+                                                                <FaGift className="me-2 text-muted" /> {beneficio.nome}
+                                                            </span>
+                                                            {status}
+                                                        </ListGroup.Item>
+                                                    );
+                                                })}
+                                            </ListGroup>
+                                        </Card.Body>
+                                    </Card>
+
+
+                                    <Card className="shadow-sm border-0 mb-4">
                                         <Card.Header className="fw-bold">Dados Bancários (Pagamentos)</Card.Header>
                                         <Card.Body>
                                             <Form.Group className="mb-3"><Form.Label>Banco</Form.Label><Form.Control type="text" name="banco" value={myDataForm.banco || ''} onChange={handleMyDataChange} /></Form.Group>
@@ -282,36 +333,6 @@ const UserProfilePage = () => {
                                 </Button>
                             </div>
                         </Form>
-                    </Tab>
-                    
-                    <Tab eventKey="overview" title={<><FaBook className="me-2" />Visão Geral</>}>
-                        <Row className="g-4">
-                            <Col md={6}>
-                                <Card className="shadow-sm border-0 h-100">
-                                    <Card.Header className="fw-bold">Meus Benefícios</Card.Header>
-                                    <Card.Body>
-                                        <p className="text-muted">Consulte os benefícios disponíveis para você.</p>
-                                        {/* Futuramente, listar os benefícios aqui */}
-                                        <Button variant="primary" disabled>Ver Benefícios</Button>
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                            <Col md={6}>
-                                <Card className="shadow-sm border-0 h-100">
-                                    <Card.Header className="fw-bold">Documentos e Holerites</Card.Header>
-                                    <Card.Body>
-                                        <p className="text-muted">Acesse seu holerite e outros documentos importantes.</p>
-                                        <ListGroup>
-                                            <ListGroup.Item action className="d-flex justify-content-between align-items-center">
-                                                Holerite - {new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}
-                                                <FaFileInvoiceDollar className="text-primary"/>
-                                            </ListGroup.Item>
-                                            <ListGroup.Item action disabled>Contrato de Trabalho (Em breve)</ListGroup.Item>
-                                        </ListGroup>
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                        </Row>
                     </Tab>
 
                     <Tab eventKey="requests" title={<><FaMoneyBillWave className="me-2" />Meu Hub de Solicitações</>}>
@@ -402,6 +423,23 @@ const UserProfilePage = () => {
                                 </Form>
                             </Card.Body>
                         </Card>
+                    </Tab>
+
+                    <Tab eventKey="overview" title={<><FaBook className="me-2" />Visão Geral</>}>
+                        <Row className="g-4">
+                            <Col md={12}>
+                                <Card className="shadow-sm border-0 h-100">
+                                    <Card.Header className="fw-bold">Documentos e Holerites</Card.Header>
+                                    <Card.Body>
+                                        <p className="text-muted">Acesse seu holerite e outros documentos importantes.</p>
+                                        <ListGroup>
+                                            <ListGroup.Item action disabled>Holerite - {new Date().toLocaleString('default', { month: 'long', year: 'numeric' })} (Em breve)</ListGroup.Item>
+                                            <ListGroup.Item action disabled>Contrato de Trabalho (Em breve)</ListGroup.Item>
+                                        </ListGroup>
+                                    </Card.Body>
+                                </Card>
+                            </Col>
+                        </Row>
                     </Tab>
                     
                     

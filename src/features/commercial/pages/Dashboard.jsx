@@ -5,7 +5,7 @@ import "../styles/Dashboard.css";
 import NewsWidget from "./../../news/pages/NewsWidget";
 import apiClient from "../../../services/api";
 
-function Dashboard({ isLoggedIn }) {
+function Dashboard() {
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);

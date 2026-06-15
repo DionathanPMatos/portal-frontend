@@ -1,5 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import { Spinner, Container } from 'react-bootstrap';
+import React, { createContext, useState, useEffect, useContext, useMemo } from 'react';
 import apiClient from '../services/api'; 
 
 // 1. Cria o Contexto
@@ -52,15 +51,6 @@ export const AuthProvider = ({ children }) => {
         initializeAuth();
     }, []);
 
-    // Mostra um spinner enquanto carrega a validação
-    if (loading) {
-        return (
-            <Container className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
-                <Spinner animation="border" variant="primary" />
-            </Container>
-        );
-    }
-
     // PASSO D: O novo fluxo de Logout do SaaS
     const handleLogout = () => {
         // Agora, deslogar significa apenas destruir o "crachá" do navegador
@@ -69,8 +59,17 @@ export const AuthProvider = ({ children }) => {
         window.location.href = '/login'; 
     };
 
+    // O valor do contexto é memoizado para evitar re-renderizações desnecessárias nos consumidores.
+    const value = useMemo(() => ({
+        user,
+        setUser,
+        isLoggedIn: !!user,
+        isLoading: loading,
+        onLogout: handleLogout
+    }), [user, loading]);
+
     return (
-        <AuthContext.Provider value={{ user, setUser, isLoggedIn: !!user, isLoading: loading, onLogout: handleLogout }}>
+        <AuthContext.Provider value={value}>
             {children}
         </AuthContext.Provider>
     );

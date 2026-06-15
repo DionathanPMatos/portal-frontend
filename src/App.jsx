@@ -87,10 +87,11 @@ import CategoriasAdmin from './features/configuration/pages/CategoriasAdmin.jsx'
 // MÓDULO RH
 // ==========================================
 import ManageEmployeesPage from "./features/human-resources/pages/ManageEmployees.jsx"; // Renomeado
+import HRDashboardPage from "./features/human-resources/pages/HRDashboardPage.jsx"; // NOVO
 import UserProfilePage from "./features/human-resources/pages/UserProfilePage.jsx"; // NOVO
+import EmployeeDetailsPage from "./features/human-resources/pages/EmployeeDetailsPage.jsx"; // 🚀 NOVA PÁGINA
 import FuncionariosPage from "./features/human-resources/pages/Funcionarios.jsx"; // Renomeado
-import BeneficiosPage from "./features/human-resources/pages/Beneficios.jsx"; // Renomeado
-import ManageBeneficiosPage from "./features/human-resources/pages/ManageBeneficios.jsx"; // Renomeado
+import BeneficiosHubPage from "./features/human-resources/pages/BeneficiosHubPage.jsx";
 
 // ==========================================
 // MÓDULO FINANCEIRO
@@ -200,9 +201,10 @@ function App() {
             <Route path="/dtc/repositorio" element={<RepositorioTecnicoPage />} />
             <Route path="/manage-employees" element={<ManageEmployeesPage isLoggedIn={isLoggedIn} />} />
             <Route path="/funcionarios" element={<FuncionariosPage />} />
+            <Route path="/rh/dashboard" element={<HRDashboardPage />} />
+            <Route path="/rh/colaboradores/:id" element={<EmployeeDetailsPage />} /> {/* 🚀 NOVA ROTA */}
             <Route path="/perfil" element={<UserProfilePage />} />
-            <Route path="/beneficios" element={<BeneficiosPage />} />
-            <Route path="/admin/beneficios" element={<ManageBeneficiosPage />} />
+            <Route path="/rh/beneficios" element={<BeneficiosHubPage />} />
             <Route path="/crm/dashboard-dtc" element={<DashboardDTCPage />} />
             <Route path="/compras" element={<PurchaseDashboardPage />} />
             <Route path="/ferramentas/calculadora-solar" element={<CalculadoraSolarPage />} /> {/* A rota para a calculadora solar */}

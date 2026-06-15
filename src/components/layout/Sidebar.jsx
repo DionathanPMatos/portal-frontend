@@ -19,7 +19,7 @@ import {
   FaChevronLeft,
 } from "react-icons/fa";
 /*import { SiMarketo } from "react-icons/si";*/
-import { GiHumanPyramid } from "react-icons/gi"; // Ícone para RH
+import { GiHumanPyramid } from "react-icons/gi";
 import { AiFillProduct, AiFillVideoCamera } from "react-icons/ai"; // Ícones para Portfólio e Soluções
 import { useTheme } from '../../contexts/ThemeContext'; // <-- 1. IMPORTE O HOOK useTheme
 
@@ -27,6 +27,7 @@ import { useTheme } from '../../contexts/ThemeContext'; // <-- 1. IMPORTE O HOOK
 
 // Constantes de dados
 import "../../styles/sidebar.css"; // Movido para a pasta styles
+import { useAuth } from "../../contexts/AuthContext";
 const iconSize = 24;
 
 const menuItems = [
@@ -74,9 +75,9 @@ const menuItems = [
     ],
   },
   {
-    name: "DTC",
+    name: "Dep. Técnico",
     icon: <FaProjectDiagram size={iconSize} />,
-    subItems: [
+    subItems: [ 
       {
         name: "Cadastro de Produtos",
         link: "https://deltacable-my.sharepoint.com/personal/miria_machado_dca_com_br/Lists/Cadastro%20de%20Produtos?env=WebViewList",
@@ -142,6 +143,7 @@ const menuItems = [
     name: "RH",
     icon: <GiHumanPyramid size={iconSize} />,
     subItems: [
+      { name: "Dashboard RH", link: "/rh/dashboard" },
       {
         name: "Folha de pagamento",
         link: "https://onvio.com.br/portaldoempregado/auth/login",
@@ -157,7 +159,7 @@ const menuItems = [
         link: "https://dcacademy.woli.com.br/pt-BR/Login/Index?returnUrl=%2Fpt-BR%2FWorkspace%2FIndex%3Fid%3D88%26hash%3DNDEyOTswMTY%3D",
         target: "_blank",
       },
-      { name: "Benefícios", link: "/beneficios" },
+      { name: "Benefícios", link: "/rh/beneficios" },
       {
         name: "Oportunidades",
         link: "https://oportunidades.mindsight.com.br/dca",
@@ -201,11 +203,12 @@ const menuItems = [
   },
 ];
 
-function Sidebar({ isLoggedIn, user, onLogout, isHidden }) {
+function Sidebar({ isHidden }) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeAccordion, setActiveAccordion] = useState(null);
   const sidebarRef = useRef(null);
   const { theme } = useTheme(); // <-- Extraindo o theme do contexto
+  const { user } = useAuth();
 
   useEffect(() => {
     function handleClickOutside(event) {

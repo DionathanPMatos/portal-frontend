@@ -4,7 +4,7 @@ import { Form, Button, Card, Container, Row, Col, Alert } from 'react-bootstrap'
 import { useTheme } from '../contexts/ThemeContext';
 import apiClient from '../services/api';  // Importa a instância configurada do Axios
 import { FaMicrosoft } from 'react-icons/fa';
-import ForgotPasswordModal from '../features/human-resources/pages/ForgotPasswordModal';
+import ForgotPasswordModal from '../features/configuration/pages/ForgotPasswordModal';
 import '../styles/Login.css';
 
 function Login() {

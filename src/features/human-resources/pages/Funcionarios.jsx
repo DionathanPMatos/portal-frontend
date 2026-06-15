@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Spinner, Alert, Card, Form, InputGroup } from 'react-bootstrap';
+import { Container, Row, Col, Spinner, Alert, Card, Form } from 'react-bootstrap';
 import { FaUserTie, FaSearch } from 'react-icons/fa';
 import apiClient from '../../../services/api';
-
+import "../../../styles/Header.css";
 
 
 const Funcionarios = () => {
@@ -101,17 +101,16 @@ const Funcionarios = () => {
                             {/* Filtros de Busca */}
                             <Row className="mb-4 g-3">
                                 <Col md={12} lg={4}>
-                                    <InputGroup className="shadow-sm">
-                                        <InputGroup.Text className="bg-white border-end-0">
-                                            <FaSearch className="text-muted" />
-                                        </InputGroup.Text>
+                                    <div className="header-search-container">
+                                        <FaSearch className="search-icon" />
                                         <Form.Control
+                                            type="text"
+                                            className="search-input"
                                             placeholder="Buscar por nome ou e-mail..."
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
-                                            className="border-start-0 ps-0 shadow-none"
                                         />
-                                    </InputGroup>
+                                    </div>
                                 </Col>
                                 <Col md={6} lg={4}>
                                     <Form.Select

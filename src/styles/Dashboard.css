@@ -1,49 +1,5 @@
 /* Dashboard.css / crm.css */
 
-.dash-grid {
-    /* Correção para componentes com posicionamento absoluto (como o calendário) não serem cortados */
-    overflow: visible !important;
-}
-
-.container-main {
-  /* 🚀 CORREÇÃO: O padding da página agora é controlado pelo .content-area (em App.css). */
-  /* A remoção do padding e do overflow-x:hidden aqui corrige o layout, */
-  /* permitindo que a grade do Bootstrap (.row) funcione corretamente sem empurrar outros elementos. */
-  width: 100%;
-  padding-top: 1rem !important;
-  padding-left: 1rem !important;
-  padding-right: 1rem !important
-
-
-}
-
-/* Estilização dos Cards */
-.card {
-  border: none;
-  border-radius: 12px; /* Bordas mais arredondadas */
-  background-color: var(--cor-fundo-card, #ffffff);
-  box-shadow: var(--sombra-card, 0 4px 12px rgba(0, 0, 0, 0.08));
-  transition: all 0.3s ease;
-  overflow: hidden; /* Garante que o conteúdo respeite as bordas arredondadas */
-}
-
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-}
-
-.card-header {
-  background-color: var(--cor-fundo-card, #ffffff);
-  border-bottom: 1px solid var(--cor-borda, #eef2f5);
-  padding: 1rem 1.5rem;
-  font-weight: 600;
-  color: #4d5c6a;
-}
-
-.card-body {
-  padding: 1.5rem;
-}
-
 /* Estilos específicos para o Kanban */
 .kanban-board {
   display: flex;
@@ -99,31 +55,6 @@
 .kanban-card p {
   color: var(--cor-texto-secundario, #8a949f);
 }
-
-/* Para o novo cabeçalho da página */
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  background-color: var(--cor-fundo-card, #fff);
-  border-radius: 12px;
-  box-shadow: var(--sombra-card, 0 4px 12px rgba(0, 0, 0, 0.08));
-}
-
-.page-title {
-  font-size: 1.2rem !important;
-  font-weight: 400;
-  color: var(--cor-texto-primario, #333);
-  margin: 0;
-}
-
-.page-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
 
 
 /* ==========================================================================
@@ -303,9 +234,13 @@
 .kpi-icon-circle-purple { background-color: #6e3ed9;}
 .kpi-icon-circle-blue { background-color: #3366ff;}
 .kpi-icon-circle-pink { background-color: #f10075;}
+.kpi-icon-circle-green { background-color: #00C49F; }
+.kpi-icon-circle-red { background-color: #FF8042; }
 .kpi-icon-circle-cyan { background-color: #00cccc;}
 
+/* ===========================================================*/
 /* --- ESTILOS DO MURAL (CARROSSEL) --- */
+/* ===========================================================*/
 
 /* 1. O degradê escuro atrás do texto (para proteger a leitura em imagens claras) */
 .card-mural::after {
@@ -363,83 +298,4 @@
 .ranking-vendedor-row td {
   padding-top: 0.6rem;
   padding-bottom: 0.6rem;
-}
-
-/* Diminui a fonte do nome do vendedor */
-.ranking-vendedor-nome {
-  font-size: 0.9rem; /* Fonte um pouco menor */
-}
-
-/* Estilização da barra de rolagem (para navegadores Webkit como Chrome, Safari) */
-.ranking-vendedores-container::-webkit-scrollbar {
-  width: 6px;
-}
-.ranking-vendedores-container::-webkit-scrollbar-thumb {
-  background: #d1d1d1;
-  border-radius: 6px;
-}
-
-/* ==========================================================================
-   CABEÇALHO DE PÁGINA COLORIDO (PADRÃO)
-   ========================================================================== */
-.page-header-colored {
-  background-color: var(--sidebar-bg-color, #002b49); /* Cor de fundo do sidebar */
-  color: white;
-  padding: 1.5rem 2rem;
-  border-radius: 12px;
-  margin-bottom: 1.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.page-header-title-wrapper .page-header-title {
-  margin: 0;
-  font-size: 1.75rem;
-  font-weight: 700;
-}
-
-.page-header-title-wrapper .page-header-subtitle {
-  margin: 0;
-  opacity: 0.8;
-  font-weight: 300;
-}
-
-.page-header-actions-wrapper {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.page-header-actions-wrapper .btn-header-action {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
-  color: white;
-}
-
-.page-header-actions-wrapper .btn-header-action:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.3);
-  color: white;
-}
-
-/* ==========================================================================
-   AJUSTE DE ESPAÇAMENTO DOS CARDS (GUTTERS)
-   ========================================================================== */
-/* Reduz o espaçamento para a linha de cards com g-4 (corpo principal do dashboard) */
-.container-main .row.g-4 {
-    --bs-gutter-x: 1.2rem; /* Padrão do Bootstrap é 1.5rem */
-    --bs-gutter-y: 1.2rem;
-}
-
-/* ==========================================================================
-   FIX PARA CALENDÁRIO (REACT-BIG-CALENDAR)
-   ========================================================================== */
-/* Garante que os pop-ups do calendário (como a lista de eventos "Ver mais"
-   e o seletor de visualização) fiquem por cima de outros elementos da página. */
-.rbc-overlay {
-  z-index: 1400 !important; /* Um valor alto, maior que o header (1000) e modais (1050) */
 }

@@ -3,16 +3,18 @@ import { RiLogoutBoxRLine } from "react-icons/ri";
 import { 
     FaBell, FaBars, FaSearch, FaBullhorn, FaUserClock, FaCheckCircle, 
     FaTimesCircle, FaCommentDots, FaCalendarCheck, FaQuestionCircle, FaDollarSign,
-    FaLightbulb, FaCalendarAlt, FaFileInvoiceDollar 
+    FaLightbulb, FaCalendarAlt, FaFileInvoiceDollar, FaUserCircle, FaChevronDown
 } from 'react-icons/fa';
 import "../../styles/Header.css";
 import { Form, Badge } from 'react-bootstrap';
 import apiClient from '../../services/api';
+import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 
 
 // O componente volta a receber props
-function Header({ isLoggedIn, user, onLogout, onToggleSidebar }) {
+function Header({ onToggleSidebar }) {
+      const { isLoggedIn, user, onLogout } = useAuth();
       const [notificacoes, setNotificacoes] = useState([]);
       const [dollarRate, setDollarRate] = useState(null);
       const [searchTerm, setSearchTerm] = useState('');
@@ -20,6 +22,8 @@ function Header({ isLoggedIn, user, onLogout, onToggleSidebar }) {
       const [isSearchLoading, setIsSearchLoading] = useState(false);
       const [showResultsDropdown, setShowResultsDropdown] = useState(false);
       const searchContainerRef = useRef(null);
+      const [showUserDropdown, setShowUserDropdown] = useState(false);
+      const userDropdownRef = useRef(null);
       const [showDropdown, setShowDropdown] = useState(false);
       const dropdownRef = useRef(null);
       const navigate = useNavigate();
@@ -100,10 +104,14 @@ function Header({ isLoggedIn, user, onLogout, onToggleSidebar }) {
             if (searchContainerRef.current && !searchContainerRef.current.contains(e.target)) {
                 setShowResultsDropdown(false);
             }
+            // Fecha dropdown do usuário
+            if (userDropdownRef.current && !userDropdownRef.current.contains(e.target)) {
+                setShowUserDropdown(false);
+            }
         }
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
-      }, [dropdownRef, searchContainerRef]);
+      }, [dropdownRef, searchContainerRef, userDropdownRef]);
 
       const handleResultClick = () => {
         // Limpa a busca e fecha o dropdown ao clicar em um resultado
@@ -288,32 +296,37 @@ function Header({ isLoggedIn, user, onLogout, onToggleSidebar }) {
             </div>
           )}
 
-          <div className="bottom">
-            {isLoggedIn ? (
-              <div className="user-profile">
-                <Link to="/perfil" className="user-profile-link" title="Ver meu perfil">
-                  {user?.userpic_url && (
-                    <img src={user.userpic_url} alt="Foto do usuário" className="user-profile-pic" />
-                  )}
-                  <span className="user-name">
-                    {/* Exibe o nome da Microsoft ou o nome interno como fallback */}
-                    {user ? user.displayName || user.nome_completo || 'Usuário' : ''}
-                  </span>
-                </Link>
-                <button onClick={onLogout} className="logout-button">
-                  <RiLogoutBoxRLine /> 
-                </button>
-              </div>
-            ) : (
-              <div className="user-profile">
-                <button onClick={handleLoginClick} className="login-button btn btn-outline-primary">
-                  Login
-                </button>
-              </div>
-              
-              
-            )}
-          </div>
+          {isLoggedIn ? (
+            <div className="user-profile" ref={userDropdownRef}>
+                <div className={`user-profile-trigger ${showUserDropdown ? 'open' : ''}`} onClick={() => setShowUserDropdown(!showUserDropdown)}>
+                    <span className="user-name">
+                        {user ? user.displayName || user.nome_completo || 'Usuário' : ''}
+                    </span>
+                    {user?.userpic_url && (
+                        <img src={user.userpic_url} alt="Foto do usuário" className="user-profile-pic" />
+                    )}
+                    <FaChevronDown size={12} className="user-dropdown-chevron" />
+                </div>
+
+                {showUserDropdown && (
+                    <div className="dropdown-menu dropdown-menu-end show shadow user-dropdown-menu">
+                        <Link to="/perfil" className="dropdown-item" onClick={() => setShowUserDropdown(false)}>
+                            <FaUserCircle className="me-2" /> Meu Perfil
+                        </Link>
+                        <div className="dropdown-divider"></div>
+                        <button onClick={() => { onLogout(); setShowUserDropdown(false); }} className="dropdown-item text-danger">
+                            <RiLogoutBoxRLine className="me-2" /> Sair
+                        </button>
+                    </div>
+                )}
+            </div>
+          ) : (
+            <div className="user-profile">
+              <button onClick={handleLoginClick} className="login-button btn btn-outline-primary">
+                Login
+              </button>
+            </div>
+          )}
 
         </nav>
       </div>

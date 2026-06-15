@@ -28,7 +28,7 @@
     color: var(--text-primary-color, #153049);
     cursor: pointer;
     font-size: 1.3rem;
-    padding: 0.1rem;
+    padding: 1rem; 
     margin-right: 0.5rem; /* Espaço entre o botão e o resto do conteúdo */
     display: flex;
     align-items: center;
@@ -201,19 +201,22 @@
     font-size: 0.8rem;
     font-weight: 500; /* Aumenta o peso da fonte para 500 px */
     color: #313132;
+    position: relative; /* Necessário para o posicionamento do dropdown */
 }
 
-/* Link para o perfil do usuário, envolvendo a foto e o nome */
-.user-profile-link {
+/* Gatilho do Dropdown do Usuário (Nome, Foto, Seta) */
+.user-profile-trigger {
     display: flex;
     align-items: center;
-    gap: 0.5rem; /* Mantém o mesmo espaçamento do container pai */
-    text-decoration: none;
-    color: inherit; /* Herda a cor do texto do container pai */
-    transition: opacity 0.2s ease;
+    gap: 0.75rem;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 20px;
+    transition: background-color 0.2s ease;
 }
-.user-profile-link:hover {
-    opacity: 0.8; /* Efeito sutil ao passar o mouse */
+
+.user-profile-trigger:hover {
+    background-color: var(--background-color, #f0f2f5);
 }
 
 .user-profile-pic {
@@ -222,6 +225,55 @@
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--cor-borda, #eef2f5);
+}
+
+.user-dropdown-chevron {
+    color: #8a949f;
+    transition: transform 0.2s ease;
+}
+
+.user-profile-trigger.open .user-dropdown-chevron {
+    transform: rotate(180deg);
+}
+
+/* Menu Dropdown do Usuário */
+.user-dropdown-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    width: 200px;
+    z-index: 1050;
+    border: 1px solid var(--cor-borda, #eef2f5);
+    border-radius: 0.75rem;
+    background-color: var(--cor-fundo-card, #ffffff);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 0.5rem 0;
+}
+
+.user-dropdown-menu .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 1.25rem;
+    font-size: 0.9rem;
+    color: var(--text-primary-color);
+    background-color: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.user-dropdown-menu .dropdown-item:hover {
+    background-color: var(--background-color, #f8f9fa);
+}
+
+.user-dropdown-menu .dropdown-divider {
+    height: 1px;
+    margin: 0.5rem 0;
+    overflow: hidden;
+    background-color: var(--cor-borda, #eef2f5);
 }
 
 .login-button {
@@ -237,19 +289,8 @@
     cursor: pointer;
 }
 
-;.login-button:hover {
+.login-button:hover {
     background-color: var(--background-color, #f0f2f5);
-}
-
-.logout-button {
-    background: transparent;
-    border: none;
-    color: #313132;
-    cursor: pointer;
-    font-size: 1.2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 /* =========================
