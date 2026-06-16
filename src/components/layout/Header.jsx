@@ -3,7 +3,7 @@ import { RiLogoutBoxRLine } from "react-icons/ri";
 import { 
     FaBell, FaBars, FaSearch, FaBullhorn, FaUserClock, FaCheckCircle, 
     FaTimesCircle, FaCommentDots, FaCalendarCheck, FaQuestionCircle, FaDollarSign,
-    FaLightbulb, FaCalendarAlt, FaFileInvoiceDollar, FaUserCircle, FaChevronDown
+    FaLightbulb, FaCalendarAlt, FaFileInvoiceDollar, FaUserCircle, FaChevronDown, FaIndustry
 } from 'react-icons/fa';
 import "../../styles/Header.css";
 import { Form, Badge } from 'react-bootstrap';
@@ -210,11 +210,22 @@ function Header({ onToggleSidebar }) {
                             <Link 
                                 to={`${result.path}${result.id}`} 
                                 key={`${result.type}-${result.id}`} 
-                                className="search-result-item"
+                                className="search-result-item d-flex align-items-center p-2 text-decoration-none border-bottom"
                                 onClick={handleResultClick}
                             >
-                                <span className="result-title">{result.title}</span>
-                                <span className="result-type">{result.type}</span>
+                                <div className="me-3 flex-shrink-0">
+                                    {result.image_url ? (
+                                        <img src={result.image_url} alt={result.title} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '50%' }} />
+                                    ) : (
+                                        <div className="bg-light d-flex align-items-center justify-content-center rounded-circle" style={{ width: '40px', height: '40px' }}>
+                                            {result.type === 'Colaborador' ? <FaUserCircle className="text-muted" size={24} /> : result.type === 'Fabricante' ? <FaIndustry className="text-muted" size={20} /> : <FaSearch className="text-muted" size={18} />}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="flex-grow-1 overflow-hidden">
+                                    <span className="result-title d-block fw-bold text-dark text-truncate" style={{ fontSize: '0.9rem', lineHeight: '1.2' }}>{result.title}</span>
+                                    <span className="result-type d-block text-muted small mt-1">{result.type}</span>
+                                </div>
                             </Link>
                         ))
                     ) : (
