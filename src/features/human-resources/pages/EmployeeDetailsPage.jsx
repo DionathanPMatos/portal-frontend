@@ -242,7 +242,7 @@ const EmployeeDetailsPage = () => {
             {successMessage && <Alert variant="success">{successMessage}</Alert>}
 
             <Breadcrumb>
-                <Breadcrumb.Item as={Link} to="/manage-employees">Gestão de Colaboradores</Breadcrumb.Item>
+                <Breadcrumb.Item linkAs={Link} linkProps={{ to: "/manage-employees" }}>Gestão de Colaboradores</Breadcrumb.Item>
                 <Breadcrumb.Item active>{employee.nome_completo}</Breadcrumb.Item>
             </Breadcrumb>
 
