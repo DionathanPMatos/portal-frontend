@@ -44,7 +44,7 @@ const Beneficios = () => {
             setToastMessage('Benefício solicitado com sucesso! Aguarde a aprovação do RH.');
             setShowToast(true);
             setShowModal(false); // Fecha o modal
-            // Recarrega os dados do perfil para atualizar o status
+            // 🚀 CORREÇÃO: Ajusta a URL para a rota correta do perfil do usuário
             const profileRes = await apiClient.get('/api/users/me/profile');
             setProfileData(profileRes.data);
         } catch (err) {
