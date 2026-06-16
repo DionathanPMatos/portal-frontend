@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form, Row, Col, Alert, Spinner, ListGroup, InputGroup, Badge } from 'react-bootstrap';
+import { Modal, Button, Form, Row, Col, Alert, Spinner, ListGroup, InputGroup, Badge, Card } from 'react-bootstrap';
 import { FaEdit, FaTrash, FaPlus, FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import apiClient from '../../../services/api';
 

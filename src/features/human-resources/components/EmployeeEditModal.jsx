@@ -50,6 +50,7 @@ const EmployeeEditModal = ({ show, onHide, employeeToEdit, onSaveSuccess }) => {
     const [jornadaTrabalho, setJornadaTrabalho] = useState('');
     const [horasMensais, setHorasMensais] = useState('');
     const [primeiroEmprego, setPrimeiroEmprego] = useState(false);
+    const [senha, setSenha] = useState('');
 
     // Novos campos da aba Profissional
     const [matricula, setMatricula] = useState('');
@@ -339,6 +340,7 @@ const EmployeeEditModal = ({ show, onHide, employeeToEdit, onSaveSuccess }) => {
         setCategoriaTrabalhador(''); setPeriodoExperiencia('');
         setJornadaTrabalho(''); setHorasMensais(''); setPrimeiroEmprego(false);
         setProcessoAdmissao('preencher');
+        setSenha('');
 
         // Reset campos profissionais
         setMatricula(''); setNumeroCracha(''); setTipoAdmissao(''); setDataExameAdmissional('');
@@ -448,6 +450,7 @@ const EmployeeEditModal = ({ show, onHide, employeeToEdit, onSaveSuccess }) => {
         formData.append('optante_fgts', optanteFgts);
         formData.append('possui_imovel_proprio', possuiImovelProprio);
         formData.append('imovel_adquirido_fgts', imovelAdquiridoFgts);
+        if (senha) formData.append('senha', senha);
 
         // Dados Pessoais
         formData.append('cpf', cpf);
@@ -609,6 +612,13 @@ const EmployeeEditModal = ({ show, onHide, employeeToEdit, onSaveSuccess }) => {
                                             <Col md={6}><Form.Group className="mb-3"><Form.Label>Time</Form.Label><Form.Select value={timeId} onChange={(e) => setTimeId(e.target.value)}><option value="">Nenhum</option>{timesList.map(t => (<option key={t.id} value={t.id}>{t.nome}</option>))}</Form.Select></Form.Group></Col>
                                             <Col md={6}><Form.Group className="mb-3"><Form.Label>Cargo*</Form.Label><Form.Select value={cargoId} onChange={(e) => setCargoId(e.target.value)} required><option value="">Selecione</option>{cargos.map(c => (<option key={c.id} value={c.id}>{c.nome_cargo}</option>))}</Form.Select></Form.Group></Col>
                                             <Col md={6}><Form.Group className="mb-3"><Form.Label>Centro de Custo*</Form.Label><Form.Select value={centroCustoId} onChange={(e) => setCentroCustoId(e.target.value)} required><option value="">Selecione</option>{centrosCusto.map(cc => (<option key={cc.id} value={cc.id}>{cc.nome}</option>))}</Form.Select></Form.Group></Col>
+                                            <Col md={6}>
+                                                <Form.Group className="mb-3">
+                                                    <Form.Label>Senha de Acesso Local</Form.Label>
+                                                    <Form.Control type="password" value={senha} onChange={(e) => setSenha(e.target.value)} placeholder={employeeToEdit ? "Preencha apenas se quiser alterar a senha atual" : "Padrão: 123456"} />
+                                                    <Form.Text className="text-muted">A senha será criptografada automaticamente ao salvar.</Form.Text>
+                                                </Form.Group>
+                                            </Col>
                                             <Col md={6}><Form.Check type="switch" id="bate-ponto-switch" label="Colaborador bate ponto?" checked={batePonto} onChange={(e) => setBatePonto(e.target.checked)} className="mt-4"/></Col>
                                         </Row>
                                     </Card.Body>

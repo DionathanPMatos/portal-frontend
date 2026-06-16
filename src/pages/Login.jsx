@@ -160,23 +160,22 @@ function Login() {
                   </div>
                 </Form>
 
-                <div className="text-center my-4 position-relative">
-                  <hr className="text-muted" />
-                  <span className="text-muted position-absolute top-50 start-50 translate-middle bg-white px-2" style={{ fontSize: '0.9rem' }}>
-                    OU
-                  </span>
-                </div>
-
-                <div className="d-grid gap-2">
-                  <Button 
-                    variant="outline-dark" 
-                    size="lg" 
-                    onClick={handleMicrosoftLogin}
-                    className="d-flex align-items-center justify-content-center"
-                  >
-                    <FaMicrosoft className="me-2 text-primary" /> Entrar com a Microsoft
-                  </Button>
-                </div>
+                    <div className="d-grid gap-2">
+                  <div className="text-center my-4 position-relative">
+                    <hr className="text-muted" />
+                    <span className="text-muted position-absolute top-50 start-50 translate-middle bg-white px-2" style={{ fontSize: '0.9rem' }}>
+                      OU
+                    </span>
+                  </div>
+                      <Button 
+                        variant="outline-dark" 
+                        size="lg" 
+                        onClick={handleMicrosoftLogin}
+                        className="d-flex align-items-center justify-content-center"
+                      >
+                        <FaMicrosoft className="me-2 text-primary" /> Entrar com a Microsoft
+                      </Button>
+                    </div>
               </Card.Body>
             </Card>
           </Col>
