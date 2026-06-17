@@ -77,17 +77,18 @@ const menuItems = [
   {
     name: "Dep. Técnico",
     icon: <FaProjectDiagram size={iconSize} />,
-    subItems: [ 
+    subItems: [
+      { name: "Painel Principal", link: "/dtc" },
       {
         name: "Cadastro de Produtos",
         link: "https://deltacable-my.sharepoint.com/personal/miria_machado_dca_com_br/Lists/Cadastro%20de%20Produtos?env=WebViewList",
         target: "_blank",
       },
-      { name: "Gerente de Produtos", link: "/OrganogramaTecnico" },
-      { name: "Fabricantes", link: "/dtc/fabricantes" },
+      { name: "Gerentes de Produtos", link: "/dtc?tab=gerentes-produtos" },
+      { name: "Fabricantes", link: "/dtc?tab=fabricantes" },
       { name: "Ferramentas Úteis", link: "/dtc/ferramentas" },
-      { name: "Solicitação de Propostas", link: "/crm/dashboard-dtc" },
-      { name: "Repositório Técnico", link: "/dtc/repositorio" },
+      { name: "Solicitação de Propostas", link: "/dtc?tab=pre-vendas" },
+      { name: "Repositório Técnico", link: "/dtc?tab=repositorio" },
       { name: "Fórum e Dúvidas", link: "/dtc/perguntas" },
       {
         name: "RMA",
@@ -122,7 +123,9 @@ const menuItems = [
     name: "Marketing",
     icon: <FaPencilAlt size={iconSize} />,
     subItems: [
-      { name: "Central de Marketing", link: "/marketing" },
+      { name: "Painel de Marketing", link: "/marketing" },
+      { name: "Solicitar Material", link: "/marketing/solicitacoes" },
+      { name: "Reservar Sala/Showroom", link: "/marketing/reservas" },
       { name: "Cases de Sucesso", link: "#" },
       { name: "Politica de Marketing", link: "#" },
     ],
@@ -141,7 +144,7 @@ const menuItems = [
     name: "RH",
     icon: <GiHumanPyramid size={iconSize} />,
     subItems: [
-      { name: "Central de RH", link: "/rh" },
+      { name: "Dashboard RH", link: "/rh/dashboard" },
       {
         name: "Folha de pagamento",
         link: "https://onvio.com.br/portaldoempregado/auth/login",
@@ -153,16 +156,18 @@ const menuItems = [
         target: "_blank",
       },
       {
-        name: "DC Academy",
+        name: "Treinamentos",
         link: "https://dcacademy.woli.com.br/pt-BR/Login/Index?returnUrl=%2Fpt-BR%2FWorkspace%2FIndex%3Fid%3D88%26hash%3DNDEyOTswMTY%3D",
         target: "_blank",
       },
+      { name: "Benefícios", link: "/rh/beneficios" },
       {
         name: "Oportunidades",
         link: "https://oportunidades.mindsight.com.br/dca",
         target: "_blank",
       },
       { name: "Ouvidoria", link: "#" },
+      { name: "Colaboradores", link: "/rh/manageemployee" },
       { name: "Politicas de RH", link: "#" },
     ],
   },

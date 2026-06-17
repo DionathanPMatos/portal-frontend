@@ -24,6 +24,15 @@
     background-color: transparent; /* Torna a área de conteúdo transparente para mostrar o fundo do body */
 }
 
+.donut-center-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+}
+
 
 /* Layout Desktop - Onde o sidebar e o header são fixos */
 @media (min-width: 769px) {

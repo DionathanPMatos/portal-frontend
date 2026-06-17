@@ -33,6 +33,7 @@ import AdminResultados from "./features/configuration/pages/ManageKpiDashboard.j
 // MÓDULO DEPARTAMENTO TÉCNICO (DTC)
 // ==========================================
 import DashboardDTCPage from "./features/technical-department/pages/DashboardDTCPage.jsx"; // Renomeado
+import DTCHubPage from "./features/technical-department/pages/DTCHubPage.jsx";
 import OrganogramaTecnicoPage from "./features/technical-department/pages/OrganogramaTecnicoPage.jsx"; // Renomeado
 import RepositorioTecnicoPage from "./features/technical-department/pages/RepositorioTecnico.jsx"; // Renomeado
 import FabricantesListPage from "./features/technical-department/pages/FabricantesListPage.jsx"; // Renomeado
@@ -199,6 +200,7 @@ function App() {
             <Route path="/admin/noticias" element={<NewsManagerPage />} /> {/* Mantido */}
             <Route path="/noticias" element={<NewsPage />} />
             <Route path="/OrganogramaTecnico" element={<OrganogramaTecnicoPage />} />
+            <Route path="/dtc" element={<DTCHubPage />} />
             <Route path="/dtc/repositorio" element={<RepositorioTecnicoPage />} />
 
             {/* ROTAS DO RH */}
