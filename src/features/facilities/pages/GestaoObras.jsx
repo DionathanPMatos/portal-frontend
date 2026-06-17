@@ -185,19 +185,8 @@ export default function GestaoObras() {
       {err && <Alert variant="danger" onClose={() => setErr("")} dismissible>{err}</Alert>}
       {success && <Alert variant="success" onClose={() => setSuccess("")} dismissible>{success}</Alert>}
 
-      <div className="page-header-colored mb-4">
-          <div className="page-header-title-wrapper">
-              <h2 className="page-header-title d-flex align-items-center gap-3">
-                  <FaHammer /> Gestão de Obras e Reformas
-              </h2>
-              <p className="page-header-subtitle">Acompanhe projetos, etapas, orçamentos e materiais das obras.</p>
-          </div>
-          <div className="page-header-actions-wrapper">
-              <Button variant="primary" className="btn-header-action" onClick={() => { setProjectData(emptyProject); setShowProject(true); }}>
-                  <i className="bi bi-plus-circle me-2"></i> Novo Projeto
-              </Button>
-          </div>
-      </div>
+      
+     
 
       <Card className="shadow-sm border-0 mb-4">
         <Card.Body>

@@ -489,24 +489,7 @@ export default function Frota() {
       {success && <Alert variant="success" onClose={() => setSuccess("")} dismissible>{success}</Alert>}
       {avisoCnh && <Alert variant="warning" onClose={() => setAvisoCnh("")} dismissible>{avisoCnh}</Alert>}
 
-      <div className="page-header-colored mb-4">
-          <div className="page-header-title-wrapper">
-              <h2 className="page-header-title d-flex align-items-center gap-3">
-                  <i className="bi bi-truck"></i> Gestão de Frota Corporativa
-              </h2>
-              <p className="page-header-subtitle">Administre veículos, reservas, despesas e manutenções da frota.</p>
-          </div>
-          <div className="page-header-actions-wrapper">
-              {currentUser && (currentUser.privilegios?.includes('Admin') || currentUser.privilegios?.includes('Gestor')) && (
-                <Button variant="outline-danger" className="btn-header-action" onClick={() => { setCustoData(emptyCusto); setShowCustoModal(true); }}>
-                  <i className="bi bi-currency-dollar me-2"></i> Lançar Despesa
-                </Button>
-              )}
-              <Button variant="primary" className="btn-header-action" onClick={() => { setReservaData(emptyReserva); setShowReservaModal(true); }}>
-                Nova Reserva
-              </Button>
-          </div>
-      </div>
+      
 
       <Card className="shadow-sm border-0 mb-4">
         <Card.Body>
@@ -571,6 +554,14 @@ export default function Frota() {
             </Tab>
 
             <Tab eventKey="calendario" title="Calendário de Reservas">
+              {currentUser && (currentUser.privilegios?.includes('Admin') || currentUser.privilegios?.includes('Gestor')) && (
+                <Button variant="outline-danger" className="btn-header-action" onClick={() => { setCustoData(emptyCusto); setShowCustoModal(true); }}>
+                  <i className="bi bi-currency-dollar me-2"></i> Lançar Despesa
+                </Button>
+              )}
+              <Button variant="primary" className="btn-header-action" onClick={() => { setReservaData(emptyReserva); setShowReservaModal(true); }}>
+                Nova Reserva
+              </Button>
               <div style={{ height: "600px", marginTop: "20px" }}>
                 <Calendar
                   localizer={localizer}

@@ -57,21 +57,20 @@ const menuItems = [
       { name: "Politicas Comerciais", link: "#", target: "_blank" },
     ],
   },
-  {
-    name: "Frota",
-    icon: <FaTruck size={iconSize} />,
-    subItems: [
-      { name: "Controle de Frota", link: "/frota" },
-    
-      
-    ],
-  },
+  
   {
     name: "Facilities",
     icon: <FaBuilding size={iconSize} />,
     subItems: [
-      { name: "Gestão de Ativos", link: "/facilities" },
-      { name: "Gestão de Obras", link: "/facilities/gestao-obras" },
+      { name: "Central de Facilities",
+    icon: <FaBuilding size={iconSize} />,
+    link: "/facilities"
+      },
+      {
+        name: "Reserva de Veículos",
+        link: "/facilities/veiculos",
+        target: "_blank",
+      }
     ],
   },
   {

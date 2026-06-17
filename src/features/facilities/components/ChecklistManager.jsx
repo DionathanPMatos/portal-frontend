@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import apiClient from "../../../services/api";
-import { Card, Form, Button, Alert, Spinner, ListGroup } from "react-bootstrap";
+import { Card, Form, Button, Alert, Spinner, ListGroup, InputGroup } from "react-bootstrap";
 
 export default function ChecklistManager({ projetoId , etapaId, checklists = [], onUpdate }) {
   const [checklistSelecionado, setChecklistSelecionado] = useState(null);
@@ -8,6 +8,8 @@ export default function ChecklistManager({ projetoId , etapaId, checklists = [],
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
   const [novo, setNovo] = useState("");
+  const [showNovoChecklistForm, setShowNovoChecklistForm] = useState(false);
+  const [novoChecklistTitulo, setNovoChecklistTitulo] = useState("");
 
   const fetchItens = useCallback(async () => {
     if (!checklistSelecionado) return;
@@ -57,39 +59,71 @@ export default function ChecklistManager({ projetoId , etapaId, checklists = [],
     }
   };
 
-  if (!checklistSelecionado && checklists.length === 0) {
-    return <p className="text-muted">Nenhum checklist criado</p>;
-  }
+  const handleCreateChecklist = async () => {
+    if (!novoChecklistTitulo.trim() || !projetoId) {
+        setErro("O título do checklist é obrigatório.");
+        return;
+    }
+    try {
+        await apiClient.post("/api/obras/checklists", {
+            projeto_id: projetoId,
+            etapa_id: etapaId, // etapaId can be null for project-level checklists
+            titulo: novoChecklistTitulo,
+            descricao: ""
+        });
+        setNovoChecklistTitulo("");
+        setShowNovoChecklistForm(false);
+        onUpdate(); // Trigger parent re-fetch
+    } catch (error) {
+        setErro("Erro ao criar o checklist: " + error.message);
+    }
+  };
 
   if (!checklistSelecionado) {
     return (
-      <ListGroup>
-        {checklists.map((c) => {
-          const percent = c.total_itens > 0 ? Math.round((c.itens_concluidos / c.total_itens) * 100) : 0;
-          return (
-            <ListGroup.Item
-              key={c.id}
-              onClick={() => setChecklistSelecionado(c)}
-              style={{ cursor: "pointer" }}
-              className="d-flex justify-content-between align-items-center"
-            >
-              <div>
-                <h6 className="mb-1">{c.titulo}</h6>
-                <small className="text-muted">{c.descricao}</small>
-              </div>
-              <div className="d-flex align-items-center gap-3">
-                <div className="text-end">
-                  <small className="text-muted" style={{fontSize: '0.75rem'}}>{c.itens_concluidos}/{c.total_itens} concluídos</small>
-                  <div className="mt-1" style={{ height: "4px", backgroundColor: "#e9ecef", borderRadius: "2px", width: "80px" }}>
-                    <div style={{ height: "100%", backgroundColor: percent === 100 ? "#28a745" : "#ffc107", width: `${percent}%` }}></div>
-                  </div>
+      <>
+        {checklists.length === 0 && !showNovoChecklistForm && <p className="text-muted">Nenhum checklist criado para esta etapa.</p>}
+        <ListGroup>
+          {checklists.map((c) => {
+            const percent = c.total_itens > 0 ? Math.round((c.itens_concluidos / c.total_itens) * 100) : 0;
+            return (
+              <ListGroup.Item
+                key={c.id}
+                action // Makes the item clickable and accessible
+                onClick={() => setChecklistSelecionado(c)}
+                className="d-flex justify-content-between align-items-center"
+              >
+                <div>
+                  <h6 className="mb-1">{c.titulo}</h6>
+                  <small className="text-muted">{c.descricao}</small>
                 </div>
-                <i className="bi bi-chevron-right text-muted"></i>
-              </div>
-            </ListGroup.Item>
-          );
-        })}
-      </ListGroup>
+                <div className="d-flex align-items-center gap-3">
+                  <div className="text-end">
+                    <small className="text-muted" style={{fontSize: '0.75rem'}}>{c.itens_concluidos}/{c.total_itens} concluídos</small>
+                    <div className="mt-1" style={{ height: "4px", backgroundColor: "#e9ecef", borderRadius: "2px", width: "80px" }}>
+                      <div style={{ height: "100%", backgroundColor: percent === 100 ? "#28a745" : "#ffc107", width: `${percent}%` }}></div>
+                    </div>
+                  </div>
+                  <i className="bi bi-chevron-right text-muted"></i>
+                </div>
+              </ListGroup.Item>
+            );
+          })}
+        </ListGroup>
+        <div className="mt-3">
+          {showNovoChecklistForm ? (
+            <InputGroup>
+              <Form.Control placeholder="Título do novo checklist..." value={novoChecklistTitulo} onChange={(e) => setNovoChecklistTitulo(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleCreateChecklist()} />
+              <Button variant="success" onClick={handleCreateChecklist}>Salvar</Button>
+              <Button variant="outline-secondary" onClick={() => setShowNovoChecklistForm(false)}>Cancelar</Button>
+            </InputGroup>
+          ) : (
+            <Button variant="outline-primary" size="sm" onClick={() => setShowNovoChecklistForm(true)}>
+              <i className="bi bi-plus-circle me-2"></i>Criar Novo Checklist
+            </Button>
+          )}
+        </div>
+      </>
     );
   }
 
@@ -144,7 +178,7 @@ export default function ChecklistManager({ projetoId , etapaId, checklists = [],
               ))}
             </ListGroup>
 
-            <div className="input-group">
+            <InputGroup>
               <Form.Control
                 placeholder="Adicionar novo item..."
                 value={novo}
@@ -154,7 +188,7 @@ export default function ChecklistManager({ projetoId , etapaId, checklists = [],
               <Button variant="success" onClick={handleAddItem} size="sm">
                 <i className="bi bi-plus"></i>
               </Button>
-            </div>
+            </InputGroup>
           </>
         )}
       </Card.Body>
