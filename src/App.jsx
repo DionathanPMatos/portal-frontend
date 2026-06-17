@@ -61,7 +61,7 @@ import GestaoObrasPage from "./features/facilities/pages/GestaoObras.jsx"; // Re
 // ==========================================
 // MÓDULO MARKETING
 // ==========================================
-import MarketingPage from "./features/marketing/pages/MarketingPage.jsx";
+import MarketingPage from "./features/marketing/pages/MarketingHubPage.jsx";
 import ReserveRoomPage from "./features/marketing/pages/ReserveRoomPage.jsx";
 import RequestMaterialPage from "./features/marketing/pages/RequestMaterialPage.jsx";
 import ManageMarketingProducts from "./features/marketing/pages/ManageMarketingProducts.jsx"; // Renomeado

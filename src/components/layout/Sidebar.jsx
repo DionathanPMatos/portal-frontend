@@ -122,9 +122,7 @@ const menuItems = [
     name: "Marketing",
     icon: <FaPencilAlt size={iconSize} />,
     subItems: [
-      { name: "Painel de Marketing", link: "/marketing" },
-      { name: "Solicitar Material", link: "/marketing/solicitacoes" },
-      { name: "Reservar Sala/Showroom", link: "/marketing/reservas" },
+      { name: "Central de Marketing", link: "/marketing" },
       { name: "Cases de Sucesso", link: "#" },
       { name: "Politica de Marketing", link: "#" },
     ],

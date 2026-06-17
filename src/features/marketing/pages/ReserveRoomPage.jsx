@@ -219,16 +219,7 @@ const ReserveRoomPage = () => {
     }, []);
 
     return (
-        <div className='container-main p-4'>
-            <div className="page-header-colored mb-4">
-                <div className="page-header-title-wrapper">
-                    <h2 className="page-header-title d-flex align-items-center gap-3">
-                        <FaCalendarAlt /> Reserva de Salas e Showroom
-                    </h2>
-                    <p className="page-header-subtitle">Consulte a disponibilidade, gerencie solicitações e configure as opções de reserva.</p>
-                </div>
-            </div>
-
+        <div className="p-3">
             {error && <Alert variant="danger" onClose={() => setError(null)} dismissible>{error}</Alert>}
             {success && <Alert variant="success" dismissible onClose={() => setSuccess(null)}>{success}</Alert>}
 
