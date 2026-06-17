@@ -357,7 +357,8 @@
 
 .notification-list {
     overflow-y: auto;
-    flex-grow: 1;
+    flex: 1 1 auto; /* Garante que a lista possa crescer e encolher */
+    min-height: 0;  /* Permite que a lista encolha para menos que seu conteúdo, ativando o scroll */
 }
 
 .notification-item {

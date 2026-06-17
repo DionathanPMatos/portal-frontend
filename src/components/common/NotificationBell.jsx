@@ -12,6 +12,7 @@ const NotificationBell = () => {
     const [toastInfo, setToastInfo] = useState({ message: '', variant: 'success' });
     const dropdownRef = useRef(null);
     const navigate = useNavigate();
+    const [originalTitle] = useState(document.title);
 
     const fetchNotificacoes = async () => {
         try {
@@ -27,6 +28,19 @@ const NotificationBell = () => {
         const interval = setInterval(fetchNotificacoes, 60000); // Atualiza a cada minuto
         return () => clearInterval(interval);
     }, []);
+
+    // Efeito para atualizar o título da aba do navegador com o contador
+    useEffect(() => {
+        if (notificacoes.length > 0) {
+            document.title = `(${notificacoes.length}) ${originalTitle}`;
+        } else {
+            document.title = originalTitle;
+        }
+
+        // Função de limpeza para restaurar o título original quando o componente for desmontado
+        return () => { document.title = originalTitle; };
+
+    }, [notificacoes, originalTitle]);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -82,6 +96,23 @@ const NotificationBell = () => {
         return iconMap[notificacao.tipo] || <FaBell />;
     };
 
+    const getNotificationText = (n) => {
+        switch (n.tipo) {
+            case 'status': return <>Sua solicitação de visita em <strong>{n.nome_cliente}</strong> foi <Badge bg={n.status_autorizacao === 'Autorizada' ? 'success' : 'danger'}>{n.status_autorizacao}</Badge>.</>;
+            case 'feedback': return <>Ação necessária: Registre o feedback da visita em <strong>{n.nome_cliente}</strong>.</>;
+            case 'retorno': return <>Lembrete de retorno para <strong>{n.nome_cliente}</strong> agendado.</>;
+            case 'aprovacao_gestor': return <>Aprovação de visita pendente para <strong>{n.vendedor_nome}</strong> no cliente <strong>{n.nome_cliente}</strong>.</>;
+            case 'nova_noticia': return <>Nova Publicação: <strong>{n.titulo}</strong>.</>;
+            case 'nova_pergunta_faq': return <>Nova dúvida técnica: <strong>"{n.titulo}"</strong> foi atribuída a você.</>;
+            case 'resposta_faq': return <>Sua pergunta <strong>"{n.titulo}"</strong> foi respondida.</>;
+            case 'reserva_sala_status': return <>Sua reserva <strong>"{n.titulo}"</strong> foi <Badge bg={n.status === 'Aprovado' ? 'success' : (n.status === 'Recusado' ? 'danger' : 'warning')}>{n.status}</Badge>.</>;
+            case 'reserva_sala_atribuicao': return <>Você foi definido como apresentador para a reserva <strong>"{n.titulo}"</strong>.</>;
+            case 'aprovacao_financeiro': return <>Aprovação financeira pendente para <strong>{n.nome_cliente}</strong>.</>;
+            case 'status_financeiro': return <>Sua solicitação de <strong>{n.nome_cliente}</strong> foi atualizada.</>;
+            default: return <span>Notificação desconhecida.</span>;
+        }
+    };
+
     return (
         <>
             <ToastContainer position="top-end" className="p-3" style={{ zIndex: 1100 }}>
@@ -105,7 +136,7 @@ const NotificationBell = () => {
                                 {notificacoes.map((n, index) => (
                                     <div key={index} className="notification-item" onClick={() => handleNotificacaoClick(n)}>
                                         <div className="notification-icon">{getNotificationIcon(n)}</div>
-                                        <div className="notification-content"><span className="notification-text">{/* ... Lógica de texto ... */}</span></div>
+                                        <div className="notification-content"><span className="notification-text">{getNotificationText(n)}</span></div>
                                     </div>
                                 ))}
                             </div>
