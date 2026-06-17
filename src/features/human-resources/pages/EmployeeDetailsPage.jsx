@@ -24,6 +24,13 @@ const EmployeeDetailsPage = () => {
     const [uploading, setUploading] = useState(false);
     const [currentDocType, setCurrentDocType] = useState('');
 
+    // 🚀 State para os dados dos dropdowns do modal de edição
+    const [dropdownData, setDropdownData] = useState({
+        cargos: [], setores: [], unidades: [], fabricantes: [],
+        verticais: [], subgrupos: [], timesList: [],
+        beneficiosList: [], centrosCusto: [], employees: []
+    });
+
     useEffect(() => {
         const fetchEmployeeDetails = async () => {
             if (!employeeId) return;
@@ -42,6 +49,36 @@ const EmployeeDetailsPage = () => {
 
         fetchEmployeeDetails();
     }, [employeeId, successMessage]); // Recarrega se houver sucesso na edição
+
+    // 🚀 Busca os dados para os dropdowns do modal de edição
+    useEffect(() => {
+        const fetchAllDropdownData = async () => {
+            try {
+                const [cargosRes, setoresRes, unidadesRes, fabricantesRes, verticaisRes, subgruposRes, timesRes, beneficiosRes, centrosCustoRes, employeesRes] = await Promise.all([
+                    apiClient.get('/api/cargos'),
+                    apiClient.get('/api/setores'),
+                    apiClient.get('/api/unidades'),
+                    apiClient.get('/api/fabricantes'),
+                    apiClient.get('/api/verticais'),
+                    apiClient.get('/api/faq/subgrupos'),
+                    apiClient.get('/api/times'),
+                    apiClient.get('/api/beneficios'),
+                    apiClient.get('/api/centro-custos'),
+                    apiClient.get('/api/funcionarios'),
+                ]);
+                setDropdownData({
+                    cargos: cargosRes.data, setores: setoresRes.data, unidades: unidadesRes.data,
+                    fabricantes: fabricantesRes.data, verticais: verticaisRes.data, subgrupos: subgruposRes.data,
+                    timesList: timesRes.data, beneficiosList: beneficiosRes.data, centrosCusto: centrosCustoRes.data,
+                    employees: employeesRes.data
+                });
+            } catch (err) {
+                console.error("Erro ao carregar dados de configuração para edição:", err);
+                setError("Não foi possível carregar os dados de configuração para o modal de edição.");
+            }
+        };
+        fetchAllDropdownData();
+    }, []);
 
     const formatCurrency = (value) => {
         if (value === null || value === undefined) return '--';
@@ -242,7 +279,7 @@ const EmployeeDetailsPage = () => {
             {successMessage && <Alert variant="success">{successMessage}</Alert>}
 
             <Breadcrumb>
-                <Breadcrumb.Item linkAs={Link} linkProps={{ to: "/manage-employees" }}>Gestão de Colaboradores</Breadcrumb.Item>
+                <Breadcrumb.Item linkAs={Link} linkProps={{ to: "/rh?tab=colaboradores" }}>Gestão de Colaboradores</Breadcrumb.Item>
                 <Breadcrumb.Item active>{employee.nome_completo}</Breadcrumb.Item>
             </Breadcrumb>
 
@@ -749,6 +786,7 @@ const EmployeeDetailsPage = () => {
                 show={showEditModal}
                 onHide={() => setShowEditModal(false)}
                 employeeToEdit={employee}
+                {...dropdownData} // 🚀 Passa todos os dados dos dropdowns para o modal
                 onSaveSuccess={handleSaveSuccess}
             />
 
