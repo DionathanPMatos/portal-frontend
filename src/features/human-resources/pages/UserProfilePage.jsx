@@ -148,6 +148,10 @@ const UserProfilePage = () => {
         return <Alert variant="warning">Não foi possível encontrar os dados do perfil. Tente fazer login novamente.</Alert>;
     }
 
+    if (!profileData) {
+        return <Alert variant="warning">Não foi possível encontrar os dados do perfil. Tente fazer login novamente.</Alert>;
+    }
+
     return (
         <div className="container-main p-4">
             <ToastContainer position="top-end" className="p-3" style={{ zIndex: 1055 }}>

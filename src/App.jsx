@@ -113,7 +113,7 @@ import NewsConfirmationReportPage from "./features/news/pages/NewsConfirmationRe
 // ==========================================
 // MÓDULO NOTIFICAÇÕES
 // ==========================================
-import AllNotificationsPage from "./components/common/AllNotificationsPage.jsx"; // Renomeado e movido para common
+import AllNotificationsPage from "./components/common/AllNotificationsPage.jsx";
 
 // ==========================================
 // ARQUIVOS DE ESTILOS CSS

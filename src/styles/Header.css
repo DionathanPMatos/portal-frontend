@@ -197,9 +197,7 @@
 .user-profile {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 0.8rem;
-    font-weight: 500; /* Aumenta o peso da fonte para 500 px */
+    gap: 0.5rem;    
     color: #313132;
     position: relative; /* Necessário para o posicionamento do dropdown */
 }
@@ -225,6 +223,23 @@
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--cor-borda, #eef2f5);
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.user-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-primary-color, #313132);
+}
+
+.user-role {
+    font-size: 0.75rem;
+    color: #8a949f;
 }
 
 .user-dropdown-chevron {
@@ -296,21 +311,19 @@
 /* =========================
    NOTIFICAÇÕES
    ========================= */
-.notification-container {
+.header-icon-btn {
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: transform 0.2s ease;
+    color: var(--text-secondary-color, #555);
+    padding: 0 0.75rem; /* Espaçamento horizontal */
+    transition: color 0.2s ease, transform 0.2s ease;
 }
 
-.notification-container:hover {
+.header-icon-btn:hover {
+    color: var(--cor-destaque, #0063c6);
     transform: scale(1.1);
-}
-
-.notification-bell {
-    font-size: 1.2rem;
-    color: var(--text-primary-color, #313132);
 }
 
 /* =========================
@@ -382,8 +395,21 @@
 .notification-item-empty { text-align: center; padding: 3rem 1rem; color: #8a949f; font-size: 0.9rem; }
 
 .notification-dropdown .dropdown-footer { padding: 0.75rem; text-align: center; border-top: 1px solid var(--cor-borda, #eef2f5); background-color: var(--background-color, #f8f9fa); }
-.notification-dropdown .dropdown-footer a { font-size: 0.85rem; font-weight: 500; color: var(--cor-destaque, #0063c6); text-decoration: none; }
+.notification-dropdown .dropdown-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1.25rem;
+}
+
+.notification-dropdown .dropdown-footer a { font-size: 0.8rem; font-weight: 500; color: var(--cor-destaque, #0063c6); text-decoration: none; }
 .notification-dropdown .dropdown-footer a:hover { text-decoration: underline; }
+
+.mark-all-read-link {
+    color: var(--text-secondary-color, #6c757d) !important;
+    font-weight: 400 !important;
+    font-size: 0.8rem;
+}
 
 /* Remove estilos antigos do Bootstrap que podem conflitar */
 .notification-dropdown .dropdown-item {
