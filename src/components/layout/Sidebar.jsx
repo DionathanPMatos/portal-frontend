@@ -144,7 +144,7 @@ const menuItems = [
     name: "RH",
     icon: <GiHumanPyramid size={iconSize} />,
     subItems: [
-      { name: "Dashboard RH", link: "/rh/dashboard" },
+      { name: "Dashboard RH", link: "/rh" },
       {
         name: "Folha de pagamento",
         link: "https://onvio.com.br/portaldoempregado/auth/login",
