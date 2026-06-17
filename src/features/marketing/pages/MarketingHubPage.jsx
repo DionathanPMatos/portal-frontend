@@ -4,7 +4,11 @@ import { Tabs, Tab, Alert } from 'react-bootstrap';
 import { FaTachometerAlt, FaBullhorn, FaChalkboard, FaBoxOpen, FaCalendarDay, FaShareAlt, FaRobot, FaClipboardList, FaFileContract } from 'react-icons/fa';
 import ReserveRoomPage from './ReserveRoomPage';
 import MarketingDashboard from './MarketingDashboard'; // 🚀 Importa o novo dashboard
+import MarketingMaterialsPage from './MarketingMaterialsPage';
+import MarketingRequestsPage from './MarketingRequestsPage';
 
+// Cores para os gráficos
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
 // --- Componente de Placeholder ---
 const PlaceholderTab = ({ title }) => (
@@ -17,8 +21,6 @@ const PlaceholderTab = ({ title }) => (
 );
 
 // --- Importe suas páginas de Marketing aqui ---
-const MarketingMaterialsPage = () => <PlaceholderTab title="Gestão de Materiais de Marketing" />;
-const MarketingRequestsPage = () => <PlaceholderTab title="Acompanhamento de Solicitações" />;
 
 const MarketingHubPage = () => {
     const [searchParams] = useSearchParams();
@@ -39,8 +41,7 @@ const MarketingHubPage = () => {
             <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} id="marketing-hub-tabs" className="mb-3 custom-tabs" fill>
                 <Tab eventKey="dashboard" title={<><FaTachometerAlt className="me-2" />Dashboard</>}><MarketingDashboard /></Tab>
                 <Tab eventKey="campanhas" title={<><FaBullhorn className="me-2" />Campanhas</>}><PlaceholderTab title="Gestão de Campanhas" /></Tab>
-                <Tab eventKey="showroom" title={<><FaChalkboard className="me-2" />Showroom</>}>
-                    <ReserveRoomPage />
+                <Tab eventKey="showroom" title={<><FaChalkboard className="me-2" />Showroom</>}><ReserveRoomPage />
                 </Tab>
                 <Tab eventKey="materiais" title={<><FaBoxOpen className="me-2" />Materiais</>}><MarketingMaterialsPage /></Tab>
                 <Tab eventKey="eventos" title={<><FaCalendarDay className="me-2" />Eventos</>}><PlaceholderTab title="Gestão de Eventos" /></Tab>
