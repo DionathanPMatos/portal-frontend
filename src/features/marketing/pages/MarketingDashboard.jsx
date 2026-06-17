@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Card, Spinner, Alert, ListGroup, Image } from 'react-bootstrap';
+import { Row, Col, Card, Spinner, Alert, ListGroup, Image, Form } from 'react-bootstrap';
 import { FaCalendarCheck, FaChartLine, FaUserFriends, FaChartPie, FaTags, FaMoon, FaCalendarDay } from 'react-icons/fa';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line } from 'recharts';
 import apiClient from '../../../services/api';
@@ -25,12 +25,20 @@ const MarketingDashboard = () => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await apiClient.get('/api/marketing/dashboard');
-                setData(response.data);
+                setLoading(true);
+                    const response = await apiClient.get('/api/marketing/dashboard', {
+                        params: {
+                            year: selectedYear,
+                            month: selectedMonth,
+                    }
+                });                setData(response.data);
             } catch (err) {
                 setError('Não foi possível carregar os dados do dashboard de marketing.');
                 console.error(err);
@@ -39,7 +47,7 @@ const MarketingDashboard = () => {
             }
         };
         fetchData();
-    }, []);
+    }, [selectedMonth, selectedYear]);
 
     if (loading) {
         return <div className="text-center p-5"><Spinner animation="border" /> Carregando dashboard...</div>;
@@ -55,6 +63,27 @@ const MarketingDashboard = () => {
 
     return (
         <div className="p-3">
+            <div className="d-flex justify-content-end gap-2 mb-4">
+                <Form.Select size="sm" value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)} style={{ width: '130px' }}>
+                    <option value="1">Janeiro</option>
+                    <option value="2">Fevereiro</option>
+                    <option value="3">Março</option>
+                    <option value="4">Abril</option>
+                    <option value="5">Maio</option>
+                    <option value="6">Junho</option>
+                    <option value="7">Julho</option>
+                    <option value="8">Agosto</option>
+                    <option value="9">Setembro</option>
+                    <option value="10">Outubro</option>
+                    <option value="11">Novembro</option>
+                    <option value="12">Dezembro</option>
+                </Form.Select>
+                <Form.Select size="sm" value={selectedYear} onChange={e => setSelectedYear(e.target.value)} style={{ width: '100px' }}>
+                    {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map(year => (
+                        <option key={year} value={year}>{year}</option>
+                    ))}
+                </Form.Select>
+            </div>
             {/* KPI Cards */}
             <Row xs={1} sm={2} lg={2} xl={3} className="g-4 mb-4">
                 <Col><KpiCard title="Total de Visitas no Mês" value={data.visitasMes} icon={<FaCalendarCheck />} /></Col>
