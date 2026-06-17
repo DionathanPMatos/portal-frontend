@@ -3,6 +3,7 @@ import { Row, Col, Card, Spinner, Alert, Table, Badge, ProgressBar, ListGroup } 
 import { FaHardHat, FaTruck, FaClipboardList, FaFileSignature, FaTools } from 'react-icons/fa';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
 import apiClient from '../../../services/api';
+import FacilitiesKpiDetailsModal from '../components/FacilitiesKpiDetailsModal'; // Importa o novo modal
 
 // Cores para os gráficos
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
@@ -34,6 +35,9 @@ const FacilitiesDashboard = () => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [showKpiModal, setShowKpiModal] = useState(false);
+    const [kpiDetails, setKpiDetails] = useState({ title: '', items: [] });
+    const [kpiLoading, setKpiLoading] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -69,6 +73,26 @@ const FacilitiesDashboard = () => {
         return <Badge bg={variants[status] || 'secondary'}>{status}</Badge>;
     };
 
+    const handleKpiClick = async (type, count) => {
+        if (count === 0) return; // Não abre o modal se o KPI for 0
+
+        setKpiLoading(true);
+        setShowKpiModal(true);
+        setKpiDetails({ title: 'Carregando...', items: [] });
+
+        try {
+            const response = await apiClient.get('/api/facilities/kpi-details', {
+                params: { type }
+            });
+            setKpiDetails(response.data);
+        } catch (err) {
+            console.error("Erro ao buscar detalhes do KPI:", err);
+            setKpiDetails({ title: 'Erro ao carregar', items: [] });
+        } finally {
+            setKpiLoading(false);
+        }
+    };
+
     const getOsStatusBadge = (status) => {
         const variants = { 'Aberta': 'danger', 'Em andamento': 'primary', 'Agendado': 'info', 'Pendente': 'warning', 'Concluído': 'success' };
         return <Badge bg={variants[status] || 'secondary'}>{status}</Badge>;
@@ -77,11 +101,31 @@ const FacilitiesDashboard = () => {
         <div className="p-3">
             {/* Linha 1 - KPIs */}
             <Row xs={1} sm={2} lg={3} xl={5} className="g-4 mb-4">
-                <Col><KpiCard title="Equipamentos Ativos" value={data.kpis.equipamentos.total} variation={data.kpis.equipamentos.variation} sparklineData={data.kpis.equipamentos.sparkline} icon={<FaTools />} /></Col>
-                <Col><KpiCard title="Veículos da Frota" value={data.kpis.frota.total} variation={data.kpis.frota.variation} sparklineData={data.kpis.frota.sparkline} icon={<FaTruck />} /></Col>
-                <Col><KpiCard title="Obras em Andamento" value={data.kpis.obras.total} variation={data.kpis.obras.variation} sparklineData={data.kpis.obras.sparkline} icon={<FaHardHat />} /></Col>
-                <Col><KpiCard title="Ordens de Serviço Abertas" value={data.kpis.ordensServico.total} variation={data.kpis.ordensServico.variation} sparklineData={data.kpis.ordensServico.sparkline} icon={<FaClipboardList />} /></Col>
-                <Col><KpiCard title="Contratos Ativos" value={data.kpis.contratos.total} variation={data.kpis.contratos.variation} sparklineData={data.kpis.contratos.sparkline} icon={<FaFileSignature />} /></Col>
+                <Col>
+                    <div onClick={() => handleKpiClick('equipamentos', data.kpis.equipamentos.total)} style={{ cursor: data.kpis.equipamentos.total > 0 ? 'pointer' : 'default' }}>
+                        <KpiCard title="Equipamentos Ativos" value={data.kpis.equipamentos.total} variation={data.kpis.equipamentos.variation} sparklineData={data.kpis.equipamentos.sparkline} icon={<FaTools />} />
+                    </div>
+                </Col>
+                <Col>
+                    <div onClick={() => handleKpiClick('frota', data.kpis.frota.total)} style={{ cursor: data.kpis.frota.total > 0 ? 'pointer' : 'default' }}>
+                        <KpiCard title="Veículos da Frota" value={data.kpis.frota.total} variation={data.kpis.frota.variation} sparklineData={data.kpis.frota.sparkline} icon={<FaTruck />} />
+                    </div>
+                </Col>
+                <Col>
+                    <div onClick={() => handleKpiClick('obras', data.kpis.obras.total)} style={{ cursor: data.kpis.obras.total > 0 ? 'pointer' : 'default' }}>
+                        <KpiCard title="Obras em Andamento" value={data.kpis.obras.total} variation={data.kpis.obras.variation} sparklineData={data.kpis.obras.sparkline} icon={<FaHardHat />} />
+                    </div>
+                </Col>
+                <Col>
+                    <div onClick={() => handleKpiClick('ordensServico', data.kpis.ordensServico.total)} style={{ cursor: data.kpis.ordensServico.total > 0 ? 'pointer' : 'default' }}>
+                        <KpiCard title="Ordens de Serviço Abertas" value={data.kpis.ordensServico.total} variation={data.kpis.ordensServico.variation} sparklineData={data.kpis.ordensServico.sparkline} icon={<FaClipboardList />} />
+                    </div>
+                </Col>
+                <Col>
+                    <div onClick={() => handleKpiClick('contratos', data.kpis.contratos.total)} style={{ cursor: data.kpis.contratos.total > 0 ? 'pointer' : 'default' }}>
+                        <KpiCard title="Contratos Ativos" value={data.kpis.contratos.total} variation={data.kpis.contratos.variation} sparklineData={data.kpis.contratos.sparkline} icon={<FaFileSignature />} />
+                    </div>
+                </Col>
             </Row>
 
             {/* Linha 2 */}
@@ -191,7 +235,7 @@ const FacilitiesDashboard = () => {
                 </Col>
             </Row>
             <Row>
-            <Col lg={8}>
+            <Col lg={6}>
                     <Card className="h-100 shadow-sm border-0">
                         <Card.Header className="fw-bold">Solicitações Recentes</Card.Header>
                         <ListGroup variant="flush">
@@ -214,7 +258,7 @@ const FacilitiesDashboard = () => {
                 </Col>
            
             
-                <Col lg={12}>
+                <Col lg={6}>
                     <Card className="h-100 shadow-sm border-0">
                         <Card.Header className="fw-bold">Contratos Próximos do Vencimento</Card.Header>
                         <Table responsive hover className="align-middle mb-0">
@@ -235,28 +279,16 @@ const FacilitiesDashboard = () => {
                         </Table>
                     </Card>
                 </Col>
-                <Col lg={12}>
-                    <Card className="h-100 shadow-sm border-0">
-                        <Card.Header className="fw-bold">Contratos Próximos do Vencimento</Card.Header>
-                        <Table responsive hover className="align-middle mb-0">
-                            <thead><tr><th>Contrato</th><th>Fornecedor</th><th>Serviço</th><th>Vencimento</th><th>Status</th></tr></thead>
-                            <tbody>
-                                {data.contratosVencendo.length > 0 ? data.contratosVencendo.map(c => (
-                                    <tr key={c.id}>
-                                        <td>{c.contrato}</td>
-                                        <td>{c.fornecedor}</td>
-                                        <td>{c.servico}</td>
-                                        <td><Badge bg="warning-soft" text="warning">{new Date(c.vencimento).toLocaleDateString()}</Badge></td>
-                                        <td>{getStatusBadge(c.status)}</td>
-                                    </tr>
-                                )) : (
-                                    <tr><td colSpan="5" className="text-center py-4 text-muted">Nenhum contrato próximo do vencimento.</td></tr>
-                                )}
-                            </tbody>
-                        </Table>
-                    </Card>
-                </Col>
+                
             </Row>
+
+            <FacilitiesKpiDetailsModal
+                show={showKpiModal}
+                onHide={() => setShowKpiModal(false)}
+                title={kpiDetails.title}
+                items={kpiDetails.items}
+                loading={kpiLoading}
+            />
         </div>
     );
 }
