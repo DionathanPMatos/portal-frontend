@@ -92,6 +92,7 @@ import UserProfilePage from "./features/human-resources/pages/UserProfilePage.js
 import EmployeeDetailsPage from "./features/human-resources/pages/EmployeeDetailsPage.jsx"; // 🚀 NOVA PÁGINA
 import FuncionariosPage from "./features/human-resources/pages/Funcionarios.jsx"; // Renomeado
 import BeneficiosHubPage from "./features/human-resources/pages/BeneficiosHubPage.jsx";
+import HRHubPage from "./features/human-resources/pages/HRHubPage.jsx";
 
 // ==========================================
 // MÓDULO FINANCEIRO
@@ -201,13 +202,10 @@ function App() {
             <Route path="/dtc/repositorio" element={<RepositorioTecnicoPage />} />
 
             {/* ROTAS DO RH */}
-            <Route path="/manage-employees" element={<ManageEmployeesPage isLoggedIn={isLoggedIn} />} />
+            <Route path="/rh" element={<HRHubPage />} />
+            <Route path="/rh/colaboradores/:id" element={<EmployeeDetailsPage />} />
             <Route path="/funcionarios" element={<FuncionariosPage />} />
-            <Route path="/rh/dashboard" element={<HRDashboardPage />} />
-            <Route path="/rh/colaboradores/:id" element={<EmployeeDetailsPage />} /> {/* 🚀 NOVA ROTA */}
             <Route path="/perfil" element={<UserProfilePage />} />
-            <Route path="/rh/beneficios" element={<BeneficiosHubPage />} />
-            <Route path="/rh/manageemployee" element={<ManageEmployeesPage />} />
 
             <Route path="/crm/dashboard-dtc" element={<DashboardDTCPage />} />
             <Route path="/compras" element={<PurchaseDashboardPage />} />

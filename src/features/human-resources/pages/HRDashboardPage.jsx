@@ -71,20 +71,17 @@ const HRDashboardPage = () => {
         return <Alert variant="danger">{error}</Alert>;
     }
 
+    if (!dashboardData) {
+        return <div className="text-center p-5"><Alert variant="warning">Nenhum dado para exibir no dashboard.</Alert></div>;
+    }
+
     const { kpis, distribuicaoSetor, distribuicaoGenero, proximosAniversariantes, headcountEvolution, turnoverEvolution, recentRequests } = dashboardData;
 
     return (
-        <div className="container-main p-4">
-            <div className="page-header-colored mb-4">
-                <div className="page-header-title-wrapper">
-                    <h2 className="page-header-title d-flex align-items-center gap-3">
-                        <FaUsers /> Dashboard de Recursos Humanos
-                    </h2>
-                    <p className="page-header-subtitle">Visão geral dos indicadores e dados da equipe.</p>
-                </div>
-                <div className="d-flex gap-2">
-                    <Form.Select size="sm" value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)} style={{ width: '130px' }}>
-                        <option value="1">Janeiro</option>
+        <div className="p-3">
+            <div className="d-flex justify-content-end gap-2 mb-4">
+                <Form.Select size="sm" value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)} style={{ width: '130px' }}>
+                    <option value="1">Janeiro</option>
                         <option value="2">Fevereiro</option>
                         <option value="3">Março</option>
                         <option value="4">Abril</option>
@@ -96,13 +93,12 @@ const HRDashboardPage = () => {
                         <option value="10">Outubro</option>
                         <option value="11">Novembro</option>
                         <option value="12">Dezembro</option>
-                    </Form.Select>
-                    <Form.Select size="sm" value={selectedYear} onChange={e => setSelectedYear(e.target.value)} style={{ width: '100px' }}>
-                        {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map(year => (
-                            <option key={year} value={year}>{year}</option>
-                        ))}
-                    </Form.Select>
-                </div>
+                </Form.Select>
+                <Form.Select size="sm" value={selectedYear} onChange={e => setSelectedYear(e.target.value)} style={{ width: '100px' }}>
+                    {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map(year => (
+                        <option key={year} value={year}>{year}</option>
+                    ))}
+                </Form.Select>
             </div>
 
             {/* KPI Cards */}

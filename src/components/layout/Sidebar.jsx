@@ -143,7 +143,7 @@ const menuItems = [
     name: "RH",
     icon: <GiHumanPyramid size={iconSize} />,
     subItems: [
-      { name: "Dashboard RH", link: "/rh/dashboard" },
+      { name: "Central de RH", link: "/rh" },
       {
         name: "Folha de pagamento",
         link: "https://onvio.com.br/portaldoempregado/auth/login",
@@ -155,18 +155,16 @@ const menuItems = [
         target: "_blank",
       },
       {
-        name: "Treinamentos",
+        name: "DC Academy",
         link: "https://dcacademy.woli.com.br/pt-BR/Login/Index?returnUrl=%2Fpt-BR%2FWorkspace%2FIndex%3Fid%3D88%26hash%3DNDEyOTswMTY%3D",
         target: "_blank",
       },
-      { name: "Benefícios", link: "/rh/beneficios" },
       {
         name: "Oportunidades",
         link: "https://oportunidades.mindsight.com.br/dca",
         target: "_blank",
       },
       { name: "Ouvidoria", link: "#" },
-      { name: "Colaboradores", link: "/rh/manageemployee" },
       { name: "Politicas de RH", link: "#" },
     ],
   },

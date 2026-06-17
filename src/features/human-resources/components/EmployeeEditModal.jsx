@@ -3,18 +3,7 @@ import { Modal, Button, Form, Row, Col, Card, Spinner, Badge, Tabs, Tab, Alert }
 import { IMaskInput } from 'react-imask';
 import apiClient from '../../../services/api';
 
-const EmployeeEditModal = ({ show, onHide, employeeToEdit, onSaveSuccess }) => {
-    // State for dropdown data
-    const [cargos, setCargos] = useState([]);
-    const [setores, setSetores] = useState([]);
-    const [unidades, setUnidades] = useState([]);
-    const [fabricantes, setFabricantes] = useState([]);
-    const [verticais, setVerticais] = useState([]);
-    const [centrosCusto, setCentrosCusto] = useState([]);
-    const [beneficiosList, setBeneficiosList] = useState([]); // 🚀 Lista de todos os benefícios
-    const [timesList, setTimesList] = useState([]); // 🚀 Para o novo dropdown de times
-    const [subgrupos, setSubgrupos] = useState([]);
-    const [employees, setEmployees] = useState([]); // For manager dropdown
+const EmployeeEditModal = ({ show, onHide, employeeToEdit, onSaveSuccess, cargos, setores, unidades, fabricantes, verticais, subgrupos, timesList, beneficiosList, employees, centrosCusto }) => {
 
     // Form fields state
     const [name, setName] = useState('');
@@ -160,173 +149,139 @@ const EmployeeEditModal = ({ show, onHide, employeeToEdit, onSaveSuccess }) => {
         { id: 'rh', label: 'Recursos Humanos' }
     ];
 
-    // Fetch all necessary data for dropdowns when modal is shown
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [cargosRes, setoresRes, unidadesRes, fabricantesRes, verticaisRes, subgruposRes, employeesRes, timesRes, beneficiosRes, centrosCustoRes] = await Promise.all([
-                    apiClient.get('/api/cargos'),
-                    apiClient.get('/api/setores'),
-                    apiClient.get('/api/unidades'),
-                    apiClient.get('/api/fabricantes'),
-                    apiClient.get('/api/verticais'),
-                    apiClient.get('/api/faq/subgrupos'),
-                    apiClient.get('/api/funcionarios'),
-                    apiClient.get('/api/times'),
-                    apiClient.get('/api/beneficios'), // Benefícios já estavam sendo buscados
-                    apiClient.get('/api/centro-custos')
-                ]);
-                setCargos(cargosRes.data);
-                setSetores(setoresRes.data);
-                setUnidades(unidadesRes.data);
-                setFabricantes(fabricantesRes.data);
-                setVerticais(verticaisRes.data);
-                setSubgrupos(subgruposRes.data);
-                setEmployees(employeesRes.data);
-                setCentrosCusto(centrosCustoRes.data);
-                setBeneficiosList(beneficiosRes.data); // <-- CORREÇÃO AQUI
-                setTimesList(timesRes.data); // 🚀 Salva os times no estado
-            } catch (err) {
-                console.error("Error fetching modal data", err);
-                console.error("Erro ao buscar dados para o formulário:", err.response?.data || err.message);
-                setError("Não foi possível carregar os dados para o formulário.");
-            }
-        };
-
         if (show) {
-            fetchData();
+            setError(null);
         }
     }, [show]);
 
     // Populate form when employeeToEdit is provided
     useEffect(() => {
-        if (show) {
-            if (employeeToEdit) {
-                setName(employeeToEdit.nome_completo || '');
-                setEmail(employeeToEdit.email || '');
-                setContact(employeeToEdit.contato || '');
-                setCargoId(employeeToEdit.cargo_id || '');
-                setSetorId(employeeToEdit.setor_id || '');
-                setGestorId(employeeToEdit.gestor_id || '');
-                setUnidadeId(employeeToEdit.unidade_id || '');
-                setPermissions(employeeToEdit.privilegios ? employeeToEdit.privilegios.split(',') : ['dashboard']);
-                setSelectedBeneficios(employeeToEdit.beneficios_atribuidos?.map(b => b.beneficio_id) || []); // 🚀 Popula benefícios
-                setSelectedFabricantes(employeeToEdit.fabricantes_ids || []);
-                setSelectedVerticais(employeeToEdit.verticais_ids || []);
-                setSelectedSubgrupos(employeeToEdit.subgrupos_ids || []);
-                setCnhNumero(employeeToEdit.cnh_numero || '');
-                setCnhValidade(employeeToEdit.cnh_validade ? employeeToEdit.cnh_validade.split('T')[0] : '');
-                setNomeSocial(employeeToEdit.nome_social || '');
-                setEmailPessoal(employeeToEdit.email_pessoal || '');
-                setTimeId(employeeToEdit.time_id || '');
-                setCentroCustoId(employeeToEdit.centro_custo_id || '');
-                setBatePonto(employeeToEdit.bate_ponto || false);
-                setVinculo(employeeToEdit.vinculo || '');
-                setSalario(employeeToEdit.salario || '');
-                setDataAdmissao(employeeToEdit.data_admissao ? employeeToEdit.data_admissao.split('T')[0] : '');
-                setCategoriaTrabalhador(employeeToEdit.categoria_trabalhador || '');
-                setPeriodoExperiencia(employeeToEdit.periodo_experiencia || '');
-                setJornadaTrabalho(employeeToEdit.jornada_trabalho || '');
-                setHorasMensais(employeeToEdit.horas_mensais || '');
-                setPrimeiroEmprego(employeeToEdit.primeiro_emprego || false);
+        if (employeeToEdit) {
+            setName(employeeToEdit.nome_completo || '');
+            setEmail(employeeToEdit.email || '');
+            setContact(employeeToEdit.contato || '');
+            setCargoId(employeeToEdit.cargo_id || '');
+            setSetorId(employeeToEdit.setor_id || '');
+            setGestorId(employeeToEdit.gestor_id || '');
+            setUnidadeId(employeeToEdit.unidade_id || '');
+            setPermissions(employeeToEdit.privilegios ? employeeToEdit.privilegios.split(',') : ['dashboard']);
+            setSelectedBeneficios(employeeToEdit.beneficios_atribuidos?.map(b => b.beneficio_id) || []); // 🚀 Popula benefícios
+            setSelectedFabricantes(employeeToEdit.fabricantes_ids || []);
+            setSelectedVerticais(employeeToEdit.verticais_ids || []);
+            setSelectedSubgrupos(employeeToEdit.subgrupos_ids || []);
+            setCnhNumero(employeeToEdit.cnh_numero || '');
+            setCnhValidade(employeeToEdit.cnh_validade ? employeeToEdit.cnh_validade.split('T')[0] : '');
+            setNomeSocial(employeeToEdit.nome_social || '');
+            setEmailPessoal(employeeToEdit.email_pessoal || '');
+            setTimeId(employeeToEdit.time_id || '');
+            setCentroCustoId(employeeToEdit.centro_custo_id || '');
+            setBatePonto(employeeToEdit.bate_ponto || false);
+            setVinculo(employeeToEdit.vinculo || '');
+            setSalario(employeeToEdit.salario || '');
+            setDataAdmissao(employeeToEdit.data_admissao ? employeeToEdit.data_admissao.split('T')[0] : '');
+            setCategoriaTrabalhador(employeeToEdit.categoria_trabalhador || '');
+            setPeriodoExperiencia(employeeToEdit.periodo_experiencia || '');
+            setJornadaTrabalho(employeeToEdit.jornada_trabalho || '');
+            setHorasMensais(employeeToEdit.horas_mensais || '');
+            setPrimeiroEmprego(employeeToEdit.primeiro_emprego || false);
 
-                // Campos profissionais
-                setMatricula(employeeToEdit.matricula || '');
-                setNumeroCracha(employeeToEdit.numero_cracha || '');
-                setTipoAdmissao(employeeToEdit.tipo_admissao || '');
-                setDataExameAdmissional(employeeToEdit.data_exame_admissional ? employeeToEdit.data_exame_admissional.split('T')[0] : '');
-                setTipoSalario(employeeToEdit.tipo_salario || '');
-                setFormaPagamento(employeeToEdit.forma_pagamento || '');
-                setSalarioValidoAPartir(employeeToEdit.salario_valido_a_partir ? employeeToEdit.salario_valido_a_partir.split('T')[0] : '');
-                setMotivoAjusteSalarial(employeeToEdit.motivo_ajuste_salarial || '');
-                setDescricaoSalarial(employeeToEdit.descricao_salarial || '');
-                setPossuiRegistroPonto(employeeToEdit.possui_registro_ponto ?? true);
-                setHoraContratual(employeeToEdit.hora_contratual || '');
-                setTipoJornada(employeeToEdit.tipo_jornada || '');
-                setRegimeJornada(employeeToEdit.regime_jornada || '');
-                setTipoHorario(employeeToEdit.tipo_horario || '');
-                setHoraNoturna(employeeToEdit.hora_noturna || false);
-                setSindicato(employeeToEdit.sindicato || '');
-                setContribuicaoSindical(employeeToEdit.contribuicao_sindical || false);
-                setEstabilidade(employeeToEdit.estabilidade || '');
-                setCargoConfianca(employeeToEdit.cargo_confianca || false);
-                setTemSeguroDesemprego(employeeToEdit.tem_seguro_desemprego || false);
-                setAposentado(employeeToEdit.aposentado || false);
-                setTerminoExperiencia(employeeToEdit.termino_experiencia ? employeeToEdit.termino_experiencia.split('T')[0] : '');
-                setInscricaoOrgaoClasse(employeeToEdit.inscricao_orgao_classe || '');
-                setConselhoProfissional(employeeToEdit.conselho_profissional || '');
-                setCipa(employeeToEdit.cipa || false);
-                setTipoRegimePrevidenciario(employeeToEdit.tipo_regime_previdenciario || '');
-                setNaturezaAtividade(employeeToEdit.natureza_atividade || '');
-                setIndicativoAdmissao(employeeToEdit.indicativo_admissao || '');
-                setPreencheCotaPcd(employeeToEdit.preenche_cota_pcd || false);
-                setAgenteNocivo(employeeToEdit.agente_nocivo || '');
-                setOptanteFgts(employeeToEdit.optante_fgts ?? true);
-                setPossuiImovelProprio(employeeToEdit.possui_imovel_proprio || false);
-                setImovelAdquiridoFgts(employeeToEdit.imovel_adquirido_fgts || false);
+            // Campos profissionais
+            setMatricula(employeeToEdit.matricula || '');
+            setNumeroCracha(employeeToEdit.numero_cracha || '');
+            setTipoAdmissao(employeeToEdit.tipo_admissao || '');
+            setDataExameAdmissional(employeeToEdit.data_exame_admissional ? employeeToEdit.data_exame_admissional.split('T')[0] : '');
+            setTipoSalario(employeeToEdit.tipo_salario || '');
+            setFormaPagamento(employeeToEdit.forma_pagamento || '');
+            setSalarioValidoAPartir(employeeToEdit.salario_valido_a_partir ? employeeToEdit.salario_valido_a_partir.split('T')[0] : '');
+            setMotivoAjusteSalarial(employeeToEdit.motivo_ajuste_salarial || '');
+            setDescricaoSalarial(employeeToEdit.descricao_salarial || '');
+            setPossuiRegistroPonto(employeeToEdit.possui_registro_ponto ?? true);
+            setHoraContratual(employeeToEdit.hora_contratual || '');
+            setTipoJornada(employeeToEdit.tipo_jornada || '');
+            setRegimeJornada(employeeToEdit.regime_jornada || '');
+            setTipoHorario(employeeToEdit.tipo_horario || '');
+            setHoraNoturna(employeeToEdit.hora_noturna || false);
+            setSindicato(employeeToEdit.sindicato || '');
+            setContribuicaoSindical(employeeToEdit.contribuicao_sindical || false);
+            setEstabilidade(employeeToEdit.estabilidade || '');
+            setCargoConfianca(employeeToEdit.cargo_confianca || false);
+            setTemSeguroDesemprego(employeeToEdit.tem_seguro_desemprego || false);
+            setAposentado(employeeToEdit.aposentado || false);
+            setTerminoExperiencia(employeeToEdit.termino_experiencia ? employeeToEdit.termino_experiencia.split('T')[0] : '');
+            setInscricaoOrgaoClasse(employeeToEdit.inscricao_orgao_classe || '');
+            setConselhoProfissional(employeeToEdit.conselho_profissional || '');
+            setCipa(employeeToEdit.cipa || false);
+            setTipoRegimePrevidenciario(employeeToEdit.tipo_regime_previdenciario || '');
+            setNaturezaAtividade(employeeToEdit.natureza_atividade || '');
+            setIndicativoAdmissao(employeeToEdit.indicativo_admissao || '');
+            setPreencheCotaPcd(employeeToEdit.preenche_cota_pcd || false);
+            setAgenteNocivo(employeeToEdit.agente_nocivo || '');
+            setOptanteFgts(employeeToEdit.optante_fgts ?? true);
+            setPossuiImovelProprio(employeeToEdit.possui_imovel_proprio || false);
+            setImovelAdquiridoFgts(employeeToEdit.imovel_adquirido_fgts || false);
 
-                // Dados Pessoais
-                setCpf(employeeToEdit.cpf || '');
-                setDataNascimento(employeeToEdit.data_nascimento ? employeeToEdit.data_nascimento.split('T')[0] : '');
-                setNacionalidade(employeeToEdit.nacionalidade || '');
-                setUfNatal(employeeToEdit.uf_natal || '');
-                setCidadeNatal(employeeToEdit.cidade_natal || '');
-                setCorRaca(employeeToEdit.cor_raca || '');
-                setGenero(employeeToEdit.genero || '');
-                setGeneroDocumento(employeeToEdit.genero_documento || '');
-                setEstadoCivil(employeeToEdit.estado_civil || '');
-                setNomeMae(employeeToEdit.nome_mae || '');
-                setNomePai(employeeToEdit.nome_pai || '');
-                setTamanhoCalcado(employeeToEdit.tamanho_calcado || '');
-                setTamanhoCamiseta(employeeToEdit.tamanho_camiseta || '');
-                setCep(employeeToEdit.cep || '');
-                setLogradouro(employeeToEdit.logradouro || '');
-                setNumero(employeeToEdit.numero || '');
-                setComplemento(employeeToEdit.complemento || '');
-                setBairro(employeeToEdit.bairro || '');
-                setCidade(employeeToEdit.cidade || '');
-                setUf(employeeToEdit.uf || '');
-                setBanco(employeeToEdit.banco || '');
-                setTipoContaBancaria(employeeToEdit.tipo_conta_bancaria || '');
-                setAgencia(employeeToEdit.agencia || '');
-                setConta(employeeToEdit.conta || '');
-                setChavePixTipo(employeeToEdit.chave_pix_tipo || '');
-                setChavePix(employeeToEdit.chave_pix || '');
-                setContatoEmergenciaNome(employeeToEdit.contato_emergencia_nome || '');
-                setContatoEmergenciaParentesco(employeeToEdit.contato_emergencia_parentesco || '');
-                setContatoEmergenciaTelefone(employeeToEdit.contato_emergencia_telefone || '');
-                setPcd(employeeToEdit.pcd || false);
-                setPcdTipo(employeeToEdit.pcd_tipo || '');
-                setPcdObservacoes(employeeToEdit.pcd_observacoes || '');
+            // Dados Pessoais
+            setCpf(employeeToEdit.cpf || '');
+            setDataNascimento(employeeToEdit.data_nascimento ? employeeToEdit.data_nascimento.split('T')[0] : '');
+            setNacionalidade(employeeToEdit.nacionalidade || '');
+            setUfNatal(employeeToEdit.uf_natal || '');
+            setCidadeNatal(employeeToEdit.cidade_natal || '');
+            setCorRaca(employeeToEdit.cor_raca || '');
+            setGenero(employeeToEdit.genero || '');
+            setGeneroDocumento(employeeToEdit.genero_documento || '');
+            setEstadoCivil(employeeToEdit.estado_civil || '');
+            setNomeMae(employeeToEdit.nome_mae || '');
+            setNomePai(employeeToEdit.nome_pai || '');
+            setTamanhoCalcado(employeeToEdit.tamanho_calcado || '');
+            setTamanhoCamiseta(employeeToEdit.tamanho_camiseta || '');
+            setCep(employeeToEdit.cep || '');
+            setLogradouro(employeeToEdit.logradouro || '');
+            setNumero(employeeToEdit.numero || '');
+            setComplemento(employeeToEdit.complemento || '');
+            setBairro(employeeToEdit.bairro || '');
+            setCidade(employeeToEdit.cidade || '');
+            setUf(employeeToEdit.uf || '');
+            setBanco(employeeToEdit.banco || '');
+            setTipoContaBancaria(employeeToEdit.tipo_conta_bancaria || '');
+            setAgencia(employeeToEdit.agencia || '');
+            setConta(employeeToEdit.conta || '');
+            setChavePixTipo(employeeToEdit.chave_pix_tipo || '');
+            setChavePix(employeeToEdit.chave_pix || '');
+            setContatoEmergenciaNome(employeeToEdit.contato_emergencia_nome || '');
+            setContatoEmergenciaParentesco(employeeToEdit.contato_emergencia_parentesco || '');
+            setContatoEmergenciaTelefone(employeeToEdit.contato_emergencia_telefone || '');
+            setPcd(employeeToEdit.pcd || false);
+            setPcdTipo(employeeToEdit.pcd_tipo || '');
+            setPcdObservacoes(employeeToEdit.pcd_observacoes || '');
 
-                // Documentos
-                setNumeroCtps(employeeToEdit.numero_ctps || '');
-                setSerieCtps(employeeToEdit.serie_ctps || '');
-                setDataEmissaoCtps(employeeToEdit.data_emissao_ctps ? employeeToEdit.data_emissao_ctps.split('T')[0] : '');
-                setUfEmissorCtps(employeeToEdit.uf_emissor_ctps || '');
-                setPis(employeeToEdit.pis || '');
-                setRgNumero(employeeToEdit.rg_numero || '');
-                setRgDataEmissao(employeeToEdit.rg_data_emissao ? employeeToEdit.rg_data_emissao.split('T')[0] : '');
-                setRgOrgaoEmissor(employeeToEdit.rg_orgao_emissor || '');
-                setRgUfEmissor(employeeToEdit.rg_uf_emissor || '');
-                setReservistaNumero(employeeToEdit.reservista_numero || '');
-                setReservistaRa(employeeToEdit.reservista_ra || '');
-                setReservistaCategoria(employeeToEdit.reservista_categoria || '');
-                setCnhDataEmissao(employeeToEdit.cnh_data_emissao ? employeeToEdit.cnh_data_emissao.split('T')[0] : '');
-                setCnhCategoria(employeeToEdit.cnh_categoria || '');
-                setTituloEleitorNumero(employeeToEdit.titulo_eleitor_numero || '');
-                setTituloEleitorZona(employeeToEdit.titulo_eleitor_zona || '');
-                setTituloEleitorSecao(employeeToEdit.titulo_eleitor_secao || '');
+            // Documentos
+            setNumeroCtps(employeeToEdit.numero_ctps || '');
+            setSerieCtps(employeeToEdit.serie_ctps || '');
+            setDataEmissaoCtps(employeeToEdit.data_emissao_ctps ? employeeToEdit.data_emissao_ctps.split('T')[0] : '');
+            setUfEmissorCtps(employeeToEdit.uf_emissor_ctps || '');
+            setPis(employeeToEdit.pis || '');
+            setRgNumero(employeeToEdit.rg_numero || '');
+            setRgDataEmissao(employeeToEdit.rg_data_emissao ? employeeToEdit.rg_data_emissao.split('T')[0] : '');
+            setRgOrgaoEmissor(employeeToEdit.rg_orgao_emissor || '');
+            setRgUfEmissor(employeeToEdit.rg_uf_emissor || '');
+            setReservistaNumero(employeeToEdit.reservista_numero || '');
+            setReservistaRa(employeeToEdit.reservista_ra || '');
+            setReservistaCategoria(employeeToEdit.reservista_categoria || '');
+            setCnhDataEmissao(employeeToEdit.cnh_data_emissao ? employeeToEdit.cnh_data_emissao.split('T')[0] : '');
+            setCnhCategoria(employeeToEdit.cnh_categoria || '');
+            setTituloEleitorNumero(employeeToEdit.titulo_eleitor_numero || '');
+            setTituloEleitorZona(employeeToEdit.titulo_eleitor_zona || '');
+            setTituloEleitorSecao(employeeToEdit.titulo_eleitor_secao || '');
 
-                setUserpicFile(null);
-                setUserpicPreview('');
-                setExistingUserpicUrl(employeeToEdit.userpic_url || '');
-            } else {
-                // Reset form for new employee
-                resetForm();
-            }
+            setUserpicFile(null);
+            setUserpicPreview('');
+            setExistingUserpicUrl(employeeToEdit.userpic_url || '');
+        } else {
+            // Reset form for new employee
+            resetForm();
         }
-    }, [employeeToEdit, show]);
+    }, [employeeToEdit]);
 
     const resetForm = () => {
         setName(''); setEmail(''); setContact('');
@@ -546,7 +501,7 @@ const EmployeeEditModal = ({ show, onHide, employeeToEdit, onSaveSuccess }) => {
         onHide();
     };
 
-    const availableSubgrupos = subgrupos.filter(sub => {
+    const availableSubgrupos = (subgrupos || []).filter(sub => {
         if (!setorId) return true;
         return String(sub.setor_id) === String(setorId);
     });
@@ -606,12 +561,12 @@ const EmployeeEditModal = ({ show, onHide, employeeToEdit, onSaveSuccess }) => {
                                     <Card.Body>
                                         <Row>
                                             <Col md={6}><Form.Group className="mb-3"><Form.Label>E-mail Profissional</Form.Label><Form.Control type="email" value={email} onChange={(e) => setEmail(e.target.value)} /></Form.Group></Col>
-                                            <Col md={6}><Form.Group className="mb-3"><Form.Label>Filial</Form.Label><Form.Select value={unidadeId} onChange={(e) => setUnidadeId(e.target.value)}><option value="">Selecione</option>{unidades.map(u => (<option key={u.id} value={u.id}>{u.nome_unidade}</option>))}</Form.Select></Form.Group></Col>
-                                            <Col md={6}><Form.Group className="mb-3"><Form.Label>Pessoa Gestora</Form.Label><Form.Select value={gestorId} onChange={(e) => setGestorId(e.target.value)}><option value="">Ninguém</option>{employees.filter(emp => !employeeToEdit || emp.id !== employeeToEdit.id).map(emp => (<option key={emp.id} value={emp.id}>{emp.nome_completo}</option>))}</Form.Select></Form.Group></Col>
-                                            <Col md={6}><Form.Group className="mb-3"><Form.Label>Departamento*</Form.Label><Form.Select value={setorId} onChange={(e) => setSetorId(e.target.value)} required><option value="">Selecione</option>{setores.map(s => (<option key={s.id} value={s.id}>{s.nome_setor}</option>))}</Form.Select></Form.Group></Col>
-                                            <Col md={6}><Form.Group className="mb-3"><Form.Label>Time</Form.Label><Form.Select value={timeId} onChange={(e) => setTimeId(e.target.value)}><option value="">Nenhum</option>{timesList.map(t => (<option key={t.id} value={t.id}>{t.nome}</option>))}</Form.Select></Form.Group></Col>
-                                            <Col md={6}><Form.Group className="mb-3"><Form.Label>Cargo*</Form.Label><Form.Select value={cargoId} onChange={(e) => setCargoId(e.target.value)} required><option value="">Selecione</option>{cargos.map(c => (<option key={c.id} value={c.id}>{c.nome_cargo}</option>))}</Form.Select></Form.Group></Col>
-                                            <Col md={6}><Form.Group className="mb-3"><Form.Label>Centro de Custo*</Form.Label><Form.Select value={centroCustoId} onChange={(e) => setCentroCustoId(e.target.value)} required><option value="">Selecione</option>{centrosCusto.map(cc => (<option key={cc.id} value={cc.id}>{cc.nome}</option>))}</Form.Select></Form.Group></Col>
+                                            <Col md={6}><Form.Group className="mb-3"><Form.Label>Filial</Form.Label><Form.Select value={unidadeId} onChange={(e) => setUnidadeId(e.target.value)}><option value="">Selecione</option>{(unidades || []).map(u => (<option key={u.id} value={u.id}>{u.nome_unidade}</option>))}</Form.Select></Form.Group></Col>
+                                            <Col md={6}><Form.Group className="mb-3"><Form.Label>Pessoa Gestora</Form.Label><Form.Select value={gestorId} onChange={(e) => setGestorId(e.target.value)}><option value="">Ninguém</option>{(employees || []).filter(emp => !employeeToEdit || emp.id !== employeeToEdit.id).map(emp => (<option key={emp.id} value={emp.id}>{emp.nome_completo}</option>))}</Form.Select></Form.Group></Col>
+                                            <Col md={6}><Form.Group className="mb-3"><Form.Label>Departamento*</Form.Label><Form.Select value={setorId} onChange={(e) => setSetorId(e.target.value)} required><option value="">Selecione</option>{(setores || []).map(s => (<option key={s.id} value={s.id}>{s.nome_setor}</option>))}</Form.Select></Form.Group></Col>
+                                            <Col md={6}><Form.Group className="mb-3"><Form.Label>Time</Form.Label><Form.Select value={timeId} onChange={(e) => setTimeId(e.target.value)}><option value="">Nenhum</option>{(timesList || []).map(t => (<option key={t.id} value={t.id}>{t.nome}</option>))}</Form.Select></Form.Group></Col>
+                                            <Col md={6}><Form.Group className="mb-3"><Form.Label>Cargo*</Form.Label><Form.Select value={cargoId} onChange={(e) => setCargoId(e.target.value)} required><option value="">Selecione</option>{(cargos || []).map(c => (<option key={c.id} value={c.id}>{c.nome_cargo}</option>))}</Form.Select></Form.Group></Col>
+                                            <Col md={6}><Form.Group className="mb-3"><Form.Label>Centro de Custo*</Form.Label><Form.Select value={centroCustoId} onChange={(e) => setCentroCustoId(e.target.value)} required><option value="">Selecione</option>{(centrosCusto || []).map(cc => (<option key={cc.id} value={cc.id}>{cc.nome}</option>))}</Form.Select></Form.Group></Col>
                                             <Col md={6}>
                                                 <Form.Group className="mb-3">
                                                     <Form.Label>Senha de Acesso Local</Form.Label>
@@ -817,7 +772,7 @@ const EmployeeEditModal = ({ show, onHide, employeeToEdit, onSaveSuccess }) => {
                                 <Form.Group className="mb-4">
                                     <Form.Label className="fw-bold text-muted small text-uppercase">Marcas Representadas (DTC)</Form.Label>
                                     <div className="d-flex flex-wrap gap-3 p-3 bg-light rounded border">
-                                        {fabricantes.map(fab => (
+                                        {(fabricantes || []).map(fab => (
                                             <Form.Check key={fab.id} type="checkbox" id={`fab-${fab.id}`} label={fab.name} checked={selectedFabricantes.includes(fab.id)}
                                                 onChange={(e) => {
                                                     if (e.target.checked) { setSelectedFabricantes([...selectedFabricantes, fab.id]); } 
@@ -831,7 +786,7 @@ const EmployeeEditModal = ({ show, onHide, employeeToEdit, onSaveSuccess }) => {
                                 <Form.Group className="mb-3">
                                     <Form.Label className="fw-bold text-muted small text-uppercase">Verticais DTC Representadas</Form.Label>
                                     <div className="d-flex flex-wrap gap-3 p-3 bg-light rounded border">
-                                        {verticais.map(vert => (
+                                        {(verticais || []).map(vert => (
                                             <Form.Check key={vert.id} type="checkbox" id={`vert-${vert.id}`} label={vert.nome} checked={selectedVerticais.includes(vert.id)}
                                                 onChange={(e) => {
                                                     if (e.target.checked) { setSelectedVerticais([...selectedVerticais, vert.id]); } 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom'; // 🚀 Importa o useNavigate
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -20,6 +20,7 @@ import TimesModal from '../components/TimesModal.jsx';
 import CentroCustoModal from '../components/CentroCustoModal.jsx';
 import OnboardingTemplateModal from '../components/OnboardingTemplateModal.jsx';
 import apiClient from '../../../services/api';
+import { useCallback, useEffect } from 'react'; // Garante que useEffect esteja importado
 import EmployeeEditModal from '../components/EmployeeEditModal.jsx';
 import ImportModal from '../components/ImportModal';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -33,6 +34,13 @@ const ManageEmployees = () => {
     const [employees, setEmployees] = useState([]);
     const [cargos, setCargos] = useState([]);
     const [setores, setSetores] = useState([]);
+    const [unidades, setUnidades] = useState([]);
+    const [fabricantes, setFabricantes] = useState([]);
+    const [verticais, setVerticais] = useState([]);
+    const [subgrupos, setSubgrupos] = useState([]);
+    const [centrosCusto, setCentrosCusto] = useState([]);
+    const [times, setTimes] = useState([]);
+    const [beneficios, setBeneficios] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
@@ -66,14 +74,42 @@ const ManageEmployees = () => {
         return nomeFormatado;
     };
 
-    const fetchEmployees = async () => {
+    // 🚀 Garante que fetchDropdownData seja uma função estável e definida corretamente
+    const fetchDropdownData = useCallback(async () => {
+        try {
+            const [cargosRes, setoresRes, unidadesRes, fabricantesRes, verticaisRes, subgruposRes, timesRes, beneficiosRes, centrosCustoRes] = await Promise.all([
+                apiClient.get('/api/cargos'),
+                apiClient.get('/api/setores'),
+                apiClient.get('/api/unidades'),
+                apiClient.get('/api/fabricantes'),
+                apiClient.get('/api/verticais'),
+                apiClient.get('/api/faq/subgrupos'),
+                apiClient.get('/api/times'),
+                apiClient.get('/api/beneficios'),
+                apiClient.get('/api/centro-custos'),
+            ]);
+            setCargos(cargosRes.data);
+            setSetores(setoresRes.data);
+            setUnidades(unidadesRes.data);
+            setFabricantes(fabricantesRes.data);
+            setVerticais(verticaisRes.data);
+            setSubgrupos(subgruposRes.data);
+            setTimes(timesRes.data);
+            setBeneficios(beneficiosRes.data);
+            setCentrosCusto(centrosCustoRes.data);
+            console.log("✅ Dropdown data fetched successfully!"); // Log para confirmar execução
+        } catch (err) {
+            console.error('Erro ao buscar dados de dropdowns:', err);
+            setError('Falha ao carregar dados de configuração.');
+        }
+    // Adiciona dependências vazias para que a função seja criada apenas uma vez
+    }, []);
+
+    const fetchEmployees = useCallback(async () => {
         try {
             setError(null);
             const response = await apiClient.get('/api/funcionarios', {
-                params: { 
-                    cargoId: filtroCargo,
-                    setorId: filtroSetor
-                }
+                params: { cargoId: filtroCargo, setorId: filtroSetor }
             });
             setEmployees(response.data);
         } catch (err) {
@@ -82,33 +118,15 @@ const ManageEmployees = () => {
         } finally {
             setLoading(false);
         }
-    };
-    
-    const fetchCargos = async () => {
-        try {
-            const response = await apiClient.get('/api/cargos');
-            setCargos(response.data);
-        } catch (err) { console.error('Erro ao buscar cargos:', err); }
-    };
-
-    const fetchSetores = async () => {
-        try {
-            const response = await apiClient.get('/api/setores');
-            setSetores(response.data);
-        } catch (err) { console.error('Erro ao buscar setores:', err); }
-    };
+    }, [filtroCargo, filtroSetor]);
 
     useEffect(() => {
         if (isLoggedIn) {
             setLoading(true);
+            fetchDropdownData();
             fetchEmployees();
-            if (cargos.length === 0) fetchCargos();
-            if (setores.length === 0) fetchSetores();
-        } else {
-            setEmployees([]);
-            setLoading(false);
         }
-    }, [isLoggedIn, filtroCargo, filtroSetor]);
+    }, [isLoggedIn, fetchEmployees]);
 
     const handleEdit = (employee) => {
         setEditingEmployee(employee);
@@ -190,37 +208,29 @@ const ManageEmployees = () => {
     };
 
     return (
-        <div className='container-main p-4'>
+        <div className='p-3'>
             {successMessage && <Alert variant="success">{successMessage}</Alert>}
             {error && <Alert variant="danger btn-sm">{error}</Alert>}
             
-            <div className="page-header-colored mb-4">
-                <div className="page-header-title-wrapper">
-                    <h2 className="page-header-title d-flex align-items-center gap-3">
-                        <FaBriefcase /> Gestão de Colaboradores
-                    </h2>
-                    <p className="page-header-subtitle">Cadastre, edite e gerencie permissões da equipe no portal.</p>
-                </div>
-                <div className="page-header-actions-wrapper">
-                    <Button variant="primary" className="btn-header-action" onClick={handleAddClick}>
-                        <FaUserPlus className="me-2" /> Iniciar Novo Cadastro
-                    </Button>
-                    <Dropdown>
-                        <Dropdown.Toggle variant="light" id="dropdown-settings">
-                            <FaCog />
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu align="end">
-                            <Dropdown.Item onClick={() => setShowImportModal(true)}><FaFileImport className="me-2" />Importar CSV</Dropdown.Item>
-                            <Dropdown.Divider />
-                            <Dropdown.Item onClick={() => setIsCargosModalOpen(true)}><FaBriefcase className="me-2" />Gerenciar Cargos</Dropdown.Item>
-                            <Dropdown.Item onClick={() => setIsSetoresModalOpen(true)}><FaSitemap className="me-2" />Gerenciar Setores</Dropdown.Item>
-                            <Dropdown.Item onClick={() => setIsCentroCustoModalOpen(true)}><FaDollarSign className="me-2" />Gerenciar Centros de Custo</Dropdown.Item>
-                            <Dropdown.Item onClick={() => setIsTimesModalOpen(true)}><FaUsers className="me-2" />Gerenciar Times</Dropdown.Item>
-                            <Dropdown.Item onClick={() => setIsOnboardingTemplateModalOpen(true)}><FaClipboardList className="me-2" />Gerenciar Modelos de Onboarding</Dropdown.Item>
-                            <Dropdown.Item onClick={() => setIsUnidadesModalOpen(true)}><FaBuilding className="me-2" />Gerenciar Filiais</Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown>
-                </div>
+            <div className="d-flex justify-content-end mb-4">
+                <Button variant="primary" onClick={handleAddClick} className="me-2">
+                    <FaUserPlus className="me-2" /> Iniciar Novo Cadastro
+                </Button>
+                <Dropdown>
+                    <Dropdown.Toggle variant="outline-secondary" id="dropdown-settings">
+                        <FaCog /> Configurações
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu align="end">
+                        <Dropdown.Item onClick={() => setShowImportModal(true)}><FaFileImport className="me-2" />Importar CSV</Dropdown.Item>
+                        <Dropdown.Divider />
+                        <Dropdown.Item onClick={() => setIsCargosModalOpen(true)}><FaBriefcase className="me-2" />Gerenciar Cargos</Dropdown.Item>
+                        <Dropdown.Item onClick={() => setIsSetoresModalOpen(true)}><FaSitemap className="me-2" />Gerenciar Setores</Dropdown.Item>
+                        <Dropdown.Item onClick={() => setIsCentroCustoModalOpen(true)}><FaDollarSign className="me-2" />Gerenciar Centros de Custo</Dropdown.Item>
+                        <Dropdown.Item onClick={() => setIsTimesModalOpen(true)}><FaUsers className="me-2" />Gerenciar Times</Dropdown.Item>
+                        <Dropdown.Item onClick={() => setIsOnboardingTemplateModalOpen(true)}><FaClipboardList className="me-2" />Gerenciar Modelos de Onboarding</Dropdown.Item>
+                        <Dropdown.Item onClick={() => setIsUnidadesModalOpen(true)}><FaBuilding className="me-2" />Gerenciar Filiais</Dropdown.Item>
+                    </Dropdown.Menu>
+                </Dropdown>
             </div>
 
             <Card className="shadow-sm border-0 mb-4">
@@ -307,9 +317,9 @@ const ManageEmployees = () => {
                         </div>
                     </Card>
 
-            
-            <CargosModal show={isCargosModalOpen} onHide={() => setIsCargosModalOpen(false)} onCargosUpdate={fetchCargos} />
-            <SetoresModal show={isSetoresModalOpen} onHide={() => setIsSetoresModalOpen(false)} onSetoresUpdate={fetchSetores} /> 
+            {/* 🚀 CORREÇÃO: Passa a função correta para atualizar os dados após a edição nos modais. */}
+            <CargosModal show={isCargosModalOpen} onHide={() => setIsCargosModalOpen(false)} onCargosUpdate={fetchDropdownData} />
+            <SetoresModal show={isSetoresModalOpen} onHide={() => setIsSetoresModalOpen(false)} onSetoresUpdate={fetchDropdownData} /> 
             <CentroCustoModal show={isCentroCustoModalOpen} onHide={() => setIsCentroCustoModalOpen(false)} />
             <OnboardingTemplateModal show={isOnboardingTemplateModalOpen} onHide={() => setIsOnboardingTemplateModalOpen(false)} />
             <TimesModal show={isTimesModalOpen} onHide={() => setIsTimesModalOpen(false)} />
@@ -325,6 +335,17 @@ const ManageEmployees = () => {
                 show={showAddEditModal}
                 onHide={handleCloseAndResetModal}
                 employeeToEdit={editingEmployee}
+                // Passando todos os dados necessários para os dropdowns
+                cargos={cargos}
+                setores={setores}
+                unidades={unidades}
+                fabricantes={fabricantes}
+                verticais={verticais}
+                subgrupos={subgrupos}
+                timesList={times}
+                beneficiosList={beneficios}
+                centrosCusto={centrosCusto}
+                employees={employees}
                 onSaveSuccess={() => {
                     setSuccessMessage("Operação realizada com sucesso!");
                     fetchEmployees();
