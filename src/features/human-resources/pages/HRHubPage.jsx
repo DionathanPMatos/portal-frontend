@@ -3,8 +3,10 @@ import { useSearchParams } from 'react-router-dom';
 import { Tabs, Tab, Alert } from 'react-bootstrap';
 import { FaTachometerAlt, FaUsers, FaSitemap, FaUmbrellaBeach, FaGift, FaChalkboardTeacher, FaClipboardCheck, FaUserTie, FaFileAlt } from 'react-icons/fa';
 import HRDashboardPage from './HRDashboardPage';
+import OrganogramaPage from './OrganogramaPage'; // 🚀 Importa a nova página do organograma
 import ManageEmployees from './ManageEmployees';
 import ManageBeneficios from './ManageBeneficios';
+import FeriasPage from './../components/FeriasPage';
 
 // Componente de placeholder para abas futuras
 const PlaceholderTab = ({ title }) => (
@@ -40,10 +42,10 @@ const HRHubPage = () => {
                     <ManageEmployees />
                 </Tab>
                 <Tab eventKey="organograma" title={<><FaSitemap className="me-2" />Organograma</>}>
-                    <PlaceholderTab title="Organograma" />
+                    <OrganogramaPage />
                 </Tab>
                 <Tab eventKey="ferias" title={<><FaUmbrellaBeach className="me-2" />Férias</>}>
-                    <PlaceholderTab title="Controle de Férias" />
+                    <FeriasPage />
                 </Tab>
                 <Tab eventKey="beneficios" title={<><FaGift className="me-2" />Benefícios</>}>
                     <ManageBeneficios />

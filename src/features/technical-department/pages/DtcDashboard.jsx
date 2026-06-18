@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Row, Col, Card, Spinner, Alert, Table, Badge, ListGroup, Form } from 'react-bootstrap';
 import { FaHourglassHalf, FaCog, FaCheckCircle, FaClock, FaCalendarAlt, FaChartPie, FaProjectDiagram, FaQuestionCircle, FaUsersCog, FaRocket, FaBook } from 'react-icons/fa';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer  } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import apiClient from '../../../services/api';
 
 const DtcDashboard = () => {
@@ -31,7 +31,7 @@ const DtcDashboard = () => {
 
     const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
     const formatDate = (dateString) => dateString ? new Date(dateString).toLocaleDateString('pt-BR') : 'N/A';
-    
+
     const formatInterval = (interval) => {
         if (!interval) return 'N/A';
         const { days, hours, minutes } = interval;
@@ -54,7 +54,7 @@ const DtcDashboard = () => {
             <Row className="mb-4 g-3 align-items-center bg-light p-3 rounded">
                 <Col xs="auto" className="fw-bold">Filtrar período:</Col>
                 <Col md={2}>
-                    <Form.Select size="sm" value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)}>
+                    <Form.Select size="sm" value={selectedMonth} onChange={e => setSelectedMonth(Number(e.target.value))}>
                         <option value="1">Janeiro</option>
                         <option value="2">Fevereiro</option>
                         <option value="3">Março</option>
@@ -70,7 +70,7 @@ const DtcDashboard = () => {
                     </Form.Select>
                 </Col>
                 <Col md={2}>
-                    <Form.Select size="sm" value={selectedYear} onChange={e => setSelectedYear(e.target.value)}>
+                    <Form.Select size="sm" value={selectedYear} onChange={e => setSelectedYear(Number(e.target.value))}>
                         {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map(year => (<option key={year} value={year}>{year}</option>))}
                     </Form.Select>
                 </Col>

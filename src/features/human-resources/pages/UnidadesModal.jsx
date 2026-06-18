@@ -41,13 +41,13 @@ const UnidadesModal = ({ show, onHide, onUnidadesUpdate }) => {
             setError(editingUnidade ? 'Falha ao atualizar unidade.' : 'Falha ao adicionar unidade.');
         }
     };
-    
+
     const handleDelete = async (id) => {
         if (window.confirm('Tem certeza que deseja excluir esta unidade?')) {
             try {
                 await apiClient.delete(`/api/unidades/${id}`);
                 await fetchUnidades();
-                if(onUnidadesUpdate) onUnidadesUpdate();
+                if (onUnidadesUpdate) onUnidadesUpdate();
             } catch (err) {
                 console.error('Erro ao excluir:', err);
                 setError('Falha ao excluir. Verifique se não há funcionários vinculados.');
@@ -65,7 +65,7 @@ const UnidadesModal = ({ show, onHide, onUnidadesUpdate }) => {
         setEditingUnidade(null);
         setError(null);
     };
-    
+
     return (
         <Modal show={show} onHide={() => { resetForm(); onHide(); }} centered>
             <Modal.Header closeButton>
@@ -80,9 +80,9 @@ const UnidadesModal = ({ show, onHide, onUnidadesUpdate }) => {
                 {editingUnidade && <Button variant="light" size="sm" onClick={resetForm} className="mb-3">Cancelar Edição</Button>}
                 {loading ? <Spinner animation="border" size="sm" /> : (
                     <ListGroup>
-                        {unidades.map(unidade => (
-                            <ListGroup.Item key={unidade.id} className="d-flex justify-content-between align-items-center">
-                                {unidade.nome_unidade}
+                        {unidades.map(unidade => ( // 🚀 CORREÇÃO: Adiciona o ID na exibição da unidade
+                            <ListGroup.Item key={unidade.id} className="d-flex justify-content-between align-items-center text-break">
+                                ({unidade.id}) {unidade.nome_unidade}
                                 <div><Button variant="outline-info" size="sm" onClick={() => handleEdit(unidade)}>Editar</Button><Button variant="outline-danger" size="sm" className="ms-2" onClick={() => handleDelete(unidade.id)}>Excluir</Button></div>
                             </ListGroup.Item>
                         ))}

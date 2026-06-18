@@ -44,7 +44,7 @@ const CentroCustoModal = ({ show, onHide, onUpdate }) => {
             setError(err.response?.data?.error || (editingItem ? 'Falha ao atualizar.' : 'Falha ao adicionar.'));
         }
     };
-    
+
     const handleDelete = async (id) => {
         if (window.confirm('Tem certeza que deseja excluir este centro de custo?')) {
             try {
@@ -68,7 +68,7 @@ const CentroCustoModal = ({ show, onHide, onUpdate }) => {
         setEditingItem(null);
         setError(null);
     };
-    
+
     const handleClose = () => {
         resetForm();
         onHide();
@@ -90,9 +90,9 @@ const CentroCustoModal = ({ show, onHide, onUpdate }) => {
                 <h5>Centros de Custo Atuais</h5>
                 {loading ? <Spinner animation="border" size="sm" /> : (
                     <ListGroup>
-                        {centrosCusto.map(item => (
-                            <ListGroup.Item key={item.id} className="d-flex justify-content-between align-items-center">
-                                {item.nome}
+                        {centrosCusto.map(item => ( // 🚀 CORREÇÃO: Adiciona o ID na exibição do centro de custo
+                            <ListGroup.Item key={item.id} className="d-flex justify-content-between align-items-center text-break">
+                                ({item.id}) {item.nome}
                                 <div>
                                     <Button variant="outline-info" size="sm" onClick={() => handleEdit(item)}>Editar</Button>
                                     <Button variant="outline-danger" size="sm" className="ms-2" onClick={() => handleDelete(item.id)}>Excluir</Button>

@@ -80,21 +80,21 @@ const HRDashboardPage = () => {
     return (
         <div className="p-3">
             <div className="d-flex justify-content-end gap-2 mb-4">
-                <Form.Select size="sm" value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)} style={{ width: '130px' }}>
+                <Form.Select size="sm" value={selectedMonth} onChange={e => setSelectedMonth(Number(e.target.value))} style={{ width: '130px' }}>
                     <option value="1">Janeiro</option>
-                        <option value="2">Fevereiro</option>
-                        <option value="3">Março</option>
-                        <option value="4">Abril</option>
-                        <option value="5">Maio</option>
-                        <option value="6">Junho</option>
-                        <option value="7">Julho</option>
-                        <option value="8">Agosto</option>
-                        <option value="9">Setembro</option>
-                        <option value="10">Outubro</option>
-                        <option value="11">Novembro</option>
-                        <option value="12">Dezembro</option>
+                    <option value="2">Fevereiro</option>
+                    <option value="3">Março</option>
+                    <option value="4">Abril</option>
+                    <option value="5">Maio</option>
+                    <option value="6">Junho</option>
+                    <option value="7">Julho</option>
+                    <option value="8">Agosto</option>
+                    <option value="9">Setembro</option>
+                    <option value="10">Outubro</option>
+                    <option value="11">Novembro</option>
+                    <option value="12">Dezembro</option>
                 </Form.Select>
-                <Form.Select size="sm" value={selectedYear} onChange={e => setSelectedYear(e.target.value)} style={{ width: '100px' }}>
+                <Form.Select size="sm" value={selectedYear} onChange={e => setSelectedYear(Number(e.target.value))} style={{ width: '100px' }}>
                     {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map(year => (
                         <option key={year} value={year}>{year}</option>
                     ))}
@@ -224,9 +224,9 @@ const HRDashboardPage = () => {
                         </ListGroup>
                     </Card>
                 </Col>
-                
+
             </Row>
-            
+
             <Row className="g-4 mt-4">
                 <Col lg={6}>
                     <Card className="h-100">
@@ -317,7 +317,7 @@ const HRDashboardPage = () => {
                         </Card.Body>
                     </Card>
                 </Col>
-                
+
             </Row>
 
             <KpiDetailsModal

@@ -37,11 +37,11 @@ function Dashboard() {
   // Função para editar a meta individual do vendedor
   const handleEditVendorMeta = async (vendedorNome, metaAtual) => {
     const novaMetaStr = window.prompt(`Digite a nova meta para o vendedor ${vendedorNome} (apenas números. Ex: 50000):`, metaAtual);
-    
+
     if (novaMetaStr === null) return; // Usuário cancelou
-    
+
     const novaMeta = parseFloat(novaMetaStr.replace(/\./g, '').replace(',', '.'));
-    
+
     if (isNaN(novaMeta)) {
       alert('Valor inválido. Digite apenas números.');
       return;
@@ -50,7 +50,7 @@ function Dashboard() {
     try {
       setLoading(true);
       await apiClient.post('/api/dashboard-metrics/meta-vendedor', { vendedor: vendedorNome, meta: novaMeta });
-      
+
       // Recarrega as métricas da tela para atualizar a barra de progresso imediatamente
       const response = await apiClient.get('/api/dashboard-metrics', {
         params: { month: selectedMonth, year: selectedYear }
@@ -82,10 +82,10 @@ function Dashboard() {
         </div>
         {/* 🚀 NOVA ÁREA DE AÇÕES NO TOPO DIREITO */}
         <div className="page-actions d-flex flex-wrap justify-content-lg-end gap-2 align-items-center">
-          <select 
-            className="form-select shadow-sm" 
+          <select
+            className="form-select shadow-sm"
             style={{ width: '140px', cursor: 'pointer' }}
-            value={selectedMonth} 
+            value={selectedMonth}
             onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
           >
             <option value={1}>Janeiro</option>
@@ -101,10 +101,10 @@ function Dashboard() {
             <option value={11}>Novembro</option>
             <option value={12}>Dezembro</option>
           </select>
-          <select 
-            className="form-select shadow-sm" 
+          <select
+            className="form-select shadow-sm"
             style={{ width: '100px', cursor: 'pointer' }}
-            value={selectedYear} 
+            value={selectedYear}
             onChange={(e) => setSelectedYear(parseInt(e.target.value))}
           >
             {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 2 + i).map(ano => (
@@ -132,7 +132,7 @@ function Dashboard() {
                   </h4>
                 </div>
                 <div className="kpi-icon-circle kpi-icon-circle-purple">
-                  <FaChartLine/>
+                  <FaChartLine />
                 </div>
               </div>
               <div className="mt-2 pt-1 border-top d-flex flex-column gap-1">
@@ -159,7 +159,7 @@ function Dashboard() {
                   </h4>
                 </div>
                 <div className="kpi-icon-circle kpi-icon-circle-blue">
-                  <FaCashRegister/>
+                  <FaCashRegister />
                 </div>
               </div>
               <div className="mt-2 pt-1 border-top">
@@ -171,7 +171,7 @@ function Dashboard() {
           </div>
         </div>
 
-        
+
         {/* Card 3: Vendas do Dia - Ajustado para melhor responsividade */}
         <div className="col-12 col-md-6 col-xl-3">
           <div className="card h-100">
@@ -223,7 +223,7 @@ function Dashboard() {
         </div>
       </div>
 
-      
+
 
       {/* 3. Corpo Principal (Grid Assimétrico) */}
       <div className="row g-4">
@@ -231,35 +231,35 @@ function Dashboard() {
         <div className="col-12 col-lg-8">
           {/* Carrossel de Imagens */}
           <div className="card mb-4">
-      <div className="card-body p-0" style={{ overflow: 'hidden', borderRadius: '8px', maxHeight: '400px' }}>
-        <Carousel fade interval={4000} pause="hover">
-          {carouselSlides.length > 0 ? (
-            carouselSlides.map(slide => (
-              /* Adicionamos 'card-mural' no Item do Carrossel */
-              <Carousel.Item key={slide.id} className="card-mural">
-                <img
-                  className="d-block w-100"
-                  src={slide.imageUrl}
-                  alt={slide.title}
-                  style={{ objectFit: 'cover', height: '400px' }}
-                />
-                
-                {/* Adicionamos 'conteudo-texto' e 'text-start' no Caption */}
-                <Carousel.Caption className="conteudo-texto text-start">
-                  <h5 className="mural-titulo">{slide.title}</h5>
-                  <p className="mural-descricao">{slide.description}</p>
-                </Carousel.Caption>
-              </Carousel.Item>
-            ))
-          ) : (
-            // Placeholder para quando não há slides
-            <div className="d-flex align-items-center justify-content-center bg-light text-muted" style={{ height: '400px' }}>
-              <span>Nenhum slide para exibir.</span>
+            <div className="card-body p-0" style={{ overflow: 'hidden', borderRadius: '8px', maxHeight: '400px' }}>
+              <Carousel fade interval={4000} pause="hover">
+                {carouselSlides.length > 0 ? (
+                  carouselSlides.map(slide => (
+                    /* Adicionamos 'card-mural' no Item do Carrossel */
+                    <Carousel.Item key={slide.id} className="card-mural">
+                      <img
+                        className="d-block w-100"
+                        src={slide.imageUrl}
+                        alt={slide.title}
+                        style={{ objectFit: 'cover', height: '400px' }}
+                      />
+
+                      {/* Adicionamos 'conteudo-texto' e 'text-start' no Caption */}
+                      <Carousel.Caption className="conteudo-texto text-start">
+                        <h5 className="mural-titulo">{slide.title}</h5>
+                        <p className="mural-descricao">{slide.description}</p>
+                      </Carousel.Caption>
+                    </Carousel.Item>
+                  ))
+                ) : (
+                  // Placeholder para quando não há slides
+                  <div className="d-flex align-items-center justify-content-center bg-light text-muted" style={{ height: '400px' }}>
+                    <span>Nenhum slide para exibir.</span>
+                  </div>
+                )}
+              </Carousel>
             </div>
-          )}
-        </Carousel>
-      </div>
-    </div>
+          </div>
 
           {/* 🚀 Mural de Avisos e Notícias (Widget Reintegrado) */}
           <NewsWidget />

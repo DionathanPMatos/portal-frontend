@@ -36,7 +36,7 @@ const CargosModal = ({ show, onHide, onCargosUpdate }) => {
         const url = editingCargo
             ? `/api/cargos/${editingCargo.id}`
             : '/api/cargos';
-        
+
         const method = editingCargo ? 'put' : 'post';
 
         try {
@@ -49,7 +49,7 @@ const CargosModal = ({ show, onHide, onCargosUpdate }) => {
             setError('Falha ao salvar cargo.');
         }
     };
-    
+
     const handleDelete = async (id) => {
         if (window.confirm('Tem certeza que deseja excluir este cargo?')) {
             try {
@@ -73,7 +73,7 @@ const CargosModal = ({ show, onHide, onCargosUpdate }) => {
         setEditingCargo(null);
         setError(null);
     };
-    
+
     const handleClose = () => {
         resetForm();
         onHide();
@@ -102,8 +102,8 @@ const CargosModal = ({ show, onHide, onCargosUpdate }) => {
                 {loading ? <Spinner animation="border" size="sm" /> : (
                     <ListGroup>
                         {cargos.map(cargo => (
-                            <ListGroup.Item key={cargo.id} className="d-flex justify-content-between align-items-center">
-                                {cargo.nome_cargo}
+                            <ListGroup.Item key={cargo.id} className="d-flex justify-content-between align-items-center text-break">
+                                ({cargo.id}) {cargo.nome_cargo}
                                 <div>
                                     <Button variant="outline-info btn-sm" size="sm" onClick={() => handleEdit(cargo)}>Editar</Button>
                                     <Button variant="outline-danger btn-sm" size="sm" className="ms-2" onClick={() => handleDelete(cargo.id)}>Excluir</Button>

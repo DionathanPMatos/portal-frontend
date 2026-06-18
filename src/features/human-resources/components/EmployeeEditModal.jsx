@@ -18,7 +18,7 @@ const EmployeeEditModal = ({ show, onHide, employeeToEdit, onSaveSuccess, cargos
     const [selectedFabricantes, setSelectedFabricantes] = useState([]);
     const [selectedVerticais, setSelectedVerticais] = useState([]);
     const [selectedSubgrupos, setSelectedSubgrupos] = useState([]);
-    
+
     const [userpicFile, setUserpicFile] = useState(null);
     const [existingUserpicUrl, setExistingUserpicUrl] = useState('');
     const [userpicPreview, setUserpicPreview] = useState('');
@@ -30,7 +30,6 @@ const EmployeeEditModal = ({ show, onHide, employeeToEdit, onSaveSuccess, cargos
     const [emailPessoal, setEmailPessoal] = useState('');
     const [timeId, setTimeId] = useState(''); // 🚀 Substitui o campo de texto 'time'
     const [centroCustoId, setCentroCustoId] = useState('');
-    const [batePonto, setBatePonto] = useState(false);
     const [vinculo, setVinculo] = useState('');
     const [salario, setSalario] = useState('');
     const [dataAdmissao, setDataAdmissao] = useState('');
@@ -176,7 +175,6 @@ const EmployeeEditModal = ({ show, onHide, employeeToEdit, onSaveSuccess, cargos
             setEmailPessoal(employeeToEdit.email_pessoal || '');
             setTimeId(employeeToEdit.time_id || '');
             setCentroCustoId(employeeToEdit.centro_custo_id || '');
-            setBatePonto(employeeToEdit.bate_ponto || false);
             setVinculo(employeeToEdit.vinculo || '');
             setSalario(employeeToEdit.salario || '');
             setDataAdmissao(employeeToEdit.data_admissao ? employeeToEdit.data_admissao.split('T')[0] : '');
@@ -289,9 +287,9 @@ const EmployeeEditModal = ({ show, onHide, employeeToEdit, onSaveSuccess, cargos
         setGestorId(''); setPermissions(['dashboard']); setSelectedFabricantes([]); setSelectedVerticais([]); setSelectedSubgrupos([]);
         setCnhNumero(''); setCnhValidade('');
         setSelectedBeneficios([]); // 🚀 Limpa benefícios
-        setUserpicFile(null); setUserpicPreview(''); 
+        setUserpicFile(null); setUserpicPreview('');
         setNomeSocial(''); setEmailPessoal(''); setTimeId(''); setCentroCustoId('');
-        setBatePonto(false); setVinculo(''); setSalario(''); setDataAdmissao('');
+        setVinculo(''); setSalario(''); setDataAdmissao('');
         setCategoriaTrabalhador(''); setPeriodoExperiencia('');
         setJornadaTrabalho(''); setHorasMensais(''); setPrimeiroEmprego(false);
         setProcessoAdmissao('preencher');
@@ -360,7 +358,6 @@ const EmployeeEditModal = ({ show, onHide, employeeToEdit, onSaveSuccess, cargos
         formData.append('email_pessoal', emailPessoal);
         if (timeId) formData.append('time_id', timeId);
         if (centroCustoId) formData.append('centro_custo_id', centroCustoId);
-        formData.append('bate_ponto', batePonto);
         formData.append('vinculo', vinculo);
         formData.append('salario', salario);
         formData.append('data_admissao', dataAdmissao);
@@ -476,8 +473,11 @@ const EmployeeEditModal = ({ show, onHide, employeeToEdit, onSaveSuccess, cargos
 
         if (userpicFile) {
             formData.append('userpic_file', userpicFile);
-        } else if (employeeToEdit && existingUserpicUrl) {
-            formData.append('userpic_url', existingUserpicUrl);
+        } else if (employeeToEdit && !existingUserpicUrl) {
+            // Se a foto existente foi removida (existingUserpicUrl está vazia),
+            // enviamos um valor vazio para o backend saber que deve apagar a referência.
+            // Se a foto não foi tocada, não enviamos nada e o backend manterá a atual.
+            formData.append('userpic_url', '');
         }
 
         const config = { headers: { 'Content-Type': 'multipart/form-data' } };
@@ -538,17 +538,19 @@ const EmployeeEditModal = ({ show, onHide, employeeToEdit, onSaveSuccess, cargos
                                             <Col md={4}><Form.Group className="mb-3"><Form.Label>Gênero (Documento)</Form.Label><Form.Control type="text" value={generoDocumento} onChange={(e) => setGeneroDocumento(e.target.value)} /></Form.Group></Col>
                                             <Col md={6}><Form.Group className="mb-3"><Form.Label>Nome da Mãe</Form.Label><Form.Control type="text" value={nomeMae} onChange={(e) => setNomeMae(e.target.value)} /></Form.Group></Col>
                                             <Col md={6}><Form.Group className="mb-3"><Form.Label>Nome do Pai</Form.Label><Form.Control type="text" value={nomePai} onChange={(e) => setNomePai(e.target.value)} /></Form.Group></Col>
-                                            <Col md={6}><Form.Group className="mb-3"><Form.Label>Celular</Form.Label>
-                                                <IMaskInput mask="(00) 00000-0000" value={contact} onAccept={(value) => setContact(value)} className="form-control" placeholder="(99) 99999-9999" />
-                                            </Form.Group></Col>
+
                                             <Col md={6}>
                                                 <Form.Group className="mb-3"><Form.Label>Foto do Perfil</Form.Label><Form.Control type="file" accept="image/*" onChange={handleImageChange} /></Form.Group>
                                             </Col>
                                             <Col md={6}>
                                                 {(userpicPreview || existingUserpicUrl) && (
                                                     <div className="mt-2 text-center">
-                                                        <p className="text-muted small mb-1">Pré-visualização:</p>
                                                         <img src={userpicPreview || existingUserpicUrl} alt="Preview" className="rounded-circle shadow-sm" style={{ width: '100px', height: '100px', objectFit: 'cover' }} />
+                                                        <Button variant="outline-danger" size="sm" className="mt-2" onClick={() => {
+                                                            setUserpicFile(null);
+                                                            setUserpicPreview('');
+                                                            setExistingUserpicUrl('');
+                                                        }}>Remover Foto</Button>
                                                     </div>
                                                 )}
                                             </Col>
@@ -568,13 +570,10 @@ const EmployeeEditModal = ({ show, onHide, employeeToEdit, onSaveSuccess, cargos
                                             <Col md={6}><Form.Group className="mb-3"><Form.Label>Cargo*</Form.Label><Form.Select value={cargoId} onChange={(e) => setCargoId(e.target.value)} required><option value="">Selecione</option>{(cargos || []).map(c => (<option key={c.id} value={c.id}>{c.nome_cargo}</option>))}</Form.Select></Form.Group></Col>
                                             <Col md={6}><Form.Group className="mb-3"><Form.Label>Centro de Custo*</Form.Label><Form.Select value={centroCustoId} onChange={(e) => setCentroCustoId(e.target.value)} required><option value="">Selecione</option>{(centrosCusto || []).map(cc => (<option key={cc.id} value={cc.id}>{cc.nome}</option>))}</Form.Select></Form.Group></Col>
                                             <Col md={6}>
-                                                <Form.Group className="mb-3">
-                                                    <Form.Label>Senha de Acesso Local</Form.Label>
-                                                    <Form.Control type="password" value={senha} onChange={(e) => setSenha(e.target.value)} placeholder={employeeToEdit ? "Preencha apenas se quiser alterar a senha atual" : "Padrão: 123456"} />
-                                                    <Form.Text className="text-muted">A senha será criptografada automaticamente ao salvar.</Form.Text>
-                                                </Form.Group>
+                                                <Form.Label>Senha de Acesso Local</Form.Label>
+                                                <Form.Control type="password" value={senha} onChange={(e) => setSenha(e.target.value)} placeholder={employeeToEdit ? "Preencha apenas se quiser alterar a senha atual" : "Padrão: 123456"} />
+                                                <Form.Text className="text-muted">A senha será criptografada automaticamente ao salvar.</Form.Text>
                                             </Col>
-                                            <Col md={6}><Form.Check type="switch" id="bate-ponto-switch" label="Colaborador bate ponto?" checked={batePonto} onChange={(e) => setBatePonto(e.target.checked)} className="mt-4"/></Col>
                                         </Row>
                                     </Card.Body>
                                 </Card>
@@ -583,9 +582,9 @@ const EmployeeEditModal = ({ show, onHide, employeeToEdit, onSaveSuccess, cargos
                                     <Card.Header className="fw-bold">Contrato e Remuneração</Card.Header>
                                     <Card.Body>
                                         <Row>
-                                            <Col md={6}><Form.Group className="mb-3"><Form.Label>Vínculo*</Form.Label><Form.Select value={vinculo} onChange={(e) => setVinculo(e.target.value)} required><option value="">Selecione</option><option>CLT</option><option>Sócio</option><option>Diretor Estatutário</option><option>Estágio</option><option>Aprendiz</option><option>Pessoa Jurídica</option></Form.Select></Form.Group></Col>
-                                            <Col md={6}><Form.Group className="mb-3"><Form.Label>Salário (R$)*</Form.Label><Form.Control type="number" step="0.01" value={salario} onChange={(e) => setSalario(e.target.value)} required /></Form.Group></Col>
-                                            <Col md={6}><Form.Group className="mb-3"><Form.Label>Data de Admissão*</Form.Label><Form.Control type="date" value={dataAdmissao} onChange={(e) => setDataAdmissao(e.target.value)} required /></Form.Group></Col>
+                                            <Col md={6}><Form.Group className="mb-3"><Form.Label>Vínculo*</Form.Label><Form.Select value={vinculo} onChange={(e) => setVinculo(e.target.value)} ><option value="">Selecione</option><option>CLT</option><option>Sócio</option><option>Diretor Estatutário</option><option>Estágio</option><option>Aprendiz</option><option>Pessoa Jurídica</option></Form.Select></Form.Group></Col>
+                                            <Col md={6}><Form.Group className="mb-3"><Form.Label>Salário (R$)*</Form.Label><Form.Control type="number" step="0.01" value={salario} onChange={(e) => setSalario(e.target.value)} /></Form.Group></Col>
+                                            <Col md={6}><Form.Group className="mb-3"><Form.Label>Data de Admissão*</Form.Label><Form.Control type="date" value={dataAdmissao} onChange={(e) => setDataAdmissao(e.target.value)} /></Form.Group></Col>
                                             <Col md={6}><Form.Group className="mb-3"><Form.Label>Período de Experiência</Form.Label><Form.Select value={periodoExperiencia} onChange={(e) => setPeriodoExperiencia(e.target.value)}><option value="">Selecione</option><option>Sem período de experiência</option><option>1 x 45 dias</option><option>2 x 45 dias</option></Form.Select></Form.Group></Col>
                                             <Col md={6}><Form.Group className="mb-3"><Form.Label>Jornada de Trabalho</Form.Label><Form.Select value={jornadaTrabalho} onChange={(e) => setJornadaTrabalho(e.target.value)}><option value="">Nenhum</option><option>44 horas semanais</option></Form.Select></Form.Group></Col>
                                             <Col md={6}><Form.Group className="mb-3"><Form.Label>Horas Mensais</Form.Label><Form.Control type="number" value={horasMensais} onChange={(e) => setHorasMensais(e.target.value)} /></Form.Group></Col>
@@ -632,7 +631,7 @@ const EmployeeEditModal = ({ show, onHide, employeeToEdit, onSaveSuccess, cargos
                                             <Col md={6}><Form.Group className="mb-3"><Form.Label>Tamanho da Camiseta</Form.Label><Form.Control type="text" value={tamanhoCamiseta} onChange={(e) => setTamanhoCamiseta(e.target.value)} /></Form.Group></Col>
                                             <Col md={6}><Form.Group className="mb-3"><Form.Label>Tamanho do Calçado</Form.Label><Form.Control type="text" value={tamanhoCalcado} onChange={(e) => setTamanhoCalcado(e.target.value)} /></Form.Group></Col>
                                         </Row>
-                                        <hr/>
+                                        <hr />
                                         <Row>
                                             <Col md={12}><Form.Check type="switch" label="Pessoa com Deficiência (PCD)" checked={pcd} onChange={(e) => setPcd(e.target.checked)} /></Col>
                                             {pcd && <>
@@ -677,17 +676,17 @@ const EmployeeEditModal = ({ show, onHide, employeeToEdit, onSaveSuccess, cargos
                                             <Col md={4}><Form.Group className="mb-3"><Form.Label>Sindicato</Form.Label><Form.Control type="text" value={sindicato} onChange={(e) => setSindicato(e.target.value)} /></Form.Group></Col>
                                             <Col md={4}><Form.Group className="mb-3"><Form.Label>Estabilidade</Form.Label><Form.Control type="text" value={estabilidade} onChange={(e) => setEstabilidade(e.target.value)} /></Form.Group></Col>
                                             <Col md={4}><Form.Group className="mb-3"><Form.Label>Término da Experiência</Form.Label><Form.Control type="date" value={terminoExperiencia} onChange={(e) => setTerminoExperiencia(e.target.value)} /></Form.Group></Col>
-                                            <Col md={3}><Form.Check type="switch" label="Ponto Eletrônico" checked={possuiRegistroPonto} onChange={(e) => setPossuiRegistroPonto(e.target.checked)} className="mt-4"/></Col>
-                                            <Col md={3}><Form.Check type="switch" label="Adic. Noturno" checked={horaNoturna} onChange={(e) => setHoraNoturna(e.target.checked)} className="mt-4"/></Col>
-                                            <Col md={3}><Form.Check type="switch" label="Contrib. Sindical" checked={contribuicaoSindical} onChange={(e) => setContribuicaoSindical(e.target.checked)} className="mt-4"/></Col>
-                                            <Col md={3}><Form.Check type="switch" label="Cargo de Confiança" checked={cargoConfianca} onChange={(e) => setCargoConfianca(e.target.checked)} className="mt-4"/></Col>
-                                            <Col md={3}><Form.Check type="switch" label="Recebeu Seg. Desemprego" checked={temSeguroDesemprego} onChange={(e) => setTemSeguroDesemprego(e.target.checked)} className="mt-4"/></Col>
-                                            <Col md={3}><Form.Check type="switch" label="Aposentado" checked={aposentado} onChange={(e) => setAposentado(e.target.checked)} className="mt-4"/></Col>
-                                            <Col md={3}><Form.Check type="switch" label="Membro CIPA" checked={cipa} onChange={(e) => setCipa(e.target.checked)} className="mt-4"/></Col>
-                                            <Col md={3}><Form.Check type="switch" label="Preenche Cota PCD" checked={preencheCotaPcd} onChange={(e) => setPreencheCotaPcd(e.target.checked)} className="mt-4"/></Col>
-                                            <Col md={3}><Form.Check type="switch" label="Optante FGTS" checked={optanteFgts} onChange={(e) => setOptanteFgts(e.target.checked)} className="mt-4"/></Col>
-                                            <Col md={3}><Form.Check type="switch" label="Possui Imóvel Próprio" checked={possuiImovelProprio} onChange={(e) => setPossuiImovelProprio(e.target.checked)} className="mt-4"/></Col>
-                                            <Col md={3}><Form.Check type="switch" label="Imóvel Adquirido (FGTS)" checked={imovelAdquiridoFgts} onChange={(e) => setImovelAdquiridoFgts(e.target.checked)} className="mt-4"/></Col>
+                                            <Col md={3}><Form.Check type="switch" label="Ponto Eletrônico" checked={possuiRegistroPonto} onChange={(e) => setPossuiRegistroPonto(e.target.checked)} className="mt-4" /></Col>
+                                            <Col md={3}><Form.Check type="switch" label="Adic. Noturno" checked={horaNoturna} onChange={(e) => setHoraNoturna(e.target.checked)} className="mt-4" /></Col>
+                                            <Col md={3}><Form.Check type="switch" label="Contrib. Sindical" checked={contribuicaoSindical} onChange={(e) => setContribuicaoSindical(e.target.checked)} className="mt-4" /></Col>
+                                            <Col md={3}><Form.Check type="switch" label="Cargo de Confiança" checked={cargoConfianca} onChange={(e) => setCargoConfianca(e.target.checked)} className="mt-4" /></Col>
+                                            <Col md={3}><Form.Check type="switch" label="Recebeu Seg. Desemprego" checked={temSeguroDesemprego} onChange={(e) => setTemSeguroDesemprego(e.target.checked)} className="mt-4" /></Col>
+                                            <Col md={3}><Form.Check type="switch" label="Aposentado" checked={aposentado} onChange={(e) => setAposentado(e.target.checked)} className="mt-4" /></Col>
+                                            <Col md={3}><Form.Check type="switch" label="Membro CIPA" checked={cipa} onChange={(e) => setCipa(e.target.checked)} className="mt-4" /></Col>
+                                            <Col md={3}><Form.Check type="switch" label="Preenche Cota PCD" checked={preencheCotaPcd} onChange={(e) => setPreencheCotaPcd(e.target.checked)} className="mt-4" /></Col>
+                                            <Col md={3}><Form.Check type="switch" label="Optante FGTS" checked={optanteFgts} onChange={(e) => setOptanteFgts(e.target.checked)} className="mt-4" /></Col>
+                                            <Col md={3}><Form.Check type="switch" label="Possui Imóvel Próprio" checked={possuiImovelProprio} onChange={(e) => setPossuiImovelProprio(e.target.checked)} className="mt-4" /></Col>
+                                            <Col md={3}><Form.Check type="switch" label="Imóvel Adquirido (FGTS)" checked={imovelAdquiridoFgts} onChange={(e) => setImovelAdquiridoFgts(e.target.checked)} className="mt-4" /></Col>
                                         </Row>
                                     </Card.Body>
                                 </Card>
@@ -752,7 +751,7 @@ const EmployeeEditModal = ({ show, onHide, employeeToEdit, onSaveSuccess, cargos
                                 </Card>
                             </div>
                         </Tab>
-                        
+
                         <Tab eventKey="acessos" title="Acessos e Responsabilidades">
                             <div className="pt-3">
                                 <Form.Group className="mb-4">
@@ -761,42 +760,42 @@ const EmployeeEditModal = ({ show, onHide, employeeToEdit, onSaveSuccess, cargos
                                         {AVAILABLE_PERMISSIONS.map(perm => (
                                             <Form.Check key={perm.id} type="checkbox" id={`perm-${perm.id}`} label={perm.label} checked={permissions.includes(perm.id)}
                                                 onChange={(e) => {
-                                                    if (e.target.checked) { setPermissions([...permissions, perm.id]); } 
+                                                    if (e.target.checked) { setPermissions([...permissions, perm.id]); }
                                                     else { setPermissions(permissions.filter(p => p !== perm.id)); }
                                                 }}
                                             />
                                         ))}
                                     </div>
                                 </Form.Group>
-                                
+
                                 <Form.Group className="mb-4">
                                     <Form.Label className="fw-bold text-muted small text-uppercase">Marcas Representadas (DTC)</Form.Label>
                                     <div className="d-flex flex-wrap gap-3 p-3 bg-light rounded border">
                                         {(fabricantes || []).map(fab => (
                                             <Form.Check key={fab.id} type="checkbox" id={`fab-${fab.id}`} label={fab.name} checked={selectedFabricantes.includes(fab.id)}
                                                 onChange={(e) => {
-                                                    if (e.target.checked) { setSelectedFabricantes([...selectedFabricantes, fab.id]); } 
+                                                    if (e.target.checked) { setSelectedFabricantes([...selectedFabricantes, fab.id]); }
                                                     else { setSelectedFabricantes(selectedFabricantes.filter(id => id !== fab.id)); }
                                                 }}
                                             />
                                         ))}
                                     </div>
                                 </Form.Group>
-                                
+
                                 <Form.Group className="mb-3">
                                     <Form.Label className="fw-bold text-muted small text-uppercase">Verticais DTC Representadas</Form.Label>
                                     <div className="d-flex flex-wrap gap-3 p-3 bg-light rounded border">
                                         {(verticais || []).map(vert => (
                                             <Form.Check key={vert.id} type="checkbox" id={`vert-${vert.id}`} label={vert.nome} checked={selectedVerticais.includes(vert.id)}
                                                 onChange={(e) => {
-                                                    if (e.target.checked) { setSelectedVerticais([...selectedVerticais, vert.id]); } 
+                                                    if (e.target.checked) { setSelectedVerticais([...selectedVerticais, vert.id]); }
                                                     else { setSelectedVerticais(selectedVerticais.filter(id => id !== vert.id)); }
                                                 }}
                                             />
                                         ))}
                                     </div>
                                 </Form.Group>
-                                
+
                                 <Form.Group className="mb-4 position-relative">
                                     <Form.Label className="fw-bold text-muted small text-uppercase">Responsabilidade FAQ (Subgrupos)</Form.Label>
                                     <div className="mb-2 d-flex flex-wrap gap-2">

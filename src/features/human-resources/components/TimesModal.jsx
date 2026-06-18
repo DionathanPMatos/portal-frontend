@@ -57,7 +57,7 @@ const TimesModal = ({ show, onHide }) => {
             try {
                 await apiClient.delete(`/api/times/${id}`);
                 fetchData();
-            } catch (err) { 
+            } catch (err) {
                 console.error('Erro ao excluir time:', err);
                 setError('Erro ao excluir time.');
             }
@@ -108,7 +108,7 @@ const TimesModal = ({ show, onHide }) => {
                                 {times.map(time => (
                                     <ListGroup.Item key={time.id} className="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <strong>{time.nome}</strong>
+                                            <strong>({time.id}) {time.nome}</strong>
                                             <div className="text-muted small">
                                                 Gestor: {time.gestor?.nome_completo || 'N/A'} <Badge pill bg="secondary">{time.membros.length}</Badge>
                                             </div>

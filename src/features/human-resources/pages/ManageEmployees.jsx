@@ -50,8 +50,8 @@ const ManageEmployees = () => {
     const [isOnboardingTemplateModalOpen, setIsOnboardingTemplateModalOpen] = useState(false);
     const [isCentroCustoModalOpen, setIsCentroCustoModalOpen] = useState(false);
     const [isTimesModalOpen, setIsTimesModalOpen] = useState(false);
-    const [showImportModal, setShowImportModal] = useState(false); 
-    const [filtroCargo, setFiltroCargo] = useState(''); 
+    const [showImportModal, setShowImportModal] = useState(false);
+    const [filtroCargo, setFiltroCargo] = useState('');
     const [filtroSetor, setFiltroSetor] = useState('');
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
@@ -102,7 +102,7 @@ const ManageEmployees = () => {
             console.error('Erro ao buscar dados de dropdowns:', err);
             setError('Falha ao carregar dados de configuração.');
         }
-    // Adiciona dependências vazias para que a função seja criada apenas uma vez
+        // Adiciona dependências vazias para que a função seja criada apenas uma vez
     }, []);
 
     const fetchEmployees = useCallback(async () => {
@@ -211,7 +211,7 @@ const ManageEmployees = () => {
         <div className='p-3'>
             {successMessage && <Alert variant="success">{successMessage}</Alert>}
             {error && <Alert variant="danger btn-sm">{error}</Alert>}
-            
+
             <div className="d-flex justify-content-end mb-4">
                 <Button variant="primary" onClick={handleAddClick} className="me-2">
                     <FaUserPlus className="me-2" /> Iniciar Novo Cadastro
@@ -258,75 +258,75 @@ const ManageEmployees = () => {
                 </Card.Body>
             </Card>
 
-                    <Card className="shadow-sm border-0">
-                        <div className="table-responsive">
-                            <Table hover className="align-middle mb-0">
-                                <thead className="table-light text-muted small text-uppercase">
-                                    <tr>
-                                        <th className="px-4 py-3 fw-bold border-0">Colaborador</th>
-                                        <th className="py-3 fw-bold border-0">Status</th>
-                                        <th className="py-3 fw-bold border-0">Departamento / Cargo</th>
-                                        <th className="py-3 fw-bold border-0">Acesso</th>
-                                        <th className="text-end px-4 py-3 fw-bold border-0">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {filteredEmployees.length > 0 ? (
-                                        filteredEmployees.map((employee) => (
-                                            <tr key={employee.id}>
-                                                <td className="px-4 py-3">
-                                                    <div className="d-flex align-items-center">
-                                                        <img src={employee.userpic_url || 'default-avatar.png'} alt="Foto" className="rounded-circle me-3 border bg-light" style={{ width: '45px', height: '45px', objectFit: 'cover' }} />
-                                                        <div>
-                                                            <div 
-                                                                className="fw-bold text-dark"
-                                                                onClick={() => handleViewDetails(employee.id)}
-                                                                style={{ cursor: 'pointer', textDecoration: 'underline' }}
-                                                                title="Ver detalhes"
-                                                            >
-                                                                {formatarNome(employee.nome_completo)}
-                                                            </div>
-                                                            <div className="text-muted small">{employee.email}</div>
-                                                            {employee.nome_unidade && <Badge bg="light" text="dark" className="border mt-1">{employee.nome_unidade}</Badge>}
-                                                        </div>
+            <Card className="shadow-sm border-0">
+                <div className="table-responsive">
+                    <Table hover className="align-middle mb-0">
+                        <thead className="table-light text-muted small text-uppercase">
+                            <tr>
+                                <th className="px-4 py-3 fw-bold border-0">Colaborador</th>
+                                <th className="py-3 fw-bold border-0">Status</th>
+                                <th className="py-3 fw-bold border-0">Departamento / Cargo</th>
+                                <th className="py-3 fw-bold border-0">Acesso</th>
+                                <th className="text-end px-4 py-3 fw-bold border-0">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredEmployees.length > 0 ? (
+                                filteredEmployees.map((employee) => (
+                                    <tr key={employee.id}>
+                                        <td className="px-4 py-3">
+                                            <div className="d-flex align-items-center">
+                                                <img src={employee.userpic_url || 'default-avatar.png'} alt="Foto" className="rounded-circle me-3 border bg-light" style={{ width: '45px', height: '45px', objectFit: 'cover' }} />
+                                                <div>
+                                                    <div
+                                                        className="fw-bold text-dark"
+                                                        onClick={() => handleViewDetails(employee.id)}
+                                                        style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                                                        title="Ver detalhes"
+                                                    >
+                                                        {formatarNome(employee.nome_completo)}
                                                     </div>
-                                                </td>
-                                                <td className="py-3">{getStatusBadge(employee.ativo)}</td>
-                                                <td className="py-3">
-                                                    <div className="fw-semibold text-dark">{employee.nome_setor || '-'}</div>
-                                                    <div className="text-muted small">{employee.nome_cargo || '-'}</div>
-                                                </td>
-                                                <td className="py-3">
-                                                    {renderPrivileges(employee.privilegios)}
-                                                </td>
-                                                <td className="text-end px-4 py-3">
-                                                    <Button variant="light" size="sm" className="me-2 shadow-sm text-primary" onClick={() => handleEdit(employee)} title="Editar"><FaEdit /></Button>
-                                                    <Button variant="light" size="sm" className="shadow-sm text-danger" onClick={() => handleDeleteClick(employee)} title="Inativar"><FaUserTimes /></Button>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan="5" className="text-center py-5 text-muted">
-                                                {isLoggedIn ? "Nenhum colaborador encontrado para o filtro selecionado." : "Efetue login para visualizar."}
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </Table>
-                        </div>
-                    </Card>
+                                                    <div className="text-muted small">{employee.email}</div>
+                                                    {employee.nome_unidade && <Badge bg="light" text="dark" className="border mt-1">{employee.nome_unidade}</Badge>}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="py-3">{getStatusBadge(employee.ativo)}</td>
+                                        <td className="py-3">
+                                            <div className="fw-semibold text-dark">{employee.nome_setor || '-'}</div>
+                                            <div className="text-muted small">{employee.nome_cargo || '-'}</div>
+                                        </td>
+                                        <td className="py-3">
+                                            {renderPrivileges(employee.privilegios)}
+                                        </td>
+                                        <td className="text-end px-4 py-3">
+                                            <Button variant="light" size="sm" className="me-2 shadow-sm text-primary" onClick={() => handleEdit(employee)} title="Editar"><FaEdit /></Button>
+                                            <Button variant="light" size="sm" className="shadow-sm text-danger" onClick={() => handleDeleteClick(employee)} title="Inativar"><FaUserTimes /></Button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="5" className="text-center py-5 text-muted">
+                                        {isLoggedIn ? "Nenhum colaborador encontrado para o filtro selecionado." : "Efetue login para visualizar."}
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </Table>
+                </div>
+            </Card>
 
             {/* 🚀 CORREÇÃO: Passa a função correta para atualizar os dados após a edição nos modais. */}
             <CargosModal show={isCargosModalOpen} onHide={() => setIsCargosModalOpen(false)} onCargosUpdate={fetchDropdownData} />
-            <SetoresModal show={isSetoresModalOpen} onHide={() => setIsSetoresModalOpen(false)} onSetoresUpdate={fetchDropdownData} /> 
+            <SetoresModal show={isSetoresModalOpen} onHide={() => setIsSetoresModalOpen(false)} onSetoresUpdate={fetchDropdownData} />
             <CentroCustoModal show={isCentroCustoModalOpen} onHide={() => setIsCentroCustoModalOpen(false)} />
             <OnboardingTemplateModal show={isOnboardingTemplateModalOpen} onHide={() => setIsOnboardingTemplateModalOpen(false)} />
             <TimesModal show={isTimesModalOpen} onHide={() => setIsTimesModalOpen(false)} />
-            <UnidadesModal show={isUnidadesModalOpen} onHide={() => setIsUnidadesModalOpen(false)} onUnidadesUpdate={() => {}} />
-            
-            <ImportModal 
-                show={showImportModal} 
+            <UnidadesModal show={isUnidadesModalOpen} onHide={() => setIsUnidadesModalOpen(false)} onUnidadesUpdate={fetchDropdownData} />
+
+            <ImportModal
+                show={showImportModal}
                 onHide={() => setShowImportModal(false)}
                 onComplete={fetchEmployees}
             />
@@ -352,7 +352,7 @@ const ManageEmployees = () => {
                     setTimeout(() => setSuccessMessage(null), 3000);
                 }}
             />
-            
+
             <Modal show={showDeleteModal} onHide={cancelDelete}>
                 <Modal.Header closeButton><Modal.Title>Confirmar Inativação</Modal.Title></Modal.Header>
                 <Modal.Body>Tem certeza que deseja inativar o acesso de <strong>{formatarNome(employeeToDelete?.nome_completo)}</strong>? Ele não poderá mais logar, mas o histórico de projetos será mantido.</Modal.Body>

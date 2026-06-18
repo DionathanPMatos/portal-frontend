@@ -44,7 +44,7 @@ const SetoresModal = ({ show, onHide, onSetoresUpdate }) => {
             setError(editingSetor ? 'Falha ao atualizar setor.' : 'Falha ao adicionar setor.');
         }
     };
-    
+
     const handleDelete = async (id) => {
         if (window.confirm('Tem certeza que deseja excluir este setor?')) {
             try {
@@ -68,7 +68,7 @@ const SetoresModal = ({ show, onHide, onSetoresUpdate }) => {
         setEditingSetor(null);
         setError(null);
     };
-    
+
     const handleClose = () => {
         resetForm();
         onHide();
@@ -96,9 +96,9 @@ const SetoresModal = ({ show, onHide, onSetoresUpdate }) => {
                 <h5>Setores Atuais</h5>
                 {loading ? <Spinner animation="border" size="sm" /> : (
                     <ListGroup>
-                        {setores.map(setor => (
-                            <ListGroup.Item key={setor.id} className="d-flex justify-content-between align-items-center">
-                                {setor.nome_setor}
+                        {setores.map(setor => ( // 🚀 CORREÇÃO: Adiciona o ID na exibição do setor
+                            <ListGroup.Item key={setor.id} className="d-flex justify-content-between align-items-center text-break">
+                                ({setor.id}) {setor.nome_setor}
                                 <div>
                                     <Button variant="outline-info" size="sm" onClick={() => handleEdit(setor)}>Editar</Button>
                                     <Button variant="outline-danger" size="sm" className="ms-2" onClick={() => handleDelete(setor.id)}>Excluir</Button>

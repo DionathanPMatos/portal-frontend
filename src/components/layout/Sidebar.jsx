@@ -57,14 +57,15 @@ const menuItems = [
       { name: "Politicas Comerciais", link: "#", target: "_blank" },
     ],
   },
-  
+
   {
     name: "Facilities",
     icon: <FaBuilding size={iconSize} />,
     subItems: [
-      { name: "Central de Facilities",
-    icon: <FaBuilding size={iconSize} />,
-    link: "/facilities"
+      {
+        name: "Central de Facilities",
+        icon: <FaBuilding size={iconSize} />,
+        link: "/facilities"
       },
       {
         name: "Reserva de Veículos",
@@ -166,7 +167,7 @@ const menuItems = [
         target: "_blank",
       },
       { name: "Ouvidoria", link: "#" },
-      { name: "Colaboradores", link: "/rh/manageemployee" },
+      { name: "Colaboradores", link: "/rh?tab=colaboradores" },
       { name: "Politicas de RH", link: "#" },
     ],
   },
@@ -245,8 +246,8 @@ function Sidebar({ isHidden }) {
           {/* 🚀 Bloco da Logomarca na Sidebar */}
           <div className="sidebar-logo">
             <img
-              src={logoUrl} 
-              alt="Logo do Sistema" 
+              src={logoUrl}
+              alt="Logo do Sistema"
               style={{ height: '40px' }}
             />
           </div>
@@ -260,9 +261,9 @@ function Sidebar({ isHidden }) {
             >
               {item.subItems ? (
                 // Lógica para itens com submenu
-                <a 
-                  href="#" 
-                  onClick={(e) => { e.preventDefault(); handleAccordionClick(item.name); }} 
+                <a
+                  href="#"
+                  onClick={(e) => { e.preventDefault(); handleAccordionClick(item.name); }}
                   style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -287,7 +288,7 @@ function Sidebar({ isHidden }) {
                 >
                   {item.subItems.map((subItem) => {
                     if (subItem.restricted && (!user?.privilegios || (!user.privilegios.includes('Admin') && !user.privilegios.includes('Gestor') && !user.privilegios.includes('rh')))) {
-                        return null;
+                      return null;
                     }
                     return (
                       <li key={subItem.name}>
@@ -309,12 +310,12 @@ function Sidebar({ isHidden }) {
         <div className="sidebar-footer">
           <p>&copy; {new Date().getFullYear()} DCA. Todos os direitos reservados.</p>
         </div>
-        </div>
+      </div>
     </>
-      
-      
 
-    
+
+
+
   );
 }
 

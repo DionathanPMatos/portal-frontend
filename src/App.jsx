@@ -26,7 +26,7 @@ import CommercialRegistrationPage from "./features/commercial/pages/Registro.jsx
 import ClientListPage from "./features/commercial/pages/Clients/Clientes.jsx"; // Renomeado e movido
 import ClientDetailPage from "./features/commercial/pages/Clients/ClienteDetalhe.jsx"; // Renomeado e movido
 import PurchaseDashboardPage from "./features/commercial/pages/DashboardCompras.jsx"; // Renomeado e movido
-import KpiComercialPage from "./features/commercial/pages/KpiComercialPage.jsx"; 
+import KpiComercialPage from "./features/commercial/pages/KpiComercialPage.jsx";
 import AdminResultados from "./features/configuration/pages/ManageKpiDashboard.jsx"; // Movido e renomeado
 
 // ==========================================
@@ -134,7 +134,7 @@ function App() {
   const [isSidebarHidden, setIsSidebarHidden] = React.useState(false);
   const handleLogout = onLogout;
 
-   useEffect(() => {
+  useEffect(() => {
     // Aplica a cor de fundo do tema diretamente no body para garantir que seja a base de todo o layout.
     if (theme && theme.background_color) {
       document.body.style.backgroundColor = theme.background_color;
@@ -142,7 +142,7 @@ function App() {
       document.body.style.backgroundColor = '#f4f7f9'; // Cor padrão de fallback
     }
   }, [theme]);
-  
+
   if (isLoading) {
     return <div className="flex items-center justify-center min-h-screen bg-gray-100"><p>Carregando...</p></div>;
   }
@@ -157,96 +157,97 @@ function App() {
         </Routes>
       ) : (
         /* Estrutura do sistema para usuários autenticados */
-      <div className={`main-container ${isSidebarHidden ? "sidebar-hidden" : ""}`}>
-        <div className="header-mobile-wrapper"> {/* Este wrapper pode ser um componente de layout */}
-          <Sidebar 
-            isLoggedIn={isLoggedIn} 
-            user={user} 
-            onLogout={handleLogout} 
-            isHidden={isSidebarHidden} 
-          />
-          <Header 
-            isLoggedIn={isLoggedIn} user={user} onLogout={handleLogout} 
-            onToggleSidebar={() => setIsSidebarHidden(!isSidebarHidden)}
-          />
-        </div>
-        <div className="content-area">
-          <Routes>
-            <Route path="/" element={<DashboardPage isLoggedIn={isLoggedIn} />} />
-            
-            {/* ROTAS DO CRM */}
-            <Route path="/crm/projetos" element={<CommercialDashboardPage />} />
-            <Route path="/modulo_crm/projetos-perdidos" element={<LostProjectsPage />} />
-            <Route path="/crm/kpi" element={<KpiComercialPage />} />
-            <Route path="/admin/resultados" element={<AdminResultados />} />
+        <div className={`main-container ${isSidebarHidden ? "sidebar-hidden" : ""}`}>
+          <div className="header-mobile-wrapper"> {/* Este wrapper pode ser um componente de layout */}
+            <Sidebar
+              isLoggedIn={isLoggedIn}
+              user={user}
+              onLogout={handleLogout}
+              isHidden={isSidebarHidden}
+            />
+            <Header
+              isLoggedIn={isLoggedIn} user={user} onLogout={handleLogout}
+              onToggleSidebar={() => setIsSidebarHidden(!isSidebarHidden)}
+            />
+          </div>
+          <div className="content-area">
+            <Routes>
+              <Route path="/" element={<DashboardPage isLoggedIn={isLoggedIn} />} />
 
-            {/* --- ALTERAÇÃO AQUI: Passando o 'user' como prop --- */}
-            <Route path="/crm/projetos/:id" element={<ProjectDetailsPage user={user} />} />
-            
-            <Route path="/crm/visitas" element={<VisitasPage user={user} />} />
+              {/* ROTAS DO CRM */}
+              <Route path="/crm/projetos" element={<CommercialDashboardPage />} />
+              <Route path="/modulo_crm/projetos-perdidos" element={<LostProjectsPage />} />
+              <Route path="/crm/kpi" element={<KpiComercialPage />} />
+              <Route path="/admin/resultados" element={<AdminResultados />} />
 
-            <Route path="/dtc/fabricantes" element={<FabricantesListPage />} />
-            <Route path="/dtc/fabricantes/:id" element={<FabricantePerfilPage />} />
-            <Route path="/admin/fabricantes" element={<GerenciarFabricantesPage />} />
-            <Route path="/dtc/ferramentas" element={<FerramentasUteisPage />} />
-            <Route path="/dtc/perguntas" element={<PerguntasDtcPage user={user} />} />
+              {/* --- ALTERAÇÃO AQUI: Passando o 'user' como prop --- */}
+              <Route path="/crm/projetos/:id" element={<ProjectDetailsPage user={user} />} />
 
-            {/* OUTRAS ROTAS (Ajuste a rota de registro se necessário) */}
-            <Route path="/registro" element={<CommercialRegistrationPage />} />
-            <Route path="/adminpage" element={<AdminPage />} />
-            <Route path="/admin/homepage" element={<ManageHomePage />} />
-            <Route path="/admin/theme" element={<AdminTheme />} />
-            <Route path="/RegisterUser" element={<RegisterUserPage />} />
-            <Route path="/admin/CategoriasAdmin" element={<CategoriasAdmin />} />
-            <Route path="/admin/noticias/:newsId/report" element={<NewsConfirmationReportPage />} /> {/* NOVO */}
-            <Route path="/admin/noticias" element={<NewsManagerPage />} /> {/* Mantido */}
-            <Route path="/noticias" element={<NewsPage />} />
-            <Route path="/OrganogramaTecnico" element={<OrganogramaTecnicoPage />} />
-            <Route path="/dtc" element={<DTCHubPage />} />
-            <Route path="/dtc/repositorio" element={<RepositorioTecnicoPage />} />
+              <Route path="/crm/visitas" element={<VisitasPage user={user} />} />
 
-            {/* ROTAS DO RH */}
-            <Route path="/rh" element={<HRHubPage />} />
-            <Route path="/rh/colaboradores/:id" element={<EmployeeDetailsPage />} />
-            <Route path="/funcionarios" element={<FuncionariosPage />} />
-            <Route path="/perfil" element={<UserProfilePage />} />
+              <Route path="/dtc/fabricantes" element={<FabricantesListPage />} />
+              <Route path="/dtc/fabricantes/:id" element={<FabricantePerfilPage />} />
+              <Route path="/admin/fabricantes" element={<GerenciarFabricantesPage />} />
+              <Route path="/dtc/ferramentas" element={<FerramentasUteisPage />} />
+              <Route path="/dtc/perguntas" element={<PerguntasDtcPage user={user} />} />
 
-            <Route path="/crm/dashboard-dtc" element={<DashboardDTCPage />} />
-            <Route path="/compras" element={<PurchaseDashboardPage />} />
-            <Route path="/ferramentas/calculadora-solar" element={<CalculadoraSolarPage />} /> {/* A rota para a calculadora solar */}
-            <Route path="/crm/prospeccao" element={<PainelProspeccaoPage />} /> {/* Usa o PainelProspeccaoPage */}
-            <Route path="/admin/gerenciar-dashboard" element={<AdminDashboard />} />
-            <Route path="/admin/gerenciar-leads" element={<GerenciamentoLeadsPage />} />
-            <Route path="/crm/clientes" element={<ClientListPage />} />
-            <Route path="/crm/clientes/:id" element={<ClientDetailPage user={user} />} />
+              {/* OUTRAS ROTAS (Ajuste a rota de registro se necessário) */}
+              <Route path="/registro" element={<CommercialRegistrationPage />} />
+              <Route path="/adminpage" element={<AdminPage />} />
+              <Route path="/admin/homepage" element={<ManageHomePage />} />
+              <Route path="/admin/theme" element={<AdminTheme />} />
+              <Route path="/RegisterUser" element={<RegisterUserPage />} />
+              <Route path="/admin/CategoriasAdmin" element={<CategoriasAdmin />} />
+              <Route path="/admin/noticias/:newsId/report" element={<NewsConfirmationReportPage />} /> {/* NOVO */}
+              <Route path="/admin/noticias" element={<NewsManagerPage />} /> {/* Mantido */}
+              <Route path="/noticias" element={<NewsPage />} />
+              <Route path="/OrganogramaTecnico" element={<OrganogramaTecnicoPage />} />
+              <Route path="/dtc" element={<DTCHubPage />} />
+              <Route path="/dtc/repositorio" element={<RepositorioTecnicoPage />} />
 
-            {/* MÓDULO FINANCEIRO */}
-            <Route path="/financeiro" element={<FinanceiroPage user={user} />} />
+              {/* ROTAS DO RH */}
+              <Route path="/rh" element={<HRHubPage />} />
+              <Route path="/rh/colaboradores/:id" element={<EmployeeDetailsPage />} />
+              <Route path="/rh/beneficios" element={<BeneficiosHubPage />} />
+              <Route path="/funcionarios" element={<FuncionariosPage />} />
+              <Route path="/perfil" element={<UserProfilePage />} />
 
-            {/* NOVA ROTA PARA O MÓDULO DE CONTROLE DE FROTA */}
-            <Route path="/frota" element={<Frota />} />
-            
-            {/* ROTAS FACILITIES */}
-            {/*<Route path="/facilities" element={<FacilitiesPage />} />
+              <Route path="/crm/dashboard-dtc" element={<DashboardDTCPage />} />
+              <Route path="/compras" element={<PurchaseDashboardPage />} />
+              <Route path="/ferramentas/calculadora-solar" element={<CalculadoraSolarPage />} /> {/* A rota para a calculadora solar */}
+              <Route path="/crm/prospeccao" element={<PainelProspeccaoPage />} /> {/* Usa o PainelProspeccaoPage */}
+              <Route path="/admin/gerenciar-dashboard" element={<AdminDashboard />} />
+              <Route path="/admin/gerenciar-leads" element={<GerenciamentoLeadsPage />} />
+              <Route path="/crm/clientes" element={<ClientListPage />} />
+              <Route path="/crm/clientes/:id" element={<ClientDetailPage user={user} />} />
+
+              {/* MÓDULO FINANCEIRO */}
+              <Route path="/financeiro" element={<FinanceiroPage user={user} />} />
+
+              {/* NOVA ROTA PARA O MÓDULO DE CONTROLE DE FROTA */}
+              <Route path="/frota" element={<Frota />} />
+
+              {/* ROTAS FACILITIES */}
+              {/*<Route path="/facilities" element={<FacilitiesPage />} />
             <Route path="/facilities/gestao-obras" element={<GestaoObrasPage />} />*/}
-            <Route path="/facilities" element={<FacilitiesHubPage />} />
+              <Route path="/facilities" element={<FacilitiesHubPage />} />
 
 
-            {/* ROTAS MARKETING */}
-            <Route path="/marketing" element={<MarketingPage user={user} />} />
-            <Route path="/marketing/reservas" element={<ReserveRoomPage />} />
-            <Route path="/marketing/solicitacoes" element={<RequestMaterialPage />} />
-            <Route path="/admin/gerenciar-produtos-marketing" element={<ManageMarketingProducts />} />
-            <Route path="/admin/gerenciar-solicitacoes-marketing" element={<ManageMarketingRequests />} />
-            <Route path="/admin/marketing/interesses" element={<ManageMarketingInterestsPage />} />
-            <Route path="/admin/marketing/locais" element={<ManageMarketingLocationsPage />} />
+              {/* ROTAS MARKETING */}
+              <Route path="/marketing" element={<MarketingPage user={user} />} />
+              <Route path="/marketing/reservas" element={<ReserveRoomPage />} />
+              <Route path="/marketing/solicitacoes" element={<RequestMaterialPage />} />
+              <Route path="/admin/gerenciar-produtos-marketing" element={<ManageMarketingProducts />} />
+              <Route path="/admin/gerenciar-solicitacoes-marketing" element={<ManageMarketingRequests />} />
+              <Route path="/admin/marketing/interesses" element={<ManageMarketingInterestsPage />} />
+              <Route path="/admin/marketing/locais" element={<ManageMarketingLocationsPage />} />
 
-            {/* ROTA PARA PÁGINA DE NOTIFICAÇÕES */}
-            <Route path="/notificacoes/todas" element={<AllNotificationsPage />} />
+              {/* ROTA PARA PÁGINA DE NOTIFICAÇÕES */}
+              <Route path="/notificacoes/todas" element={<AllNotificationsPage />} />
 
-          </Routes>
+            </Routes>
+          </div>
         </div>
-      </div>
       )}
     </BrowserRouter>
   );

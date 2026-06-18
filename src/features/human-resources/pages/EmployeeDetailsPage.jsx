@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Container, Tabs, Tab, Card, Row, Col, Spinner, Alert, ListGroup, Badge, Breadcrumb, Image, Button, Table, OverlayTrigger, Tooltip, ProgressBar, Form } from 'react-bootstrap';
 import { FaArrowLeft, FaUser, FaSitemap, FaBuilding, FaUserTie, FaCalendarAlt, FaIdCard, FaDollarSign, FaAddressCard, FaEnvelope, FaUsers, FaEdit, FaPlus, FaTrash, FaFileUpload, FaDownload } from 'react-icons/fa';
@@ -7,6 +7,7 @@ import EmployeeEditModal from '../components/EmployeeEditModal'; // 🚀 Importa
 import DependentsModal from '../components/DependentsModal'; // Importa o modal de dependentes
 import ExamePeriodicoModal from '../components/ExamePeriodicoModal'; // Importa o modal de exames
 import StartOnboardingModal from '../components/StartOnboardingModal';
+import SolicitarFeriasModal from '../components/ferias/SolicitarFeriasModal';
 
 const EmployeeDetailsPage = () => {
     const { id: employeeId } = useParams(); // Pega o ID da URL
@@ -24,31 +25,45 @@ const EmployeeDetailsPage = () => {
     const [uploading, setUploading] = useState(false);
     const [currentDocType, setCurrentDocType] = useState('');
 
+    // State para a aba de Férias
+    const [periodosAquisitivos, setPeriodosAquisitivos] = useState([]);
+    const [saldoFerias, setSaldoFerias] = useState(null);
+    const [showSolicitarModal, setShowSolicitarModal] = useState(false);
+
     // 🚀 State para os dados dos dropdowns do modal de edição
     const [dropdownData, setDropdownData] = useState({
         cargos: [], setores: [], unidades: [], fabricantes: [],
         verticais: [], subgrupos: [], timesList: [],
         beneficiosList: [], centrosCusto: [], employees: []
     });
+    // 🚀 Busca os dados do colaborador
+    const fetchEmployeeDetails = useCallback(async () => {
+        if (!employeeId) return;
+        setLoading(true);
+        setError(null);
+        try {
+            const [employeeRes, periodosRes, saldoRes] = await Promise.all([
+                apiClient.get(`/api/funcionarios/${employeeId}`),
+                apiClient.get(`/api/ferias/funcionarios/${employeeId}/periodos-aquisitivos`),
+                apiClient.get(`/api/ferias/funcionarios/${employeeId}/saldo-ferias`)
+            ]);
+
+            setEmployee(employeeRes.data);
+            setPeriodosAquisitivos(periodosRes.data);
+            setSaldoFerias(saldoRes.data);
+
+        } catch (err) {
+            setError('Não foi possível carregar os detalhes do colaborador e suas férias.');
+        } finally {
+            setLoading(false);
+        }
+    }, [employeeId]);
 
     useEffect(() => {
-        const fetchEmployeeDetails = async () => {
-            if (!employeeId) return;
-            setLoading(true);
-            setError(null);
-            try {
-                const response = await apiClient.get(`/api/funcionarios/${employeeId}`);
-                setEmployee(response.data);
-            } catch (err) {
-                console.error('Erro ao buscar detalhes do colaborador:', err);
-                setError('Não foi possível carregar os detalhes do colaborador.');
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchEmployeeDetails();
-    }, [employeeId, successMessage]); // Recarrega se houver sucesso na edição
+    }, [fetchEmployeeDetails, successMessage]);
+
+
 
     // 🚀 Busca os dados para os dropdowns do modal de edição
     useEffect(() => {
@@ -66,6 +81,7 @@ const EmployeeDetailsPage = () => {
                     apiClient.get('/api/centro-custos'),
                     apiClient.get('/api/funcionarios'),
                 ]);
+                // Atualiza o estado com os dados
                 setDropdownData({
                     cargos: cargosRes.data, setores: setoresRes.data, unidades: unidadesRes.data,
                     fabricantes: fabricantesRes.data, verticais: verticaisRes.data, subgrupos: subgruposRes.data,
@@ -77,30 +93,31 @@ const EmployeeDetailsPage = () => {
                 setError("Não foi possível carregar os dados de configuração para o modal de edição.");
             }
         };
+        // Chama a função
         fetchAllDropdownData();
     }, []);
-
+    // Função para formatar moeda
     const formatCurrency = (value) => {
         if (value === null || value === undefined) return '--';
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
     };
-    
+    // Função para renderizar um campo
     const renderField = (label, value, options = {}) => {
         const { isDate = false, isCurrency = false } = options;
         let displayValue = value || <span className="text-black-50">--</span>;
-    
+
         if (isDate && value) {
             displayValue = new Date(value).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
         } else if (isCurrency && (value !== null && value !== undefined)) {
             displayValue = formatCurrency(value);
         }
-    
+
         return (<Col md={4} className="mb-3">
             <div className="text-muted small">{label}</div>
             <div className="fw-semibold">{displayValue}</div>
         </Col>);
     };
-
+    // Função para renderizar um campo booleano
     const renderBooleanField = (label, value) => (
         <Col md={4} className="mb-3">
             <div className="text-muted small">{label}</div>
@@ -109,11 +126,11 @@ const EmployeeDetailsPage = () => {
             }</div>
         </Col>
     );
-
+    // Função para renderizar o botão de edição
     const handleEditClick = () => { // 🚀 Abre o modal
         setShowEditModal(true);
     };
-
+    // Função para fechar o modal
     const handleSaveSuccess = () => { // 🚀 Callback de sucesso
         setShowEditModal(false);
         setSuccessMessage('Dados do colaborador atualizados com sucesso!');
@@ -122,37 +139,36 @@ const EmployeeDetailsPage = () => {
             setSuccessMessage(null);
         }, 4000);
     };
-
+    // Função para fechar o modal
     const handleAddDependent = () => {
         setEditingDependent(null);
         setShowDependentsModal(true);
     };
-
+    // 🚀 Callback de sucesso
     const handleEditDependent = (dependent) => {
         setEditingDependent(dependent);
         setShowDependentsModal(true);
     };
-
+    // 🚀 Callback de sucesso
     const handleDeleteDependent = async (dependentId) => {
-        if (window.confirm('Tem certeza que deseja excluir este dependente?')) {
+        if (window.confirm('Tem certeza?')) {
             try {
                 await apiClient.delete(`/api/dependentes/${dependentId}`);
-                setSuccessMessage('Dependente excluído com sucesso!');
-                setTimeout(() => {
-                    setSuccessMessage(null); // Isso vai acionar o useEffect para recarregar
-                }, 100);
+                // A recarga agora é feita pelo useEffect que observa o successMessage
+                setSuccessMessage('Dependente excluído!');
+                setTimeout(() => setSuccessMessage(null), 3000); // Mantém a mensagem por 3s
             } catch (err) {
                 console.error('Erro ao excluir dependente:', err);
-                setError('Não foi possível excluir o dependente.');
+                setError('Erro ao excluir dependente.');
             }
         }
     };
-
+    // Função para renderizar o botão de edição
     const handleAddExame = () => {
         setEditingExame(null);
         setShowExameModal(true);
     };
-
+    // Função para renderizar o botão de edição
     const handleEditExame = (exame) => {
         setEditingExame(exame);
         setShowExameModal(true);
@@ -172,7 +188,7 @@ const EmployeeDetailsPage = () => {
             }
         }
     };
-
+    // Função para renderizar o botão de edição
     const handleUploadClick = (docType) => {
         setCurrentDocType(docType);
         fileInputRef.current.click();
@@ -227,8 +243,8 @@ const EmployeeDetailsPage = () => {
         }
     };
 
-    const onboardingProgress = employee?.onboarding ? 
-        (employee.onboarding.etapas.filter(e => e.status === 'Concluído').length / employee.onboarding.etapas.length) * 100 
+    const onboardingProgress = employee?.onboarding ?
+        (employee.onboarding.etapas.filter(e => e.status === 'Concluído').length / employee.onboarding.etapas.length) * 100
         : 0;
 
     const renderDocumentsList = (docType) => {
@@ -241,12 +257,12 @@ const EmployeeDetailsPage = () => {
             </ListGroup.Item>
         ));
     };
-
+    // Função para renderizar um item de informação
     const renderInfoItem = (icon, label, value, isDate = false) => {
-        const displayValue = isDate && value 
-            ? new Date(value).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) 
+        const displayValue = isDate && value
+            ? new Date(value).toLocaleDateString('pt-BR', { timeZone: 'UTC' })
             : (value || <span className="text-black-50">--</span>);
-    
+
         return (
             <ListGroup.Item>
                 <div className="employee-badge-info-item">
@@ -257,6 +273,59 @@ const EmployeeDetailsPage = () => {
                     </div>
                 </div>
             </ListGroup.Item>
+        );
+    };
+
+    // 🚀 Componente para o Card de Período Aquisitivo de Férias
+    const PeriodoAquisitivoCard = ({ periodo }) => {
+        const saldoPercent = (periodo.dias_saldo / periodo.dias_direito) * 100;
+        const statusMap = {
+            EM_ANDAMENTO: { bg: 'secondary', label: 'Em Andamento' },
+            DISPONIVEL: { bg: 'success', label: 'Disponível' },
+            PARCIALMENTE_GOZADO: { bg: 'info', label: 'Parcialmente Gozado' },
+            GOZADO: { bg: 'light', label: 'Gozado' },
+            VENCENDO: { bg: 'warning', label: 'Vencendo' },
+            VENCIDO: { bg: 'danger', label: 'Vencido' },
+        };
+        const statusInfo = statusMap[periodo.status] || { bg: 'dark', label: periodo.status };
+
+        return (
+            <Card className="mb-3 shadow-sm">
+                <Card.Header className="d-flex justify-content-between align-items-center">
+                    <span className="fw-bold">{periodo.numero_periodo}º Período Aquisitivo</span>
+                    <Badge bg={statusInfo.bg}>{statusInfo.label}</Badge>
+                </Card.Header>
+                <Card.Body>
+                    <Row>
+                        <Col md={6}>
+                            <p className="mb-1 small text-muted">Período Aquisitivo (PA):</p>
+                            <p className="fw-semibold">{new Date(periodo.data_inicio_pa).toLocaleDateString('pt-BR', { timeZone: 'UTC' })} a {new Date(periodo.data_fim_pa).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</p>
+                        </Col>
+                        <Col md={6}>
+                            <p className="mb-1 small text-muted">Período Concessivo (PC):</p>
+                            <p className="fw-semibold">{new Date(periodo.data_inicio_pc).toLocaleDateString('pt-BR', { timeZone: 'UTC' })} a {new Date(periodo.data_fim_pc).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</p>
+                        </Col>
+                    </Row>
+                    <div className="mt-2">
+                        <div className="d-flex justify-content-between small mb-1">
+                            <span>Saldo: <strong>{periodo.dias_saldo}</strong> de {periodo.dias_direito} dias</span>
+                            <span>{saldoPercent.toFixed(0)}%</span>
+                        </div>
+                        <ProgressBar now={saldoPercent} />
+                    </div>
+                </Card.Body>
+                {periodo.solicitacoes.length > 0 && (
+                    <ListGroup variant="flush">
+                        <ListGroup.Item className="small fw-bold bg-light">Férias Agendadas/Gozadas neste Período:</ListGroup.Item>
+                        {periodo.solicitacoes.map(sol => (
+                            <ListGroup.Item key={sol.id} className="d-flex justify-content-between align-items-center small">
+                                <span>{new Date(sol.data_inicio).toLocaleDateString('pt-BR', { timeZone: 'UTC' })} a {new Date(sol.data_fim).toLocaleDateString('pt-BR', { timeZone: 'UTC' })} ({sol.dias_solicitados} dias)</span>
+                                <Badge bg={STATUS_CONFIG[sol.status]?.bg || 'secondary'}>{STATUS_CONFIG[sol.status]?.label || sol.status}</Badge>
+                            </ListGroup.Item>
+                        ))}
+                    </ListGroup>
+                )}
+            </Card>
         );
     };
 
@@ -271,6 +340,16 @@ const EmployeeDetailsPage = () => {
     if (!employee) {
         return <Alert variant="warning">Colaborador não encontrado.</Alert>;
     }
+    // Renderiza o componente
+    const STATUS_CONFIG = {
+        PENDENTE: { bg: 'warning', text: 'dark', label: 'Pendente' },
+        APROVADA: { bg: 'success', text: 'white', label: 'Aprovada' },
+        RECUSADA: { bg: 'danger', text: 'white', label: 'Recusada' },
+        CANCELADA: { bg: 'secondary', text: 'white', label: 'Cancelada' },
+        EM_GOZO: { bg: 'info', text: 'white', label: 'Em Gozo' },
+        CONCLUIDA: { bg: 'dark', text: 'white', label: 'Concluída' },
+    };
+
 
     return (
         <div className="container-main p-4">
@@ -306,9 +385,9 @@ const EmployeeDetailsPage = () => {
                 <Col md={4} lg={3}>
                     <Card className="employee-badge-card mb-4">
                         <Card.Body className="text-center">
-                            <Image 
-                                src={employee.userpic_url || `https://ui-avatars.com/api/?name=${employee.nome_completo}&background=random`} 
-                                roundedCircle 
+                            <Image
+                                src={employee.userpic_url || `https://ui-avatars.com/api/?name=${employee.nome_completo}&background=random`}
+                                roundedCircle
                                 className="mb-3"
                                 style={{ width: '120px', height: '120px', objectFit: 'cover', border: '4px solid white', boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}
                             />
@@ -361,7 +440,7 @@ const EmployeeDetailsPage = () => {
                                                     <ListGroup.Item key={formacao.id}>
                                                         <div className="d-flex justify-content-between">
                                                             <span className="fw-bold">{formacao.titulo_curso || 'Não especificado'}</span>
-                                                            <Badge bg="secondary">{formacao.ano_conclusao}</Badge> 
+                                                            <Badge bg="secondary">{formacao.ano_conclusao}</Badge>
                                                         </div>
                                                         <div>{formacao.instituicao_ensino}</div>
                                                         <div className="text-muted small">{formacao.curso}</div>
@@ -388,7 +467,7 @@ const EmployeeDetailsPage = () => {
                                                             <div>
                                                                 <div className="fw-bold">{dep.nome_completo}</div>
                                                                 <div className="text-muted small">
-                                                                    {dep.grau_parentesco} &bull; Nasc: {dep.data_nascimento ? new Date(dep.data_nascimento).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'N/A'} 
+                                                                    {dep.grau_parentesco} &bull; Nasc: {dep.data_nascimento ? new Date(dep.data_nascimento).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'N/A'}
                                                                 </div>
                                                             </div>
                                                             <div>
@@ -757,7 +836,7 @@ const EmployeeDetailsPage = () => {
                                         <ListGroup>
                                             {employee.onboarding.etapas.map(etapa => (
                                                 <ListGroup.Item key={etapa.id}>
-                                                    <Form.Check 
+                                                    <Form.Check
                                                         type="checkbox"
                                                         id={`etapa-${etapa.id}`}
                                                         label={etapa.etapa_template.titulo}
@@ -777,6 +856,58 @@ const EmployeeDetailsPage = () => {
                             ) : (
                                 <Alert variant="info">Nenhum processo de onboarding iniciado para este colaborador. <Button variant="link" onClick={() => setShowStartOnboardingModal(true)}>Iniciar Onboarding</Button></Alert>
                             )}
+                        </Tab>
+                        <Tab eventKey="ferias" title="Férias">
+                            {saldoFerias ? (
+                                <>
+                                    <Card className="mb-4 shadow-sm">
+                                        <Card.Header className="fw-bold">Resumo de Férias</Card.Header>
+                                        <Card.Body>
+                                            <Row className="align-items-center">
+                                                <Col md={8}>
+                                                    <p className="mb-1">Saldo Total Disponível: <strong className="fs-5">{saldoFerias.total_dias_saldo} dias</strong></p>
+                                                    {saldoFerias.proximo_vencimento ? (
+                                                        <p className="mb-1 text-muted small">
+                                                            Próximo vencimento em <strong>{new Date(saldoFerias.proximo_vencimento.data).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</strong> ({saldoFerias.proximo_vencimento.dias_restantes} dias restantes)
+                                                        </p>
+                                                    ) : <p className="text-muted small">Nenhum período com vencimento próximo.</p>}
+                                                    {saldoFerias.tem_ferias_vencidas && <Alert variant="danger" className="mt-2 py-2 small">Atenção! Você possui períodos de férias vencidos.</Alert>}
+                                                </Col>
+                                                <Col md={4} className="text-md-end mt-3 mt-md-0">
+                                                    <Button onClick={() => setShowSolicitarModal(true)}>Solicitar Férias</Button>
+                                                </Col>
+                                            </Row>
+                                        </Card.Body>
+                                    </Card>
+
+                                    <h5 className="mt-4 mb-3">Meus Períodos Aquisitivos</h5>
+                                    {periodosAquisitivos.length > 0 ? (
+                                        periodosAquisitivos.map(pa => (
+                                            <PeriodoAquisitivoCard key={pa.id} periodo={pa} />
+                                        ))
+                                    ) : (
+                                        <Alert variant="info">Nenhum período aquisitivo encontrado.</Alert>
+                                    )}
+
+                                    <h5 className="mt-4 mb-3">Histórico Geral de Solicitações</h5>
+                                    <Table striped bordered hover responsive size="sm">
+                                        <thead><tr><th>Período</th><th>Dias</th><th>Abono</th><th>Status</th><th>Aprovador</th></tr></thead>
+                                        <tbody>
+                                            {periodosAquisitivos.flatMap(pa => pa.solicitacoes).length > 0 ? (
+                                                periodosAquisitivos.flatMap(pa => pa.solicitacoes).sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).map(sol => (
+                                                    <tr key={sol.id}>
+                                                        <td>{new Date(sol.data_inicio).toLocaleDateString('pt-BR', { timeZone: 'UTC' })} a {new Date(sol.data_fim).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</td>
+                                                        <td>{sol.dias_solicitados}</td>
+                                                        <td>{sol.abono_pecuniario ? `${sol.dias_abono} dias` : 'Não'}</td>
+                                                        <td><Badge bg={STATUS_CONFIG[sol.status]?.bg || 'secondary'}>{STATUS_CONFIG[sol.status]?.label || sol.status}</Badge></td>
+                                                        <td>{sol.aprovador?.nome_completo || '--'}</td>
+                                                    </tr>
+                                                ))
+                                            ) : (<tr><td colSpan="5" className="text-center text-muted">Nenhuma solicitação encontrada.</td></tr>)}
+                                        </tbody>
+                                    </Table>
+                                </>
+                            ) : <Alert variant="info">Dados de férias não disponíveis.</Alert>}
                         </Tab>
                     </Tabs>
                 </Col>
@@ -823,6 +954,17 @@ const EmployeeDetailsPage = () => {
                     setSuccessMessage('Onboarding iniciado com sucesso!');
                     setTimeout(() => setSuccessMessage(null), 100);
                 }}
+            />
+
+            <SolicitarFeriasModal
+                show={showSolicitarModal}
+                onHide={() => setShowSolicitarModal(false)}
+                onSuccess={() => {
+                    setShowSolicitarModal(false);
+                    setSuccessMessage('Solicitação de férias enviada com sucesso!');
+                    setTimeout(() => setSuccessMessage(null), 100); // Recarrega
+                }}
+                funcionarioId={employeeId}
             />
         </div>
     );
