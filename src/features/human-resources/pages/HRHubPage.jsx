@@ -6,7 +6,7 @@ import HRDashboardPage from './HRDashboardPage';
 import OrganogramaPage from './OrganogramaPage'; // 🚀 Importa a nova página do organograma
 import ManageEmployees from './ManageEmployees';
 import ManageBeneficios from './ManageBeneficios';
-import FeriasPage from './../components/FeriasPage';
+import FeriasPage from './../../human-resources/components/FeriasPage';
 
 // Componente de placeholder para abas futuras
 const PlaceholderTab = ({ title }) => (
