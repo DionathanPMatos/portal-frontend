@@ -21,9 +21,7 @@ import {
 /*import { SiMarketo } from "react-icons/si";*/
 import { GiHumanPyramid } from "react-icons/gi";
 import { AiFillProduct, AiFillVideoCamera } from "react-icons/ai"; // Ícones para Portfólio e Soluções
-import { useTheme } from '../../contexts/ThemeContext'; // <-- 1. IMPORTE O HOOK useTheme
-
-
+import { useTheme } from "../../contexts/ThemeContext"; // <-- 1. IMPORTE O HOOK useTheme
 
 // Constantes de dados
 import "../../styles/sidebar.css"; // Movido para a pasta styles
@@ -42,10 +40,10 @@ const menuItems = [
     name: "Comercial",
     icon: <FaHandshake size={iconSize} />,
     subItems: [
-      { name: "CRM - Mannesoft", link: "/crm/projetos" },
+      { name: "CRM", link: "/crm/projetos" },
       { name: "Clientes", link: "/crm/clientes" },
-      { name: "Visitas Comerciais", link: "/crm/visitas" },
-      { name: "KPIs Comerciais", link: "/crm/kpi" },
+      { name: "Visitas ", link: "/crm/visitas" },
+      { name: "KPIs", link: "/crm/kpi" },
       {
         name: "Email Corporativo",
         link: "https://outlook.office.com/mail/",
@@ -65,13 +63,13 @@ const menuItems = [
       {
         name: "Central de Facilities",
         icon: <FaBuilding size={iconSize} />,
-        link: "/facilities"
+        link: "/facilities",
       },
       {
         name: "Reserva de Veículos",
         link: "/facilities/veiculos",
         target: "_blank",
-      }
+      },
     ],
   },
   {
@@ -241,14 +239,17 @@ function Sidebar({ isHidden }) {
         </div>
       )}
 
-      <div className={`sidebar ${isOpen ? "open" : ""} ${isHidden ? "hidden" : ""}`} ref={sidebarRef}>
+      <div
+        className={`sidebar ${isOpen ? "open" : ""} ${isHidden ? "hidden" : ""}`}
+        ref={sidebarRef}
+      >
         <div className="top">
           {/* 🚀 Bloco da Logomarca na Sidebar */}
           <div className="sidebar-logo">
             <img
               src={logoUrl}
               alt="Logo do Sistema"
-              style={{ height: '40px' }}
+              style={{ height: "40px" }}
             />
           </div>
         </div>
@@ -263,15 +264,27 @@ function Sidebar({ isHidden }) {
                 // Lógica para itens com submenu
                 <a
                   href="#"
-                  onClick={(e) => { e.preventDefault(); handleAccordionClick(item.name); }}
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleAccordionClick(item.name);
+                  }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    width: "100%",
+                  }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <div style={{ display: "flex", alignItems: "center" }}>
                     <span className="icon-wrapper">{item.icon}</span>
                     <span className="item-name">{item.name}</span>
                   </div>
                   <span className="item-name pe-3">
-                    {activeAccordion === item.name ? <FaChevronDown size={12} /> : <FaChevronRight size={12} />}
+                    {activeAccordion === item.name ? (
+                      <FaChevronDown size={12} />
+                    ) : (
+                      <FaChevronRight size={12} />
+                    )}
                   </span>
                 </a>
               ) : (
@@ -284,17 +297,27 @@ function Sidebar({ isHidden }) {
               {item.subItems && (
                 <ul
                   className={`subitems ${activeAccordion === item.name ? "subitems-open" : ""}`}
-                  style={{ display: activeAccordion === item.name ? 'block' : 'none' }}
+                  style={{
+                    display: activeAccordion === item.name ? "block" : "none",
+                  }}
                 >
                   {item.subItems.map((subItem) => {
-                    if (subItem.restricted && (!user?.privilegios || (!user.privilegios.includes('Admin') && !user.privilegios.includes('Gestor') && !user.privilegios.includes('rh')))) {
+                    if (
+                      subItem.restricted &&
+                      (!user?.privilegios ||
+                        (!user.privilegios.includes("Admin") &&
+                          !user.privilegios.includes("Gestor") &&
+                          !user.privilegios.includes("rh")))
+                    ) {
                       return null;
                     }
                     return (
                       <li key={subItem.name}>
                         <Link
                           to={subItem.link}
-                          {...(subItem.target ? { target: subItem.target } : {})}
+                          {...(subItem.target
+                            ? { target: subItem.target }
+                            : {})}
                           rel="noopener noreferrer"
                         >
                           {subItem.name}
@@ -308,14 +331,12 @@ function Sidebar({ isHidden }) {
           ))}
         </ul>
         <div className="sidebar-footer">
-          <p>&copy; {new Date().getFullYear()} DCA. Todos os direitos reservados.</p>
+          <p>
+            &copy; {new Date().getFullYear()} DCA. Todos os direitos reservados.
+          </p>
         </div>
       </div>
     </>
-
-
-
-
   );
 }
 

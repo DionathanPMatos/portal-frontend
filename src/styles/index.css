@@ -63,6 +63,8 @@ a {
 .btn-primary {
     background-color: #1C3B57 !important;
     border-color: #1C3B57 !important;
+    border-radius: 25px;
+    font-size: 14px;
 }
 
 .btn-primary:hover,
@@ -81,6 +83,21 @@ a {
     border-color: #1C3B57 !important;
 }
 
+.btn-outline-secondary
+{
+    color: #6c757d !important;
+    border-color: #6c757d !important;
+    border-radius: 25px;
+    font-size: 14px;
+}
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus,
+.show > .btn-outline-secondary.dropdown-toggle {
+    color: #495057 !important;
+    background-color: #e9ecef !important;
+    border-color: #6c757d !important;
+    box-shadow: 0 0 0 0.25rem rgba(108, 117, 125, 0.5) !important;
+}
 /* Estilização dos Cards */
 .card {
   border: none;
@@ -142,7 +159,7 @@ a {
 
 .page-header-title-wrapper .page-header-title {
   margin: 0;
-  font-size: 32px; /* Título Principal */
+  font-size: 24px; /* Título Principal */
   font-weight: 700;
   color: #212529; /* Cor de texto escura padrão */
 }
@@ -182,6 +199,103 @@ a {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+
+/* Barra de Pesquisa */
+.header-search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-left: 1.5rem; /* Espaçamento do botão de toggle */
+    flex-grow: 1; /* Faz a barra de pesquisa ocupar o espaço disponível */
+    max-width: 600px; /* Limita a largura máxima da barra */
+}
+
+.search-icon {
+    position: absolute;
+    left: 15px;
+    color: #8a949f; /* Cor do ícone */
+    font-size: 0.9rem;
+    pointer-events: none; /* Para poder clicar no input através do ícone */
+}
+
+.search-input {
+    background-color: var(--background-color, #f0f2f5);
+    border: 1px solid transparent;
+    border-radius: 20px; /* Bordas bem arredondadas */
+    padding: 0.5rem 1rem 0.5rem 2.5rem; /* Padding: top/bottom, right, left (para dar espaço ao ícone) */
+    width: 100%; /* Ocupa toda a largura do container */
+    font-size: 0.9rem;
+    color: var(--text-primary-color);
+    transition: all 0.3s ease;
+}
+
+.search-input::placeholder {
+    color: #8a949f;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--cor-destaque, #0063c6);
+    background-color: var(--cor-fundo-card, #ffffff);
+    box-shadow: 0 0 0 2px rgba(0, 99, 198, 0.2);
+}
+
+/* Dropdown de Resultados da Pesquisa */
+.search-results-dropdown {
+    position: absolute;
+    top: calc(100% + 8px); /* 8px abaixo da barra de pesquisa */
+    left: 0;
+    width: 100%;
+    background-color: var(--cor-fundo-card, #ffffff);
+    border-radius: 0.75rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    z-index: 1100;
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid var(--cor-borda, #eef2f5);
+}
+
+.search-result-item, .search-result-item-static {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1.25rem;
+    text-decoration: none;
+    color: var(--text-primary-color);
+    border-bottom: 1px solid var(--cor-borda, #eef2f5);
+    transition: background-color 0.2s ease;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+.search-result-item:hover {
+    background-color: var(--background-color, #f0f2f5);
+}
+
+.search-result-item-static {
+    color: #8a949f;
+    font-style: italic;
+}
+
+.result-title {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.result-type {
+    font-size: 0.75rem;
+    color: #8a949f;
+    background-color: var(--background-color, #f0f2f5);
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.25rem;
+    margin-left: 1rem;
+    flex-shrink: 0;
 }
 
 /* ==========================================================================

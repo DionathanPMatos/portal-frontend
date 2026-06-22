@@ -1,10 +1,13 @@
 // App.jsx
 
 import React, { useEffect } from "react";
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { useAuth } from './contexts/AuthContext';
-import { useTheme } from './contexts/ThemeContext';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useAuth } from "./contexts/AuthContext";
+import { useTheme } from "./contexts/ThemeContext";
 
+// PrimeReact
+import "primereact/resources/themes/lara-light-indigo/theme.css"; // Tema
+import "primereact/resources/primereact.min.css"; // Core CSS
 
 // ==========================================
 // COMPONENTES GERAIS / CORE
@@ -19,7 +22,7 @@ import RegisterUserPage from "./pages/RegisterUserPage.jsx"; // Movido para page
 // ==========================================
 // MÓDULO COMERCIAL (CRM)
 // ==========================================
-import CommercialDashboardPage from "./features/commercial/pages/Dashboard.jsx"; // Renomeado para o dashboard de projetos
+import CommercialDashboardPage from "./features/commercial/pages/DashboardProjetos.jsx"; // Renomeado para o dashboard de projetos
 import ProjectDetailsPage from "./features/commercial/pages/DetalhesProjeto.jsx"; // Renomeado para detalhes do projeto
 import LostProjectsPage from "./features/commercial/pages/CRM/ProjetosPerdidos.jsx"; // Movido para pages/
 import CommercialRegistrationPage from "./features/commercial/pages/Registro.jsx"; // Registro do CRM
@@ -46,7 +49,7 @@ import PerguntasDtcPage from "./features/technical-department/pages/PerguntasDtc
 // MÓDULO VISITANTES
 // ==========================================
 import VisitasPage from "./features/visitors/pages/VisitasPage.jsx"; // Renomeado
-import AdminDashboard from './features/visitors/pages/AdminDashboardPage.jsx'; // Movido e renomeado
+import AdminDashboard from "./features/visitors/pages/AdminDashboardPage.jsx"; // Movido e renomeado
 
 // ==========================================
 //MÓDULO DE CONTROLE DE FROTA
@@ -58,8 +61,7 @@ import Frota from "./features/fleet-management/pages/Frota.jsx"; // Ajustado par
 // ==========================================
 /*import FacilitiesPage from "./features/facilities/pages/Facilities.jsx"; // Movido e renomeado
 import GestaoObrasPage from "./features/facilities/pages/GestaoObras.jsx"; // Renomeado*/
-import FacilitiesHubPage from './features/facilities/pages/FacilitiesHubPage';
-
+import FacilitiesHubPage from "./features/facilities/pages/FacilitiesHubPage";
 
 // ==========================================
 // MÓDULO MARKETING
@@ -76,7 +78,7 @@ import ManageMarketingLocationsPage from "./features/marketing/pages/ManageMarke
 // MÓDULO AGENTE PROSPECÇÃO (IA E LEADS)
 // ==========================================
 import PainelProspeccaoPage from "./features/prospect-agent/pages/PainelProspeccaoPage.jsx"; // Mantido
-import GerenciamentoLeadsPage from './features/prospect-agent/pages/GerenciamentoLeadsPage.jsx'; // Renomeado
+import GerenciamentoLeadsPage from "./features/prospect-agent/pages/GerenciamentoLeadsPage.jsx"; // Renomeado
 
 // ==========================================
 // MÓDULO CONFIGURAÇÃO
@@ -84,7 +86,7 @@ import GerenciamentoLeadsPage from './features/prospect-agent/pages/Gerenciament
 import AdminPage from "./features/configuration/pages/AdminPage.jsx"; // Renomeado
 import AdminTheme from "./features/configuration/pages/AdminThemePage.jsx"; // Renomeado
 import ManageHomePage from "./features/configuration/pages/ManageHomePage.jsx";
-import CategoriasAdmin from './features/configuration/pages/CategoriasAdmin.jsx'; // Ajuste a pasta se guardou noutro lado
+import CategoriasAdmin from "./features/configuration/pages/CategoriasAdmin.jsx"; // Ajuste a pasta se guardou noutro lado
 
 // ==========================================
 // MÓDULO RH
@@ -139,12 +141,16 @@ function App() {
     if (theme && theme.background_color) {
       document.body.style.backgroundColor = theme.background_color;
     } else {
-      document.body.style.backgroundColor = '#f4f7f9'; // Cor padrão de fallback
+      document.body.style.backgroundColor = "#f4f7f9"; // Cor padrão de fallback
     }
   }, [theme]);
 
   if (isLoading) {
-    return <div className="flex items-center justify-center min-h-screen bg-gray-100"><p>Carregando...</p></div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <p>Carregando...</p>
+      </div>
+    );
   }
 
   return (
@@ -157,8 +163,12 @@ function App() {
         </Routes>
       ) : (
         /* Estrutura do sistema para usuários autenticados */
-        <div className={`main-container ${isSidebarHidden ? "sidebar-hidden" : ""}`}>
-          <div className="header-mobile-wrapper"> {/* Este wrapper pode ser um componente de layout */}
+        <div
+          className={`main-container ${isSidebarHidden ? "sidebar-hidden" : ""}`}
+        >
+          <div className="header-mobile-wrapper">
+            {" "}
+            {/* Este wrapper pode ser um componente de layout */}
             <Sidebar
               isLoggedIn={isLoggedIn}
               user={user}
@@ -166,85 +176,167 @@ function App() {
               isHidden={isSidebarHidden}
             />
             <Header
-              isLoggedIn={isLoggedIn} user={user} onLogout={handleLogout}
+              isLoggedIn={isLoggedIn}
+              user={user}
+              onLogout={handleLogout}
               onToggleSidebar={() => setIsSidebarHidden(!isSidebarHidden)}
             />
           </div>
           <div className="content-area">
             <Routes>
-              <Route path="/" element={<DashboardPage isLoggedIn={isLoggedIn} />} />
-
+              <Route
+                path="/"
+                element={<DashboardPage isLoggedIn={isLoggedIn} />}
+              />
               {/* ROTAS DO CRM */}
-              <Route path="/crm/projetos" element={<CommercialDashboardPage />} />
-              <Route path="/modulo_crm/projetos-perdidos" element={<LostProjectsPage />} />
+              <Route
+                path="/crm/projetos"
+                element={<CommercialDashboardPage />}
+              />
+              <Route
+                path="/modulo_crm/projetos-perdidos"
+                element={<LostProjectsPage />}
+              />
               <Route path="/crm/kpi" element={<KpiComercialPage />} />
               <Route path="/admin/resultados" element={<AdminResultados />} />
-
               {/* --- ALTERAÇÃO AQUI: Passando o 'user' como prop --- */}
-              <Route path="/crm/projetos/:id" element={<ProjectDetailsPage user={user} />} />
-
-              <Route path="/crm/visitas" element={<VisitasPage user={user} />} />
-
-              <Route path="/dtc/fabricantes" element={<FabricantesListPage />} />
-              <Route path="/dtc/fabricantes/:id" element={<FabricantePerfilPage />} />
-              <Route path="/admin/fabricantes" element={<GerenciarFabricantesPage />} />
-              <Route path="/dtc/ferramentas" element={<FerramentasUteisPage />} />
-              <Route path="/dtc/perguntas" element={<PerguntasDtcPage user={user} />} />
-
+              <Route
+                path="/crm/projetos/:id"
+                element={<ProjectDetailsPage user={user} />}
+              />
+              <Route
+                path="/crm/visitas"
+                element={<VisitasPage user={user} />}
+              />
+              <Route
+                path="/dtc/fabricantes"
+                element={<FabricantesListPage />}
+              />
+              <Route
+                path="/dtc/fabricantes/:id"
+                element={<FabricantePerfilPage />}
+              />
+              <Route
+                path="/admin/fabricantes"
+                element={<GerenciarFabricantesPage />}
+              />
+              <Route
+                path="/dtc/ferramentas"
+                element={<FerramentasUteisPage />}
+              />
+              <Route
+                path="/dtc/perguntas"
+                element={<PerguntasDtcPage user={user} />}
+              />
               {/* OUTRAS ROTAS (Ajuste a rota de registro se necessário) */}
-              <Route path="/registro" element={<CommercialRegistrationPage />} />
+              <Route
+                path="/registro"
+                element={<CommercialRegistrationPage />}
+              />
               <Route path="/adminpage" element={<AdminPage />} />
               <Route path="/admin/homepage" element={<ManageHomePage />} />
               <Route path="/admin/theme" element={<AdminTheme />} />
               <Route path="/RegisterUser" element={<RegisterUserPage />} />
-              <Route path="/admin/CategoriasAdmin" element={<CategoriasAdmin />} />
-              <Route path="/admin/noticias/:newsId/report" element={<NewsConfirmationReportPage />} /> {/* NOVO */}
-              <Route path="/admin/noticias" element={<NewsManagerPage />} /> {/* Mantido */}
+              <Route
+                path="/admin/CategoriasAdmin"
+                element={<CategoriasAdmin />}
+              />
+              <Route
+                path="/admin/noticias/:newsId/report"
+                element={<NewsConfirmationReportPage />}
+              />{" "}
+              {/* NOVO */}
+              <Route
+                path="/admin/noticias"
+                element={<NewsManagerPage />}
+              />{" "}
+              {/* Mantido */}
               <Route path="/noticias" element={<NewsPage />} />
-              <Route path="/OrganogramaTecnico" element={<OrganogramaTecnicoPage />} />
+              <Route
+                path="/OrganogramaTecnico"
+                element={<OrganogramaTecnicoPage />}
+              />
               <Route path="/dtc" element={<DTCHubPage />} />
-              <Route path="/dtc/repositorio" element={<RepositorioTecnicoPage />} />
-
+              <Route
+                path="/dtc/repositorio"
+                element={<RepositorioTecnicoPage />}
+              />
               {/* ROTAS DO RH */}
               <Route path="/rh" element={<HRHubPage />} />
-              <Route path="/rh/colaboradores/:id" element={<EmployeeDetailsPage />} />
+              <Route
+                path="/rh/colaboradores/:id"
+                element={<EmployeeDetailsPage />}
+              />
               <Route path="/rh/beneficios" element={<BeneficiosHubPage />} />
               <Route path="/funcionarios" element={<FuncionariosPage />} />
               <Route path="/perfil" element={<UserProfilePage />} />
-
               <Route path="/crm/dashboard-dtc" element={<DashboardDTCPage />} />
               <Route path="/compras" element={<PurchaseDashboardPage />} />
-              <Route path="/ferramentas/calculadora-solar" element={<CalculadoraSolarPage />} /> {/* A rota para a calculadora solar */}
-              <Route path="/crm/prospeccao" element={<PainelProspeccaoPage />} /> {/* Usa o PainelProspeccaoPage */}
-              <Route path="/admin/gerenciar-dashboard" element={<AdminDashboard />} />
-              <Route path="/admin/gerenciar-leads" element={<GerenciamentoLeadsPage />} />
+              <Route
+                path="/ferramentas/calculadora-solar"
+                element={<CalculadoraSolarPage />}
+              />{" "}
+              {/* A rota para a calculadora solar */}
+              <Route
+                path="/crm/prospeccao"
+                element={<PainelProspeccaoPage />}
+              />{" "}
+              {/* Usa o PainelProspeccaoPage */}
+              <Route
+                path="/admin/gerenciar-dashboard"
+                element={<AdminDashboard />}
+              />
+              <Route
+                path="/admin/gerenciar-leads"
+                element={<GerenciamentoLeadsPage />}
+              />
               <Route path="/crm/clientes" element={<ClientListPage />} />
-              <Route path="/crm/clientes/:id" element={<ClientDetailPage user={user} />} />
-
+              <Route
+                path="/crm/clientes/:id"
+                element={<ClientDetailPage user={user} />}
+              />
               {/* MÓDULO FINANCEIRO */}
-              <Route path="/financeiro" element={<FinanceiroPage user={user} />} />
-
+              <Route
+                path="/financeiro"
+                element={<FinanceiroPage user={user} />}
+              />
               {/* NOVA ROTA PARA O MÓDULO DE CONTROLE DE FROTA */}
               <Route path="/frota" element={<Frota />} />
-
               {/* ROTAS FACILITIES */}
               {/*<Route path="/facilities" element={<FacilitiesPage />} />
             <Route path="/facilities/gestao-obras" element={<GestaoObrasPage />} />*/}
               <Route path="/facilities" element={<FacilitiesHubPage />} />
-
-
               {/* ROTAS MARKETING */}
-              <Route path="/marketing" element={<MarketingPage user={user} />} />
+              <Route
+                path="/marketing"
+                element={<MarketingPage user={user} />}
+              />
               <Route path="/marketing/reservas" element={<ReserveRoomPage />} />
-              <Route path="/marketing/solicitacoes" element={<RequestMaterialPage />} />
-              <Route path="/admin/gerenciar-produtos-marketing" element={<ManageMarketingProducts />} />
-              <Route path="/admin/gerenciar-solicitacoes-marketing" element={<ManageMarketingRequests />} />
-              <Route path="/admin/marketing/interesses" element={<ManageMarketingInterestsPage />} />
-              <Route path="/admin/marketing/locais" element={<ManageMarketingLocationsPage />} />
-
+              <Route
+                path="/marketing/solicitacoes"
+                element={<RequestMaterialPage />}
+              />
+              <Route
+                path="/admin/gerenciar-produtos-marketing"
+                element={<ManageMarketingProducts />}
+              />
+              <Route
+                path="/admin/gerenciar-solicitacoes-marketing"
+                element={<ManageMarketingRequests />}
+              />
+              <Route
+                path="/admin/marketing/interesses"
+                element={<ManageMarketingInterestsPage />}
+              />
+              <Route
+                path="/admin/marketing/locais"
+                element={<ManageMarketingLocationsPage />}
+              />
               {/* ROTA PARA PÁGINA DE NOTIFICAÇÕES */}
-              <Route path="/notificacoes/todas" element={<AllNotificationsPage />} />
-
+              <Route
+                path="/notificacoes/todas"
+                element={<AllNotificationsPage />}
+              />
             </Routes>
           </div>
         </div>
