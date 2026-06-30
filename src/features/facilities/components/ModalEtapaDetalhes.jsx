@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import apiClient from "../../../services/api";
-import { Modal, Form, Button, Row, Col, Alert, Table, Badge, ProgressBar } from "react-bootstrap";
+import { Modal, Form, Button, Row, Col, Alert, ProgressBar } from "react-bootstrap";
+import Select from "react-select";
 
-export default function ModalEtapaDetalhes({ show, onHide, etapa, projetoId, onUpdate }) {
+export default function ModalEtapaDetalhes({ show, onHide, etapa, projetoId, onUpdate, funcionarios = [] }) {
   const [data, setData] = useState(etapa || {});
   const [erro, setErro] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,10 +19,38 @@ export default function ModalEtapaDetalhes({ show, onHide, etapa, projetoId, onU
     setData({ ...data, [name]: value });
   };
 
+  const getParsedResponsavelIds = (ids) => {
+    if (!ids) return [];
+    if (Array.isArray(ids)) return ids.map(Number);
+    try {
+      const parsed = JSON.parse(ids);
+      return Array.isArray(parsed) ? parsed.map(Number) : [];
+    } catch (e) {
+      return [];
+    }
+  };
+
+  const funcionarioOptions = funcionarios.map(f => ({
+    value: f.id,
+    label: f.nome_completo
+  }));
+
+  const handleResponsaveisChange = (selected) => {
+    const ids = selected ? selected.map(o => o.value) : [];
+    setData({ ...data, responsavel_ids: ids });
+  };
+
+  const selectedOptions = funcionarioOptions.filter(o => 
+    getParsedResponsavelIds(data.responsavel_ids).includes(o.value)
+  );
+
   const handleSave = async () => {
     setLoading(true);
     try {
-      await apiClient.put(`/api/obras/etapas/${data.id}`, data);
+      await apiClient.put(`/api/obras/etapas/${data.id}`, {
+        ...data,
+        responsavel_ids: getParsedResponsavelIds(data.responsavel_ids)
+      });
       setErro("");
       onUpdate();
       onHide();
@@ -73,7 +102,7 @@ export default function ModalEtapaDetalhes({ show, onHide, etapa, projetoId, onU
               <Form.Control
                 type="date"
                 name="data_inicio_real"
-                value={data.data_inicio_real || ""}
+                value={data.data_inicio_real ? data.data_inicio_real.split('T')[0] : ""}
                 onChange={handleChange}
               />
             </Form.Group>
@@ -84,12 +113,26 @@ export default function ModalEtapaDetalhes({ show, onHide, etapa, projetoId, onU
               <Form.Control
                 type="date"
                 name="data_fim_real"
-                value={data.data_fim_real || ""}
+                value={data.data_fim_real ? data.data_fim_real.split('T')[0] : ""}
                 onChange={handleChange}
               />
             </Form.Group>
           </Col>
         </Row>
+
+        <Form.Group className="mb-3">
+          <Form.Label><strong>Responsáveis pela Etapa</strong></Form.Label>
+          <Select
+            isMulti
+            options={funcionarioOptions}
+            value={selectedOptions}
+            onChange={handleResponsaveisChange}
+            placeholder="Selecione os responsáveis..."
+            className="basic-multi-select"
+            classNamePrefix="select"
+            noOptionsMessage={() => 'Nenhum colaborador encontrado'}
+          />
+        </Form.Group>
 
         <Form.Group>
           <Form.Label>Descrição</Form.Label>

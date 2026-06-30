@@ -62,13 +62,20 @@ const menuItems = [
     subItems: [
       {
         name: "Central de Facilities",
-        icon: <FaBuilding size={iconSize} />,
         link: "/facilities",
+        restricted: true,
       },
       {
         name: "Reserva de Veículos",
-        link: "/facilities/veiculos",
-        target: "_blank",
+        link: "/facilities/reserva-veiculos",
+      },
+      {
+        name: "Multas e Infrações",
+        link: "/facilities/minhas-multas",
+      },
+      {
+        name: "Minhas Obras",
+        link: "/facilities/minhas-obras",
       },
     ],
   },

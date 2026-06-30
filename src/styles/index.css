@@ -10,15 +10,19 @@
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     line-height: 1.6;
-    color: #343a40; /* Tom de preto um pouco mais suave */
-    font-size: 14px; /* Texto Normal Padrão */
+    color: #343a40;
+    /* Tom de preto um pouco mais suave */
+    font-size: 14px;
+    /* Texto Normal Padrão */
     /* A cor de fundo agora é controlada dinamicamente pelo App.jsx */
     min-height: 100vh;
 }
 
 /* Legendas e textos pequenos */
-small, .small {
-    font-size: 12px !important; /* Garante a sobreposição */
+small,
+.small {
+    font-size: 12px !important;
+    /* Garante a sobreposição */
 }
 
 a {
@@ -34,13 +38,13 @@ a {
 }
 
 .container-main {
-  /* 🚀 CORREÇÃO: O padding da página agora é controlado pelo .content-area (em App.css). */
-  /* A remoção do padding e do overflow-x:hidden aqui corrige o layout, */
-  /* permitindo que a grade do Bootstrap (.row) funcione corretamente sem empurrar outros elementos. */
-  width: 100%;
-  padding-top: 1rem !important;
-  padding-left: 1rem !important;
-  padding-right: 1rem !important
+    /* 🚀 CORREÇÃO: O padding da página agora é controlado pelo .content-area (em App.css). */
+    /* A remoção do padding e do overflow-x:hidden aqui corrige o layout, */
+    /* permitindo que a grade do Bootstrap (.row) funcione corretamente sem empurrar outros elementos. */
+    width: 100%;
+    padding-top: 1rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important
 }
 
 
@@ -71,8 +75,9 @@ a {
 .btn-primary:focus,
 .btn-primary:active,
 .btn-primary.active,
-.show > .btn-primary.dropdown-toggle {
-    background-color: #152d42 !important; /* A slightly darker shade for hover/active states */
+.show>.btn-primary.dropdown-toggle {
+    background-color: #152d42 !important;
+    /* A slightly darker shade for hover/active states */
     border-color: #152d42 !important;
     box-shadow: 0 0 0 0.25rem rgba(28, 59, 87, 0.5) !important;
 }
@@ -83,52 +88,57 @@ a {
     border-color: #1C3B57 !important;
 }
 
-.btn-outline-secondary
-{
+.btn-outline-secondary {
     color: #6c757d !important;
     border-color: #6c757d !important;
     border-radius: 25px;
     font-size: 14px;
 }
+
 .btn-outline-secondary:hover,
 .btn-outline-secondary:focus,
-.show > .btn-outline-secondary.dropdown-toggle {
+.show>.btn-outline-secondary.dropdown-toggle {
     color: #495057 !important;
     background-color: #e9ecef !important;
     border-color: #6c757d !important;
     box-shadow: 0 0 0 0.25rem rgba(108, 117, 125, 0.5) !important;
 }
+
 /* Estilização dos Cards */
 .card {
-  border: none;
-  border-radius: 12px; /* Bordas mais arredondadas */
-  background-color: var(--cor-fundo-card, #ffffff);
-  box-shadow: var(--sombra-card, 0 4px 12px rgba(0, 0, 0, 0.08));
-  transition: all 0.3s ease;
-  overflow: hidden; /* Garante que o conteúdo respeite as bordas arredondadas */
+    border: none;
+    border-radius: 12px;
+    /* Bordas mais arredondadas */
+    background-color: var(--cor-fundo-card, #ffffff);
+    box-shadow: var(--sombra-card, 0 4px 12px rgba(0, 0, 0, 0.08));
+    transition: all 0.3s ease;
+    overflow: hidden;
+    /* Garante que o conteúdo respeite as bordas arredondadas */
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 .card-header {
-  background-color: var(--cor-fundo-card, #ffffff);
-  border-bottom: 1px solid var(--cor-borda, #eef2f5);
-  padding: 1rem 1.5rem;
-  font-size: 18px; /* Título de Card */
-  font-weight: 600;
-  color: #4d5c6a;
+    background-color: var(--cor-fundo-card, #ffffff);
+    border-bottom: 1px solid var(--cor-borda, #eef2f5);
+    padding: 1rem 1.5rem;
+    font-size: 18px;
+    /* Título de Card */
+    font-weight: 600;
+    color: #4d5c6a;
 }
 
 .card-body {
-  padding: 1.5rem;
+    padding: 1.5rem;
 }
 
 /* Reduz o espaçamento para a linha de cards com g-4 (corpo principal do dashboard) */
 .container-main .row.g-4 {
-    --bs-gutter-x: 1.2rem; /* Padrão do Bootstrap é 1.5rem */
+    --bs-gutter-x: 1.2rem;
+    /* Padrão do Bootstrap é 1.5rem */
     --bs-gutter-y: 1.2rem;
 }
 
@@ -138,67 +148,77 @@ a {
    ========================================================================== */
 /* Agora sem cor, apenas um cabeçalho de página padrão */
 .page-header-colored {
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  border-bottom: 1px solid #dee2e6; /* Linha de separação */
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    border-bottom: 1px solid #dee2e6;
+    /* Linha de separação */
 }
 
 /* Ajuste para o cabeçalho da página ocupar 100% da largura dentro do .container-main */
 .container-main .page-header-colored {
-    margin-left: -1rem; /* Compensa o padding-left do .container-main */
-    margin-right: -1rem; /* Compensa o padding-right do .container-main */
-    padding-left: 1rem;  /* Alinha com o conteúdo do container-main */
-    padding-right: 1rem; /* Alinha com o conteúdo do container-main */
-    border-radius: 0; /* Remove as bordas arredondadas para o visual de largura total */
+    margin-left: -1rem;
+    /* Compensa o padding-left do .container-main */
+    margin-right: -1rem;
+    /* Compensa o padding-right do .container-main */
+    padding-left: 1rem;
+    /* Alinha com o conteúdo do container-main */
+    padding-right: 1rem;
+    /* Alinha com o conteúdo do container-main */
+    border-radius: 0;
+    /* Remove as bordas arredondadas para o visual de largura total */
 }
 
 .page-header-title-wrapper .page-header-title {
-  margin: 0;
-  font-size: 24px; /* Título Principal */
-  font-weight: 700;
-  color: #212529; /* Cor de texto escura padrão */
+    margin: 0;
+    font-size: 24px;
+    /* Título Principal */
+    font-weight: 700;
+    color: #212529;
+    /* Cor de texto escura padrão */
 }
 
 .page-header-title-wrapper .page-header-subtitle {
-  margin: 0;
-  font-size: 13px; /* Texto Secundário */
-  color: #6c757d; /* Cor de texto secundária (cinza) */
+    margin: 0;
+    font-size: 13px;
+    /* Texto Secundário */
+    color: #6c757d;
+    /* Cor de texto secundária (cinza) */
 }
 
 .page-header-actions-wrapper {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  align-items: center;
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: center;
 }
 
 /* Para o novo cabeçalho da página */
 .page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  background-color: var(--cor-fundo-card, #fff);
-  border-radius: 12px;
-  box-shadow: var(--sombra-card, 0 4px 12px rgba(0, 0, 0, 0.08));
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: var(--cor-fundo-card, #fff);
+    border-radius: 12px;
+    box-shadow: var(--sombra-card, 0 4px 12px rgba(0, 0, 0, 0.08));
 }
 
 .page-title {
-  font-size: 1.2rem !important;
-  font-weight: 400;
-  color: var(--cor-texto-primario, #333);
-  margin: 0;
+    font-size: 1.2rem !important;
+    font-weight: 400;
+    color: var(--cor-texto-primario, #333);
+    margin: 0;
 }
 
 .page-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 
@@ -207,25 +227,33 @@ a {
     position: relative;
     display: flex;
     align-items: center;
-    margin-left: 1.5rem; /* Espaçamento do botão de toggle */
-    flex-grow: 1; /* Faz a barra de pesquisa ocupar o espaço disponível */
-    max-width: 600px; /* Limita a largura máxima da barra */
+    margin-left: 1.5rem;
+    /* Espaçamento do botão de toggle */
+    flex-grow: 1;
+    /* Faz a barra de pesquisa ocupar o espaço disponível */
+    max-width: 600px;
+    /* Limita a largura máxima da barra */
 }
 
 .search-icon {
     position: absolute;
     left: 15px;
-    color: #8a949f; /* Cor do ícone */
+    color: #8a949f;
+    /* Cor do ícone */
     font-size: 0.9rem;
-    pointer-events: none; /* Para poder clicar no input através do ícone */
+    pointer-events: none;
+    /* Para poder clicar no input através do ícone */
 }
 
 .search-input {
     background-color: var(--background-color, #f0f2f5);
     border: 1px solid transparent;
-    border-radius: 20px; /* Bordas bem arredondadas */
-    padding: 0.5rem 1rem 0.5rem 2.5rem; /* Padding: top/bottom, right, left (para dar espaço ao ícone) */
-    width: 100%; /* Ocupa toda a largura do container */
+    border-radius: 20px;
+    /* Bordas bem arredondadas */
+    padding: 0.5rem 1rem 0.5rem 2.5rem;
+    /* Padding: top/bottom, right, left (para dar espaço ao ícone) */
+    width: 100%;
+    /* Ocupa toda a largura do container */
     font-size: 0.9rem;
     color: var(--text-primary-color);
     transition: all 0.3s ease;
@@ -245,7 +273,8 @@ a {
 /* Dropdown de Resultados da Pesquisa */
 .search-results-dropdown {
     position: absolute;
-    top: calc(100% + 8px); /* 8px abaixo da barra de pesquisa */
+    top: calc(100% + 8px);
+    /* 8px abaixo da barra de pesquisa */
     left: 0;
     width: 100%;
     background-color: var(--cor-fundo-card, #ffffff);
@@ -257,7 +286,8 @@ a {
     border: 1px solid var(--cor-borda, #eef2f5);
 }
 
-.search-result-item, .search-result-item-static {
+.search-result-item,
+.search-result-item-static {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -304,7 +334,8 @@ a {
 /* Garante que os pop-ups do calendário (como a lista de eventos "Ver mais"
    e o seletor de visualização) fiquem por cima de outros elementos da página. */
 .rbc-overlay {
-  z-index: 1400 !important; /* Um valor alto, maior que o header (1000) e modais (1050) */
+    z-index: 1400 !important;
+    /* Um valor alto, maior que o header (1000) e modais (1050) */
 }
 
 /* ==========================================================================
@@ -312,7 +343,8 @@ a {
    ========================================================================== */
 .employee-badge-card {
     position: sticky;
-    top: 1rem; /* Fixa o card ao rolar a página */
+    top: 1rem;
+    /* Fixa o card ao rolar a página */
 }
 
 .employee-badge-card .card-body {
@@ -349,4 +381,27 @@ a {
 .employee-badge-info-item .value {
     font-weight: 500;
     color: #212529;
+}
+
+/* Guia de estilo para abas */
+.nav-tabs {
+    display: flex;
+    align-items: center;
+    border-bottom: none !important;
+}
+
+.nav-link {
+    color: var(--text-primary-color);
+    background-color: var(--cor-fundo-card, #ffffff);
+    border-bottom: none !important;
+}
+
+.nav-link.active {
+    background-color: var(--sidebar-color) !important;
+    color: #ffffff !important;
+    border-bottom: none !important;
+}
+
+.nav-link:hover {
+    color: var(--sidebar-color);
 }

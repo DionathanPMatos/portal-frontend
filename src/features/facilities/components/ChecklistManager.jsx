@@ -1,8 +1,18 @@
 import React, { useState, useEffect, useCallback } from "react";
 import apiClient from "../../../services/api";
-import { Card, Form, Button, Alert, Spinner, ListGroup, InputGroup } from "react-bootstrap";
+import { Card, Form, Button, Alert, Spinner, ListGroup, InputGroup, Badge } from "react-bootstrap";
+import { useAuth } from "../../../contexts/AuthContext";
 
-export default function ChecklistManager({ projetoId , etapaId, checklists = [], onUpdate }) {
+export default function ChecklistManager({ 
+  projetoId, 
+  etapaId, 
+  checklists = [], 
+  onUpdate, 
+  funcionarios = [], 
+  projeto = null, 
+  stages = [] 
+}) {
+  const { user } = useAuth();
   const [checklistSelecionado, setChecklistSelecionado] = useState(null);
   const [itens, setItens] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -10,6 +20,44 @@ export default function ChecklistManager({ projetoId , etapaId, checklists = [],
   const [novo, setNovo] = useState("");
   const [showNovoChecklistForm, setShowNovoChecklistForm] = useState(false);
   const [novoChecklistTitulo, setNovoChecklistTitulo] = useState("");
+
+  const hasPrivilege = (user, requiredPrivileges) => {
+    if (!user || !user.privilegios) return false;
+    const userPrivileges = user.privilegios.toLowerCase().split(",");
+    return requiredPrivileges.some((p) => userPrivileges.includes(p.toLowerCase()));
+  };
+
+  const canEditItem = (item) => {
+    if (!user) return false;
+    
+    // Admins, supervisores e gestores sempre podem alterar tudo
+    if (hasPrivilege(user, ["Admin", "Supervisor", "Gestor"])) return true;
+
+    // Responsável pelo projeto sempre pode alterar tudo
+    if (projeto && String(projeto.responsavel_id) === String(user.id)) return true;
+
+    // Se o usuário for o responsável específico deste item
+    if (item.responsavel_id && String(item.responsavel_id) === String(user.id)) return true;
+
+    // Se o usuário for um dos responsáveis pela etapa
+    const stageId = item.etapa_id || etapaId;
+    if (stages && stageId) {
+      const stage = stages.find(s => s.id === stageId);
+      if (stage && stage.responsavel_ids) {
+        let ids = [];
+        try {
+          ids = Array.isArray(stage.responsavel_ids) 
+            ? stage.responsavel_ids 
+            : JSON.parse(stage.responsavel_ids);
+        } catch (e) {
+          ids = [];
+        }
+        if (Array.isArray(ids) && ids.map(String).includes(String(user.id))) return true;
+      }
+    }
+
+    return false;
+  };
 
   const fetchItens = useCallback(async () => {
     if (!checklistSelecionado) return;
@@ -33,12 +81,26 @@ export default function ChecklistManager({ projetoId , etapaId, checklists = [],
     try {
       await apiClient.put(`/api/obras/checklist-itens/${item.id}`, {
         ...item,
-        concluido: !item.concluido
+        concluido: !item.concluido,
+        data_conclusao: !item.concluido ? new Date().toISOString() : null
       });
       await fetchItens();
       onUpdate();
     } catch (error) {
       setErro("Erro ao atualizar item: " + error.message);
+    }
+  };
+
+  const handleUpdateItemResponsible = async (item, responsavelId) => {
+    try {
+      await apiClient.put(`/api/obras/checklist-itens/${item.id}`, {
+        ...item,
+        responsavel_id: responsavelId ? Number(responsavelId) : null
+      });
+      await fetchItens();
+      onUpdate();
+    } catch (error) {
+      setErro("Erro ao atualizar responsável: " + error.message);
     }
   };
 
@@ -67,13 +129,13 @@ export default function ChecklistManager({ projetoId , etapaId, checklists = [],
     try {
         await apiClient.post("/api/obras/checklists", {
             projeto_id: projetoId,
-            etapa_id: etapaId, // etapaId can be null for project-level checklists
+            etapa_id: etapaId,
             titulo: novoChecklistTitulo,
             descricao: ""
         });
         setNovoChecklistTitulo("");
         setShowNovoChecklistForm(false);
-        onUpdate(); // Trigger parent re-fetch
+        onUpdate();
     } catch (error) {
         setErro("Erro ao criar o checklist: " + error.message);
     }
@@ -89,7 +151,7 @@ export default function ChecklistManager({ projetoId , etapaId, checklists = [],
             return (
               <ListGroup.Item
                 key={c.id}
-                action // Makes the item clickable and accessible
+                action
                 onClick={() => setChecklistSelecionado(c)}
                 className="d-flex justify-content-between align-items-center"
               >
@@ -162,20 +224,48 @@ export default function ChecklistManager({ projetoId , etapaId, checklists = [],
         ) : (
           <>
             <ListGroup className="mb-3">
-              {itens.map((item) => (
-                <ListGroup.Item key={item.id} className="d-flex align-items-center gap-2">
-                  <Form.Check
-                    type="checkbox"
-                    checked={item.concluido || false}
-                    onChange={() => handleToggleItem(item)}
-                    className="mb-0"
-                  />
-                  <span style={{ textDecoration: item.concluido ? "line-through" : "none", color: item.concluido ? "#999" : "#000" }}>
-                    {item.descricao}
-                  </span>
-                  {item.concluido && <i className="bi bi-check-circle-fill text-success ms-auto"></i>}
-                </ListGroup.Item>
-              ))}
+              {itens.map((item) => {
+                const editable = canEditItem(item);
+                return (
+                  <ListGroup.Item key={item.id} className="d-flex align-items-center justify-content-between gap-3 py-2">
+                    <div className="d-flex align-items-center gap-2 flex-grow-1">
+                      <Form.Check
+                        type="checkbox"
+                        checked={item.concluido || false}
+                        onChange={() => handleToggleItem(item)}
+                        disabled={!editable}
+                        className="mb-0"
+                      />
+                      <span style={{ textDecoration: item.concluido ? "line-through" : "none", color: item.concluido ? "#999" : "#000" }}>
+                        {item.descricao}
+                      </span>
+                    </div>
+
+                    <div className="d-flex align-items-center gap-2">
+                      {editable ? (
+                        <Form.Select
+                          size="sm"
+                          style={{ width: "160px", fontSize: "0.78rem" }}
+                          value={item.responsavel_id || ""}
+                          onChange={(e) => handleUpdateItemResponsible(item, e.target.value)}
+                        >
+                          <option value="">Sem responsável</option>
+                          {funcionarios.map(f => (
+                            <option key={f.id} value={f.id}>{f.nome_completo}</option>
+                          ))}
+                        </Form.Select>
+                      ) : (
+                        item.responsavel_id && (
+                          <Badge bg="secondary" style={{ fontSize: "0.72rem" }}>
+                            👤 {funcionarios.find(f => f.id === item.responsavel_id)?.nome_completo || "Responsável"}
+                          </Badge>
+                        )
+                      )}
+                      {item.concluido && <i className="bi bi-check-circle-fill text-success"></i>}
+                    </div>
+                  </ListGroup.Item>
+                );
+              })}
             </ListGroup>
 
             <InputGroup>

@@ -1,11 +1,68 @@
-import React, { useState } from "react";
-import { Modal, Row, Col, Form, Button, Tabs, Tab, InputGroup, Spinner } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
+import { Modal, Row, Col, Form, Button, Tabs, Tab, InputGroup, Spinner, Dropdown } from "react-bootstrap";
 import apiClient from "../../../services/api";
 
 
 export default function ModalPrestador({ show, onHide, prestadorData, setPrestadorData, onSave }) {
   const [loadingCnpj, setLoadingCnpj] = useState(false);
   const [loadingCep, setLoadingCep] = useState(false);
+
+  const [especialidades, setEspecialidades] = useState([]);
+  const [subcategorias, setSubcategorias] = useState([]);
+
+  const [showNewEspecialidade, setShowNewEspecialidade] = useState(false);
+  const [newEspName, setNewEspName] = useState("");
+  const [showNewSubcategoria, setShowNewSubcategoria] = useState(false);
+  const [newSubName, setNewSubName] = useState("");
+
+  const [espSearch, setEspSearch] = useState("");
+  const [subSearch, setSubSearch] = useState("");
+  const [showEspDropdown, setShowEspDropdown] = useState(false);
+  const [showSubDropdown, setShowSubDropdown] = useState(false);
+
+  const filteredEspecialidades = especialidades.filter(esp => 
+    esp.toLowerCase().includes(espSearch.toLowerCase())
+  );
+
+  const filteredSubcategorias = subcategorias.filter(sub => 
+    sub.toLowerCase().includes(subSearch.toLowerCase())
+  );
+
+  useEffect(() => {
+    if (show) {
+      apiClient.get("/api/facilities/prestadores")
+        .then(res => {
+          const list = res.data || [];
+          const uniqueEsp = [...new Set(list.map(p => p.especialidade).filter(Boolean))].sort();
+          const uniqueSub = [...new Set(list.map(p => p.subcategoria).filter(Boolean))].sort();
+          setEspecialidades(uniqueEsp);
+          setSubcategorias(uniqueSub);
+        })
+        .catch(err => console.error("Erro ao carregar categorias:", err));
+    }
+  }, [show]);
+
+  const handleAddEspecialidade = () => {
+    const val = newEspName.trim();
+    if (!val) return;
+    if (!especialidades.includes(val)) {
+      setEspecialidades(prev => [...prev, val].sort());
+    }
+    setPrestadorData(prev => ({ ...prev, especialidade: val }));
+    setShowNewEspecialidade(false);
+    setNewEspName("");
+  };
+
+  const handleAddSubcategoria = () => {
+    const val = newSubName.trim();
+    if (!val) return;
+    if (!subcategorias.includes(val)) {
+      setSubcategorias(prev => [...prev, val].sort());
+    }
+    setPrestadorData(prev => ({ ...prev, subcategoria: val }));
+    setShowNewSubcategoria(false);
+    setNewSubName("");
+  };
 
   const handleBuscarCNPJ = async () => {
     const cnpjLimpo = prestadorData.cnpj?.replace(/\D/g, '');
@@ -83,8 +140,102 @@ export default function ModalPrestador({ show, onHide, prestadorData, setPrestad
           
           <Tab eventKey="contatos" title="Contatos & Especialidade">
             <Row className="g-3">
-              <Col md={4}><Form.Group><Form.Label>Especialidade</Form.Label><Form.Control value={prestadorData.especialidade || ''} onChange={e => setPrestadorData({...prestadorData, especialidade: e.target.value})} placeholder="Ex: Climatização" /></Form.Group></Col>
-              <Col md={4}><Form.Group><Form.Label>Subcategoria</Form.Label><Form.Control value={prestadorData.subcategoria || ''} onChange={e => setPrestadorData({...prestadorData, subcategoria: e.target.value})} placeholder="Ex: Limpeza de dutos" /></Form.Group></Col>
+              <Col md={4}>
+                <Form.Group className="position-relative">
+                  <Form.Label>Especialidade</Form.Label>
+                  <InputGroup>
+                    <Dropdown className="w-100 flex-grow-1" show={showEspDropdown} onToggle={(isOpen) => setShowEspDropdown(isOpen)}>
+                      <Dropdown.Toggle 
+                        variant="outline-secondary" 
+                        className="w-100 text-start d-flex justify-content-between align-items-center"
+                        style={{ borderColor: '#ced4da', color: '#495057', borderRadius: '0.375rem 0 0 0.375rem', height: '100%', minHeight: '38px' }}
+                      >
+                        {prestadorData.especialidade || "Selecione..."}
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu className="w-100 shadow" style={{ maxHeight: '250px', overflowY: 'auto', zIndex: 1050 }}>
+                        <div className="px-3 py-2 border-bottom sticky-top bg-white">
+                          <Form.Control
+                            type="text"
+                            placeholder="Pesquisar especialidade..."
+                            value={espSearch}
+                            onChange={(e) => setEspSearch(e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        </div>
+                        <Dropdown.Item onClick={() => { setPrestadorData({...prestadorData, especialidade: ""}); setShowEspDropdown(false); }}>
+                          <em>Nenhuma</em>
+                        </Dropdown.Item>
+                        {filteredEspecialidades.length === 0 ? (
+                          <Dropdown.Item disabled className="text-muted text-center py-2">Nenhuma encontrada</Dropdown.Item>
+                        ) : (
+                          filteredEspecialidades.map(esp => (
+                            <Dropdown.Item 
+                              key={esp} 
+                              active={prestadorData.especialidade === esp}
+                              onClick={() => {
+                                setPrestadorData({...prestadorData, especialidade: esp});
+                                setEspSearch("");
+                                setShowEspDropdown(false);
+                              }}
+                            >
+                              {esp}
+                            </Dropdown.Item>
+                          ))
+                        )}
+                      </Dropdown.Menu>
+                    </Dropdown>
+                    <Button variant="outline-primary" onClick={() => setShowNewEspecialidade(true)} style={{ zIndex: 5 }}>+</Button>
+                  </InputGroup>
+                </Form.Group>
+              </Col>
+              <Col md={4}>
+                <Form.Group className="position-relative">
+                  <Form.Label>Subcategoria</Form.Label>
+                  <InputGroup>
+                    <Dropdown className="w-100 flex-grow-1" show={showSubDropdown} onToggle={(isOpen) => setShowSubDropdown(isOpen)}>
+                      <Dropdown.Toggle 
+                        variant="outline-secondary" 
+                        className="w-100 text-start d-flex justify-content-between align-items-center"
+                        style={{ borderColor: '#ced4da', color: '#495057', borderRadius: '0.375rem 0 0 0.375rem', height: '100%', minHeight: '38px' }}
+                      >
+                        {prestadorData.subcategoria || "Selecione..."}
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu className="w-100 shadow" style={{ maxHeight: '250px', overflowY: 'auto', zIndex: 1050 }}>
+                        <div className="px-3 py-2 border-bottom sticky-top bg-white">
+                          <Form.Control
+                            type="text"
+                            placeholder="Pesquisar subcategoria..."
+                            value={subSearch}
+                            onChange={(e) => setSubSearch(e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        </div>
+                        <Dropdown.Item onClick={() => { setPrestadorData({...prestadorData, subcategoria: ""}); setShowSubDropdown(false); }}>
+                          <em>Nenhuma</em>
+                        </Dropdown.Item>
+                        {filteredSubcategorias.length === 0 ? (
+                          <Dropdown.Item disabled className="text-muted text-center py-2">Nenhuma encontrada</Dropdown.Item>
+                        ) : (
+                          filteredSubcategorias.map(sub => (
+                            <Dropdown.Item 
+                              key={sub} 
+                              active={prestadorData.subcategoria === sub}
+                              onClick={() => {
+                                setPrestadorData({...prestadorData, subcategoria: sub});
+                                setSubSearch("");
+                                setShowSubDropdown(false);
+                              }}
+                            >
+                              {sub}
+                            </Dropdown.Item>
+                          ))
+                        )}
+                      </Dropdown.Menu>
+                    </Dropdown>
+                    <Button variant="outline-primary" onClick={() => setShowNewSubcategoria(true)} style={{ zIndex: 5 }}>+</Button>
+                  </InputGroup>
+                </Form.Group>
+              </Col>
               <Col md={4}><Form.Group><Form.Label>Porte da Empresa</Form.Label>
                 <Form.Select value={prestadorData.porte_empresa || ''} onChange={e => setPrestadorData({...prestadorData, porte_empresa: e.target.value})}>
                   <option value="">Selecione...</option><option value="MEI">MEI</option><option value="Microempresa (ME)">Microempresa (ME)</option><option value="Pequeno Porte (EPP)">Pequeno Porte (EPP)</option><option value="Médio/Grande">Médio/Grande</option>
@@ -122,6 +273,45 @@ export default function ModalPrestador({ show, onHide, prestadorData, setPrestad
         <Button variant="secondary" onClick={onHide}>Cancelar</Button>
         <Button variant="primary" onClick={onSave} disabled={!prestadorData.nome_fantasia || !prestadorData.razao_social}>Salvar Prestador</Button>
       </Modal.Footer>
+
+      {/* QUICK MODALS PARA ESPECIALIDADE E SUBCATEGORIA */}
+      <Modal show={showNewEspecialidade} onHide={() => setShowNewEspecialidade(false)} centered size="sm" style={{ zIndex: 1060 }}>
+        <Modal.Header closeButton><Modal.Title className="h6 fw-bold">Nova Especialidade</Modal.Title></Modal.Header>
+        <Modal.Body>
+          <Form.Group>
+            <Form.Label>Nome da Especialidade</Form.Label>
+            <Form.Control 
+              type="text" 
+              value={newEspName} 
+              onChange={e => setNewEspName(e.target.value)} 
+              placeholder="Ex: Climatização"
+            />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" size="sm" onClick={() => setShowNewEspecialidade(false)}>Cancelar</Button>
+          <Button variant="primary" size="sm" onClick={handleAddEspecialidade}>Adicionar</Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showNewSubcategoria} onHide={() => setShowNewSubcategoria(false)} centered size="sm" style={{ zIndex: 1060 }}>
+        <Modal.Header closeButton><Modal.Title className="h6 fw-bold">Nova Subcategoria</Modal.Title></Modal.Header>
+        <Modal.Body>
+          <Form.Group>
+            <Form.Label>Nome da Subcategoria</Form.Label>
+            <Form.Control 
+              type="text" 
+              value={newSubName} 
+              onChange={e => setNewSubName(e.target.value)} 
+              placeholder="Ex: Limpeza de dutos"
+            />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" size="sm" onClick={() => setShowNewSubcategoria(false)}>Cancelar</Button>
+          <Button variant="primary" size="sm" onClick={handleAddSubcategoria}>Adicionar</Button>
+        </Modal.Footer>
+      </Modal>
     </Modal>
   );
 }

@@ -59,9 +59,11 @@ import Frota from "./features/fleet-management/pages/Frota.jsx"; // Ajustado par
 // ==========================================
 // MÓDULO FACILITIES
 // ==========================================
-/*import FacilitiesPage from "./features/facilities/pages/Facilities.jsx"; // Movido e renomeado
-import GestaoObrasPage from "./features/facilities/pages/GestaoObras.jsx"; // Renomeado*/
+/*import FacilitiesPage from "./features/facilities/pages/Facilities.jsx"; // Movido e renomeado*/
 import FacilitiesHubPage from "./features/facilities/pages/FacilitiesHubPage";
+import UserReservaVeiculos from "./features/facilities/pages/UserReservaVeiculos.jsx";
+import UserMultas from "./features/facilities/pages/UserMultas.jsx";
+import GestaoObras from "./features/facilities/pages/GestaoObras.jsx";
 
 // ==========================================
 // MÓDULO MARKETING
@@ -306,6 +308,9 @@ function App() {
               {/*<Route path="/facilities" element={<FacilitiesPage />} />
             <Route path="/facilities/gestao-obras" element={<GestaoObrasPage />} />*/}
               <Route path="/facilities" element={<FacilitiesHubPage />} />
+              <Route path="/facilities/reserva-veiculos" element={<UserReservaVeiculos />} />
+              <Route path="/facilities/minhas-multas" element={<UserMultas />} />
+              <Route path="/facilities/minhas-obras" element={<GestaoObras onlyMyProjects={true} />} />
               {/* ROTAS MARKETING */}
               <Route
                 path="/marketing"

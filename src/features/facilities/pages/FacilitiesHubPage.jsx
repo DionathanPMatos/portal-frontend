@@ -6,6 +6,7 @@ import FacilitiesDashboard from './FacilitiesDashboard';
 import Facilities from './Facilities'; // Assumindo que este é o componente de Equipamentos
 import GestaoObras from './GestaoObras'; // Assumindo que este é o componente de Obras
 import Frota from '../../fleet-management/pages/Frota'; // 🚀 Importa o componente de Frota
+import Fornecedores from './Fornecedores';
 
 
 const PlaceholderTab = ({ title }) => (
@@ -41,7 +42,7 @@ const FacilitiesHubPage = () => {
                 <Tab eventKey="manutencoes" title={<><FaWrench className="me-2" />Serviços e Manutenções</>}><PlaceholderTab title="Ordens de Serviço" /></Tab>
                 <Tab eventKey="solicitacoes" title={<><FaClipboardList className="me-2" />Solicitações</>}><PlaceholderTab title="Central de Solicitações" /></Tab>
                 <Tab eventKey="contratos" title={<><FaFileSignature className="me-2" />Contratos</>}><PlaceholderTab title="Gestão de Contratos" /></Tab>
-                <Tab eventKey="fornecedores" title={<><FaHandshake className="me-2" />Fornecedores</>}><PlaceholderTab title="Gestão de Fornecedores" /></Tab>
+                <Tab eventKey="fornecedores" title={<><FaHandshake className="me-2" />Fornecedores</>}><Fornecedores /></Tab>
                 <Tab eventKey="relatorios" title={<><FaChartBar className="me-2" />Relatórios</>}><PlaceholderTab title="Relatórios de Facilities" /></Tab>
             </Tabs>
         </div>
