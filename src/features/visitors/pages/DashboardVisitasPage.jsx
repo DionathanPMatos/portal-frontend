@@ -60,35 +60,27 @@ export default function DashboardVisitasPage() { // Renomeado
                 </div>
             </div>
             <Row className="mb-4">
-                <Col md={3}>
+                <Col md={4}>
                     <Card className="text-center shadow-sm border-0 border-start border-4 border-primary">
                         <Card.Body>
-                            <h6 className="text-muted">Total Solicitadas</h6>
+                            <h6 className="text-muted">Total de Visitas</h6>
                             <h3 className="mb-0 fw-bold">{metrics.kpis?.total_visitas || 0}</h3>
                         </Card.Body>
                     </Card>
                 </Col>
-                <Col md={3}>
+                <Col md={4}>
                     <Card className="text-center shadow-sm border-0 border-start border-4 border-warning">
                         <Card.Body>
-                            <h6 className="text-muted">Pendentes</h6>
+                            <h6 className="text-muted">Agendadas (Sem Feedback)</h6>
                             <h3 className="mb-0 fw-bold">{metrics.kpis?.pendentes || 0}</h3>
                         </Card.Body>
                     </Card>
                 </Col>
-                <Col md={3}>
+                <Col md={4}>
                     <Card className="text-center shadow-sm border-0 border-start border-4 border-success">
                         <Card.Body>
-                            <h6 className="text-muted">Autorizadas</h6>
+                            <h6 className="text-muted">Realizadas (Com Feedback)</h6>
                             <h3 className="mb-0 fw-bold">{metrics.kpis?.autorizadas || 0}</h3>
-                        </Card.Body>
-                    </Card>
-                </Col>
-                <Col md={3}>
-                    <Card className="text-center shadow-sm border-0 border-start border-4 border-danger">
-                        <Card.Body>
-                            <h6 className="text-muted">Recusadas</h6>
-                            <h3 className="mb-0 fw-bold">{metrics.kpis?.recusadas || 0}</h3>
                         </Card.Body>
                     </Card>
                 </Col>
@@ -96,7 +88,7 @@ export default function DashboardVisitasPage() { // Renomeado
 
             <Card className="shadow-sm">
                 <Card.Body>
-                    <h5>Visitas Autorizadas por Vendedor</h5>
+                    <h5>Visitas por Vendedor</h5>
                     {metrics.ranking && metrics.ranking.length > 0 ? (
                         <div style={{ width: '100%', height: Math.max(300, metrics.ranking.length * 50) }}>
                             <ResponsiveContainer>

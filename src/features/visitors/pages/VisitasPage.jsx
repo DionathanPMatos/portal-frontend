@@ -35,7 +35,7 @@ export default function VisitasPage({ user }) { // Renomeado
                                         <PainelGestorPage />
                                     </Tab>
                                 )}
-                                <Tab eventKey="minhas-visitas" title="Minhas Visitas">
+                                <Tab eventKey="minhas-visitas" title="Agenda e Visitas">
                                     <PainelVendedorPage />
                                 </Tab>
                             </Tabs>
