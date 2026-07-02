@@ -18,6 +18,8 @@ import {
   Badge,
 } from "react-bootstrap";
 import apiClient from "../../../../services/api";
+import ClienteFormModal from "./ClienteFormModal";
+import { FaUser } from "react-icons/fa";
 
 const onlyDigits = (v = "") => String(v ?? "").replace(/\D/g, "");
 const formatDateBR = (iso) => {
@@ -83,167 +85,7 @@ const getStatusVariant = (status) => {
   return "secondary";
 };
 
-function ClienteEditModal({ show, onHide, value, onSaved }) {
-  const [saving, setSaving] = useState(false);
-  const [err, setErr] = useState("");
-  const [data, setData] = useState(emptyCliente);
 
-  useEffect(() => {
-    setErr("");
-    setData({ ...emptyCliente, ...(value || {}) });
-  }, [value, show]);
-
-  const setField = (k, v) => setData((s) => ({ ...s, [k]: v }));
-
-  const handleSave = async () => {
-    setErr("");
-    setSaving(true);
-    try {
-      const payload = {
-        ...data,
-        cnpj_cpf: onlyDigits(data.cnpj_cpf),
-        cnpj_matriz: onlyDigits(data.cnpj_matriz),
-        cep: onlyDigits(data.cep),
-        uf: String(data.uf || "").toUpperCase().slice(0, 2),
-      };
-
-      if (!payload.nome_cliente?.trim()) {
-        setErr("O campo 'Nome do Cliente' é obrigatório.");
-        setSaving(false);
-        return;
-      }
-
-      await apiClient.put(`/api/clientes/${value.id}`, payload);
-      onSaved?.();
-      onHide?.();
-    } catch (e) {
-      console.error(e);
-      setErr("Falha ao salvar cliente.");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  return (
-    <Modal show={show} onHide={onHide} size="lg" centered backdrop="static">
-      <Modal.Header closeButton>
-        <Modal.Title>Editar Cliente</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        {err && <Alert variant="danger">{err}</Alert>}
-        <Row className="g-3">
-          <Col md={6}>
-            <Form.Group>
-              <Form.Label>Nome do Cliente (lista)</Form.Label>
-              <Form.Control
-                value={data.nome_cliente || ""}
-                onChange={(e) => setField("nome_cliente", e.target.value)}
-              />
-            </Form.Group>
-          </Col>
-
-          <Col md={6}>
-            <Form.Group>
-              <Form.Label>CNPJ/CPF</Form.Label>
-              <Form.Control
-                value={data.cnpj_cpf || ""}
-                onChange={(e) => setField("cnpj_cpf", e.target.value)}
-              />
-            </Form.Group>
-          </Col>
-
-          <Col md={6}>
-            <Form.Group>
-              <Form.Label>Razão Social</Form.Label>
-              <Form.Control
-                value={data.razao_social || ""}
-                onChange={(e) => setField("razao_social", e.target.value)}
-              />
-            </Form.Group>
-          </Col>
-
-          <Col md={6}>
-            <Form.Group>
-              <Form.Label>Nome Fantasia</Form.Label>
-              <Form.Control
-                value={data.nome_fantasia || ""}
-                onChange={(e) => setField("nome_fantasia", e.target.value)}
-              />
-            </Form.Group>
-          </Col>
-
-          <Col md={6}>
-            <Form.Group>
-              <Form.Label>Segmento</Form.Label>
-              <Form.Control
-                value={data.segmento || ""}
-                onChange={(e) => setField("segmento", e.target.value)}
-                placeholder="Ex: Energia, Data Center, Indústria..."
-              />
-            </Form.Group>
-          </Col>
-
-          <Col md={6}>
-            <Form.Group>
-              <Form.Label>Perfil</Form.Label>
-              <Form.Select
-                value={data.perfil || ""}
-                onChange={(e) => setField("perfil", e.target.value)}
-              >
-                <option value="">Selecione</option>
-                <option value="Cliente Final">Cliente Final</option>
-                <option value="Distribuidor">Distribuidor</option>
-                <option value="Integrador">Integrador</option>
-                <option value="Revenda">Revenda</option>
-                <option value="Fabricante">Fabricante</option>
-              </Form.Select>
-            </Form.Group>
-          </Col>
-
-          <Col md={6}>
-            <Form.Group>
-              <Form.Label>Site</Form.Label>
-              <Form.Control
-                value={data.site || ""}
-                onChange={(e) => setField("site", e.target.value)}
-              />
-            </Form.Group>
-          </Col>
-
-          <Col md={6}>
-            <Form.Group>
-              <Form.Label>Inscrição Estadual</Form.Label>
-              <Form.Control
-                value={data.inscricao_estadual || ""}
-                onChange={(e) => setField("inscricao_estadual", e.target.value)}
-              />
-            </Form.Group>
-          </Col>
-
-          <Col md={12}>
-            <Form.Group>
-              <Form.Label>Observações</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={3}
-                value={data.observacoes || ""}
-                onChange={(e) => setField("observacoes", e.target.value)}
-              />
-            </Form.Group>
-          </Col>
-        </Row>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onHide} disabled={saving}>
-          Cancelar
-        </Button>
-        <Button variant="primary" onClick={handleSave} disabled={saving}>
-          {saving ? "Salvando..." : "Salvar"}
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
-}
 
 function ContatoModal({ show, onHide, value, clienteId, onSaved }) {
   const isEdit = Boolean(value?.id);
@@ -840,50 +682,41 @@ export default function ClienteDetalhe() {
   }
 
   return (
-    <Container className="mt-4">
-      <Breadcrumb>
-        <Breadcrumb.Item linkAs={Link} linkProps={{ to: "/crm" }}>
-          CRM
-        </Breadcrumb.Item>
-        <Breadcrumb.Item linkAs={Link} linkProps={{ to: "/crm/clientes" }}>
-          Clientes
-        </Breadcrumb.Item>
-        <Breadcrumb.Item active>{cliente?.nome_cliente || "Detalhes"}</Breadcrumb.Item>
-      </Breadcrumb>
+    <div className="container-main p-4">
+      <div className="page-header-colored mb-4">
+        <div className="page-header-title-wrapper d-flex justify-content-between align-items-center w-100 flex-wrap gap-3">
+          <div>
+            <h2 className="page-header-title d-flex align-items-center gap-3">
+              <FaUser /> {cliente?.nome_cliente || "Detalhes do Cliente"}
+              {cliente?.tier_estrategico && (
+                <Badge bg="info" className="fs-6">{cliente.tier_estrategico}</Badge>
+              )}
+              {cliente?.status_credito && (
+                <Badge bg={getStatusVariant(cliente.status_credito)} className="fs-6">{cliente.status_credito}</Badge>
+              )}
+            </h2>
+            <p className="page-header-subtitle">
+              Criado em: {formatDateBR(cliente?.created_at)} • Atualizado: {formatDateBR(cliente?.updated_at)}
+            </p>
+          </div>
+          <div className="d-flex gap-2">
+            <Button variant="light" onClick={() => navigate("/crm/clientes")}>
+              Voltar
+            </Button>
+            <Button variant="primary" onClick={() => setShowEdit(true)}>
+              Editar Cliente
+            </Button>
+            <Button variant="danger" onClick={handleInativar}>
+              Inativar
+            </Button>
+          </div>
+        </div>
+      </div>
 
       {err && <Alert variant="danger">{err}</Alert>}
       {success && <Alert variant="success">{success}</Alert>}
 
-      <Row className="align-items-center mb-3">
-        <Col>
-          <h4 className="mb-0">
-            {headerTitle}
-            {cliente.tier_estrategico && (
-              <Badge bg="info" className="ms-2">{cliente.tier_estrategico}</Badge>
-            )}
-            {cliente.status_credito && (
-              <Badge bg={getStatusVariant(cliente.status_credito)} className="ms-2">{cliente.status_credito}</Badge>
-            )}
-          </h4>
-          <div className="text-muted">
-            Criado em: {formatDateBR(cliente.created_at)} • Atualizado:{" "}
-            {formatDateBR(cliente.updated_at)}
-          </div>
-        </Col>
-        <Col className="text-end">
-          <Button variant="outline-secondary" className="me-2" onClick={() => navigate("/crm/clientes")}>
-            Voltar
-          </Button>
-          <Button variant="outline-primary" className="me-2" onClick={() => setShowEdit(true)}>
-            Editar Cliente
-          </Button>
-          <Button variant="outline-danger" onClick={handleInativar}>
-            Inativar
-          </Button>
-        </Col>
-      </Row>
-
-      <Card>
+      <Card className="shadow-sm border-0">
         <Card.Body>
           <Tabs defaultActiveKey="dados" className="mb-3" mountOnEnter unmountOnExit>
             <Tab eventKey="dados" title="Dados">
@@ -1314,10 +1147,10 @@ export default function ClienteDetalhe() {
         </Card.Body>
       </Card>
 
-      <ClienteEditModal
+      <ClienteFormModal
         show={showEdit}
         onHide={() => setShowEdit(false)}
-        value={cliente}
+        initialValue={cliente}
         onSaved={() => {
           setSuccess("Cliente atualizado.");
           fetchAll();
@@ -1348,6 +1181,6 @@ export default function ClienteDetalhe() {
           setTimeout(() => setSuccess(""), 2500);
         }}
       />
-    </Container>
+    </div>
   );
 }

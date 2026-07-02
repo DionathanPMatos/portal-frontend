@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Table, Form, Modal, Badge, InputGroup, ListGroup, Offcanvas, Row, Col } from 'react-bootstrap';
+import { Card, Button, Table, Form, Modal, Badge, InputGroup, ListGroup, Offcanvas, Row, Col, Tabs, Tab } from 'react-bootstrap';
 import { 
   FaCalendarAlt, 
   FaMapMarkerAlt, 
@@ -12,10 +12,26 @@ import {
   FaTimes,
   FaClipboardList
 } from 'react-icons/fa';
+import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { format, parse, startOfWeek, getDay } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import apiClient from '../../../services/api'; // Importa a instância configurada do Axios
 import ClienteFormModal from '../../commercial/pages/Clients/ClienteFormModal';
 
-export default function PainelVendedorPage() {
+const locales = {
+  'pt-BR': ptBR,
+};
+
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  locales,
+});
+
+export default function PainelVendedorPage({ user }) {
     const [visitas, setVisitas] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [showFeedbackModal, setShowFeedbackModal] = useState(false);
@@ -68,7 +84,7 @@ export default function PainelVendedorPage() {
 
     const carregarVisitas = async () => {
         try {
-            const { data } = await apiClient.get('/api/visitas');
+            const { data } = await apiClient.get('/api/visitas?minhas=true');
             setVisitas(data);
         } catch (error) {
             console.error(error);
@@ -178,142 +194,198 @@ export default function PainelVendedorPage() {
         "PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"
     ];
 
+    const events = filteredVisitas.map(v => {
+        const dateParts = v.data_visita.split('-');
+        const start = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+        const end = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]), 23, 59, 59);
+        return {
+            id: v.id,
+            title: `${v.nome_cliente} (${v.vendedor_nome || 'N/A'})`,
+            start,
+            end,
+            allDay: true,
+            resource: v
+        };
+    });
+
     return (
         <div>
-            {/* Próximos Agendamentos */}
-            <div className="mb-4">
-                <h5 className="fw-bold mb-3 d-flex align-items-center gap-2 text-dark">
-                    <FaCalendarAlt className="text-primary" /> Próximos Agendamentos
-                </h5>
-                <Row className="g-3">
-                    {proximosAgendamentos.map(v => (
-                        <Col key={v.id} md={3}>
-                            <Card className="h-100 border-0 shadow-sm card-hover-effect" style={{
-                                background: 'rgba(255, 255, 255, 0.9)',
-                                backdropFilter: 'blur(10px)',
-                                borderTop: '4px solid #0d6efd'
-                            }}>
-                                <Card.Body className="d-flex flex-column justify-content-between p-3">
-                                    <div>
-                                        <div className="d-flex justify-content-between align-items-start mb-2">
-                                            <span className="text-primary fw-bold small">
-                                                {new Date(v.data_visita).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}
-                                            </span>
-                                            <Badge bg="primary" size="sm">Agendada</Badge>
-                                        </div>
-                                        <h6 className="fw-bold text-dark mb-1 text-truncate" title={v.nome_cliente}>
-                                            {v.nome_cliente}
-                                        </h6>
-                                        <p className="text-muted small mb-2 d-flex align-items-center gap-1">
-                                            <FaMapMarkerAlt className="text-danger" size={12} />
-                                            {v.cliente_cidade && v.cliente_uf ? `${v.cliente_cidade}/${v.cliente_uf}` : 'Sem localidade'}
-                                        </p>
-                                        <p className="text-secondary small mb-3 text-truncate-2" title={v.justificativa_objetivo}>
-                                            {v.justificativa_objetivo}
-                                        </p>
-                                    </div>
-                                    <Button 
-                                        variant="outline-primary" 
-                                        size="sm" 
-                                        className="w-100 mt-auto d-flex align-items-center justify-content-center gap-1"
-                                        onClick={() => { 
-                                            setFeedbackVisita({ id: v.id, feedback: '', requerRetorno: false, dataRetorno: '' }); 
-                                            setShowFeedbackModal(true); 
-                                        }}
-                                    >
-                                        <FaClipboardList size={12} /> Registrar Visita
-                                    </Button>
-                                </Card.Body>
-                            </Card>
-                        </Col>
-                    ))}
-                    {proximosAgendamentos.length === 0 && (
-                        <Col md={12}>
-                            <Card className="border-0 shadow-sm bg-light">
-                                <Card.Body className="text-center py-4 text-muted">
-                                    Nenhum agendamento futuro pendente. Agende novas visitas abaixo.
-                                </Card.Body>
-                            </Card>
-                        </Col>
-                    )}
-                </Row>
-            </div>
-
-            {/* Controle da Lista */}
-            <div className="d-flex justify-content-between align-items-center mb-3 mt-4">
-                <h5 className="fw-bold text-dark mb-0">Todas as Visitas</h5>
-                <div className="d-flex gap-2">
-                    <Button variant="outline-secondary" className="d-flex align-items-center gap-1" onClick={() => setShowFilterSidebar(true)}>
-                        <FaFilter size={14} /> Filtrar
-                    </Button>
-                    <Button variant="primary" className="d-flex align-items-center gap-1" onClick={() => setShowModal(true)}>
-                        <FaPlus size={12} /> Novo Agendamento
-                    </Button>
-                </div>
-            </div>
-
-            {/* Tabela de Visitas */}
-            <Card className="shadow-sm border-0">
-                <Card.Body className="p-0">
-                    <Table hover responsive className="mb-0 align-middle">
-                        <thead className="bg-light">
-                            <tr>
-                                <th className="px-4 py-3">Data</th>
-                                <th className="py-3">Cliente</th>
-                                <th className="py-3">Localidade</th>
-                                <th className="py-3">Objetivo</th>
-                                <th className="py-3">Status</th>
-                                <th className="py-3">Retorno Previsto</th>
-                                <th className="px-4 py-3 text-end">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredVisitas.map(v => (
-                                <tr key={v.id}>
-                                    <td className="px-4 py-3 fw-semibold text-secondary">
-                                        {new Date(v.data_visita).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}
-                                    </td>
-                                    <td className="py-3 fw-bold text-dark">{v.nome_cliente}</td>
-                                    <td className="py-3 text-secondary">
-                                        {v.cliente_cidade && v.cliente_uf ? (
-                                            <span className="d-inline-flex align-items-center gap-1">
-                                                <FaMapMarkerAlt className="text-muted" size={12} />
-                                                {v.cliente_cidade}/{v.cliente_uf}
-                                            </span>
-                                        ) : (
-                                            <span className="text-muted">-</span>
-                                        )}
-                                    </td>
-                                    <td className="py-3 text-secondary" style={{ maxWidth: '250px' }}>
-                                        <div className="text-truncate" title={v.justificativa_objetivo}>
-                                            {v.justificativa_objetivo}
-                                        </div>
-                                    </td>
-                                    <td className="py-3">{getStatusBadge(v)}</td>
-                                    <td className="py-3 text-secondary">
-                                        {v.data_retorno ? new Date(v.data_retorno).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : (v.feedback_vendedor && !v.requer_retorno ? 'Não' : '-')}
-                                    </td>
-                                    <td className="px-4 py-3 text-end">
-                                        {!v.feedback_vendedor && (
-                                            <Button size="sm" variant="outline-info" onClick={() => { setFeedbackVisita({ id: v.id, feedback: '', requerRetorno: false, dataRetorno: '' }); setShowFeedbackModal(true); }}>
-                                                Registrar Visita
+            <Tabs defaultActiveKey="lista" className="mb-4">
+                <Tab eventKey="lista" title="Lista de Visitas">
+                    {/* Próximos Agendamentos */}
+                    <div className="mb-4 mt-3">
+                        <h5 className="fw-bold mb-3 d-flex align-items-center gap-2 text-dark">
+                            <FaCalendarAlt className="text-primary" /> Próximos Agendamentos
+                        </h5>
+                        <Row className="g-3">
+                            {proximosAgendamentos.map(v => (
+                                <Col key={v.id} md={3}>
+                                    <Card className="h-100 border-0 shadow-sm card-hover-effect" style={{
+                                        background: 'rgba(255, 255, 255, 0.9)',
+                                        backdropFilter: 'blur(10px)',
+                                        borderTop: '4px solid #0d6efd'
+                                    }}>
+                                        <Card.Body className="d-flex flex-column justify-content-between p-3">
+                                            <div>
+                                                <div className="d-flex justify-content-between align-items-start mb-2">
+                                                    <span className="text-primary fw-bold small">
+                                                        {new Date(v.data_visita).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}
+                                                    </span>
+                                                    <Badge bg="primary" size="sm">Agendada</Badge>
+                                                </div>
+                                                <h6 className="fw-bold text-dark mb-1 text-truncate" title={v.nome_cliente}>
+                                                    {v.nome_cliente}
+                                                </h6>
+                                                <p className="text-muted small mb-2 d-flex align-items-center gap-1">
+                                                    <FaMapMarkerAlt className="text-danger" size={12} />
+                                                    {v.cliente_cidade && v.cliente_uf ? `${v.cliente_cidade}/${v.cliente_uf}` : 'Sem localidade'}
+                                                </p>
+                                            </div>
+                                            <Button 
+                                                variant="outline-primary" 
+                                                size="sm" 
+                                                className="w-100 mt-auto d-flex align-items-center justify-content-center gap-1"
+                                                onClick={() => { 
+                                                    setFeedbackVisita({ id: v.id, feedback: '', requerRetorno: false, dataRetorno: '' }); 
+                                                    setShowFeedbackModal(true); 
+                                                }}
+                                            >
+                                                <FaClipboardList size={12} /> Registrar Visita
                                             </Button>
-                                        )}
-                                        {v.feedback_vendedor && <Badge bg="secondary" className="px-2 py-1">Concluída</Badge>}
-                                    </td>
-                                </tr>
+                                        </Card.Body>
+                                    </Card>
+                                </Col>
                             ))}
-                            {filteredVisitas.length === 0 && (
-                                <tr>
-                                    <td colSpan="7" className="text-center py-4 text-muted">
-                                        Nenhuma visita cadastrada ou encontrada com os filtros atuais.
-                                    </td>
-                                </tr>
+                            {proximosAgendamentos.length === 0 && (
+                                <Col md={12}>
+                                    <Card className="border-0 shadow-sm bg-light">
+                                        <Card.Body className="text-center py-4 text-muted">
+                                            Nenhum agendamento futuro pendente. Agende novas visitas abaixo.
+                                        </Card.Body>
+                                    </Card>
+                                </Col>
                             )}
-                        </tbody>
-                    </Table>
-                </Card.Body>
-            </Card>
+                        </Row>
+                    </div>
+
+                    {/* Controle da Lista */}
+                    <div className="d-flex justify-content-between align-items-center mb-3 mt-4">
+                        <h5 className="fw-bold text-dark mb-0">Todas as Visitas</h5>
+                        <div className="d-flex gap-2">
+                            <Button variant="outline-secondary" className="d-flex align-items-center gap-1" onClick={() => setShowFilterSidebar(true)}>
+                                <FaFilter size={14} /> Filtrar
+                            </Button>
+                            <Button variant="primary" className="d-flex align-items-center gap-1" onClick={() => setShowModal(true)}>
+                                <FaPlus size={12} /> Novo Agendamento
+                            </Button>
+                        </div>
+                    </div>
+
+                    {/* Tabela de Visitas */}
+                    <Card className="shadow-sm border-0">
+                        <Card.Body className="p-0">
+                            <Table hover responsive className="mb-0 align-middle">
+                                <thead className="bg-light">
+                                    <tr>
+                                        <th className="px-4 py-3">Data</th>
+                                        <th className="py-3">Cliente</th>
+                                        <th className="py-3">Localidade</th>
+                                        <th className="py-3">Cadastrado Por</th>
+                                        <th className="py-3">Status</th>
+                                        <th className="py-3">Retorno Previsto</th>
+                                        <th className="px-4 py-3 text-end">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredVisitas.map(v => (
+                                        <tr key={v.id}>
+                                            <td className="px-4 py-3 fw-semibold text-secondary">
+                                                {new Date(v.data_visita).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}
+                                            </td>
+                                            <td className="py-3 fw-bold text-dark">{v.nome_cliente}</td>
+                                            <td className="py-3 text-secondary">
+                                                {v.cliente_cidade && v.cliente_uf ? (
+                                                    <span className="d-inline-flex align-items-center gap-1">
+                                                        <FaMapMarkerAlt className="text-muted" size={12} />
+                                                        {v.cliente_cidade}/{v.cliente_uf}
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-muted">-</span>
+                                                )}
+                                            </td>
+                                            <td className="py-3 text-secondary">
+                                                {v.vendedor_nome || 'N/A'}
+                                            </td>
+                                            <td className="py-3">{getStatusBadge(v)}</td>
+                                            <td className="py-3 text-secondary">
+                                                {v.data_retorno ? new Date(v.data_retorno).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : (v.feedback_vendedor && !v.requer_retorno ? 'Não' : '-')}
+                                            </td>
+                                            <td className="px-4 py-3 text-end">
+                                                {!v.feedback_vendedor && (
+                                                    <Button size="sm" variant="outline-info" onClick={() => { setFeedbackVisita({ id: v.id, feedback: '', requerRetorno: false, dataRetorno: '' }); setShowFeedbackModal(true); }}>
+                                                        Registrar Visita
+                                                    </Button>
+                                                )}
+                                                {v.feedback_vendedor && <Badge bg="secondary" className="px-2 py-1">Concluída</Badge>}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    {filteredVisitas.length === 0 && (
+                                        <tr>
+                                            <td colSpan="7" className="text-center py-4 text-muted">
+                                                Nenhuma visita cadastrada ou encontrada com os filtros atuais.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </Table>
+                        </Card.Body>
+                    </Card>
+                </Tab>
+
+                <Tab eventKey="calendario" title="Visualização em Calendário">
+                    <Card className="border-0 shadow-sm mt-3">
+                        <Card.Body>
+                            <Calendar
+                                localizer={localizer}
+                                events={events}
+                                startAccessor="start"
+                                endAccessor="end"
+                                style={{ height: 600 }}
+                                messages={{
+                                    next: "Próximo",
+                                    previous: "Anterior",
+                                    today: "Hoje",
+                                    month: "Mês",
+                                    week: "Semana",
+                                    day: "Dia",
+                                    agenda: "Agenda"
+                                }}
+                                onSelectEvent={(event) => {
+                                    const v = event.resource;
+                                    if (!v.feedback_vendedor) {
+                                        setFeedbackVisita({ id: v.id, feedback: '', requerRetorno: false, dataRetorno: '' });
+                                        setShowFeedbackModal(true);
+                                    }
+                                }}
+                                eventPropGetter={(event) => {
+                                    const v = event.resource;
+                                    const isCompleted = !!v.feedback_vendedor;
+                                    return {
+                                        style: {
+                                            backgroundColor: isCompleted ? '#198754' : '#0d6efd',
+                                            color: '#ffffff',
+                                            borderRadius: '4px',
+                                            border: 'none',
+                                            cursor: !isCompleted ? 'pointer' : 'default'
+                                        }
+                                    };
+                                }}
+                            />
+                        </Card.Body>
+                    </Card>
+                </Tab>
+            </Tabs>
 
             {/* Offcanvas Filtros */}
             <Offcanvas show={showFilterSidebar} onHide={() => setShowFilterSidebar(false)} placement="end">

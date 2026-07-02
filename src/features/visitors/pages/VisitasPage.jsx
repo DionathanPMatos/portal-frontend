@@ -3,6 +3,7 @@ import { Container, Row, Col, Card, Tabs, Tab } from 'react-bootstrap';
 import PainelVendedorPage from './PainelVendedorPage'; // Renomeado
 import PainelGestorPage from './PainelGestorPage'; // Renomeado
 import DashboardVisitasPage from './DashboardVisitasPage'; // Renomeado
+import MapaClientesPage from './MapaClientesPage';
 import { FaMapMarkedAlt } from 'react-icons/fa';
 import '../../../styles/App.css'; // Caminho ajustado para o CSS global
 
@@ -24,7 +25,7 @@ export default function VisitasPage({ user }) { // Renomeado
             <Card className="shadow-sm border-0 mb-4">
                 <Card.Body>
 
-                            <Tabs defaultActiveKey={isManager ? "dashboard" : "minhas-visitas"} className="mb-4">
+                            <Tabs defaultActiveKey={isManager ? "dashboard" : "minhas-visitas"} className="mb-4" mountOnEnter>
                                 {isManager && (
                                     <Tab eventKey="dashboard" title="Dashboard">
                                         <DashboardVisitasPage />
@@ -36,7 +37,10 @@ export default function VisitasPage({ user }) { // Renomeado
                                     </Tab>
                                 )}
                                 <Tab eventKey="minhas-visitas" title="Agenda e Visitas">
-                                    <PainelVendedorPage />
+                                    <PainelVendedorPage user={user} />
+                                </Tab>
+                                <Tab eventKey="mapa" title="Mapa de Clientes">
+                                    <MapaClientesPage user={user} />
                                 </Tab>
                             </Tabs>
                         </Card.Body>

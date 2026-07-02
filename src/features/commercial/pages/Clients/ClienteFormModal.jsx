@@ -57,9 +57,26 @@ export default function ClienteFormModal({ show, onHide, initialValue, onSaved }
 
   useEffect(() => {
     setErr("");
-    setData({ ...emptyCliente, ...(initialValue || {}) });
-    setContatosList([]);
     setNovoContato({ nome: "", contato: "", cargo: "", email: "" });
+
+    if (show && initialValue?.id) {
+      setBusyLookup(true);
+      apiClient.get(`/api/clientes/${initialValue.id}`)
+        .then((res) => {
+          setData({ ...emptyCliente, ...(res.data?.cliente || res.data || {}) });
+        })
+        .catch((e) => {
+          console.error("Erro ao buscar dados do cliente para edição:", e);
+          setErr("Falha ao carregar os dados do cliente.");
+          setData({ ...emptyCliente, ...initialValue });
+        })
+        .finally(() => {
+          setBusyLookup(false);
+        });
+    } else {
+      setData({ ...emptyCliente, ...(initialValue || {}) });
+      setContatosList([]);
+    }
   }, [initialValue, show]);
 
   // Carrega segmentos
